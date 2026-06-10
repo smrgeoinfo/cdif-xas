@@ -1,0 +1,16 @@
+services:
+  api:
+    build: .
+    container_name: ${CONTAINER}
+    ports:
+      - "${PORT}:80"
+    volumes:
+      - ./api:/app/api
+      - ../n8n-compose/local-files:/files
+    networks:
+      - dv
+
+networks:
+  dv:
+    external: true
+    name: dataverse

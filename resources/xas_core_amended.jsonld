@@ -1,0 +1,49 @@
+{
+  "@context": {
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "xas": "http://ddialliance.org/Specification/XAS/"
+  },
+  "@graph": [
+    {
+      "@id": "xas:Facility",
+      "skos:prefLabel": "Facility",
+      "skos:definition": "Tags related to the synchrotron or other facility at which the measurement was made"
+    },
+    {
+      "@id": "xas:Beamline",
+      "skos:prefLabel": "Beamline",
+      "skos:definition": "Tags related to the structure of the beamline and its photon delivery system"
+    },
+    {
+      "@id": "xas:Mono",
+      "skos:prefLabel": "Mono",
+      "skos:definition": "Tags related to the monochromator"
+    },
+    {
+      "@id": "xas:Detector",
+      "skos:prefLabel": "Detector",
+      "skos:definition": "Tags related to the details of the photon detection system"
+    },
+    {
+      "@id": "xas:Sample",
+      "skos:prefLabel": "Sample",
+      "skos:definition": "Tags related to the details of sample preparation and measurement"
+    },
+    {
+      "@id": "xas:Scan",
+      "skos:prefLabel": "Scan",
+      "skos:definition": "Tags related to the parameters of the scan"
+    },
+    {
+      "@id": "xas:Element",
+      "skos:prefLabel": "Element",
+      "skos:definition": "Tags related to the absorbing atom"
+    },
+    {
+      "@id": "xas:Column",
+      "skos:prefLabel": "Column",
+      "skos:definition": "Tags used for identifying the data columns and their units"
+    }
+  ]
+}
+

@@ -1,0 +1,13 @@
+[project]
+name = "cdif-xas"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi[standard]>=0.136.3",
+    "jsonschema>=4.26.0",
+    "pyld>=3.0.0",
+    "rdflib>=7.6.0",
+    "requests>=2.34.2",
+]

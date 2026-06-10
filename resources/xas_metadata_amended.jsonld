@@ -1,0 +1,245 @@
+{
+    "@context": {
+        "skos": "http://www.w3.org/2004/02/skos/core#",
+        "xas": "http://ddialliance.org/Specification/XAS/"
+    },
+    "@graph": [
+        {
+            "@id": "xas:Facility.name",
+            "skos:prefLabel": "Facility.name",
+            "skos:definition": "The name of synchrotron or other X-ray facility. This is recommended for use in all XDI files.",
+            "xas:units": "none",
+            "xas:format": "string"
+        },
+        {
+            "@id": "xas:Facility.energy",
+            "skos:prefLabel": "Facility.energy",
+            "skos:definition": "The energy of the stored current in the storage ring.",
+            "xas:units": [
+                "GeV",
+                "MeV"
+            ],
+            "xas:format": "float + units"
+        },
+        {
+            "@id": "xas:Facility.current",
+            "skos:prefLabel": "Facility.current",
+            "skos:definition": "The amount of stored current in the storage ring at the beginning of the scan.",
+            "xas:units": [
+                "mA",
+                "A"
+            ],
+            "xas:format": "float + units"
+        },
+        {
+            "@id": "xas:Facility.xray_source",
+            "skos:prefLabel": "Facility.xray_source",
+            "skos:definition": "A string identifying the source of the X-rays, such as 'bend magnet', 'undulator', or 'rotating copper anode'.",
+            "xas:units": "none",
+            "xas:format": "string"
+        },
+        {
+            "@id": "xas:Beamline.name",
+            "skos:prefLabel": "Beamline.name",
+            "skos:definition": "The name by which the beamline is known. For a beamline with a facility designation and a common name, the designation is preferred.",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Beamline.collimation",
+            "skos:prefLabel": "Beamline.collimation",
+            "skos:definition": "A concise statement of how beam collimation is provided",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Beamline.focusing",
+            "skos:prefLabel": "Beamline.focusing",
+            "skos:definition": "A concise statement about how beam focusing is provided",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Beamline.harmonic_rejection",
+            "skos:prefLabel": "Beamline.harmonic_rejection",
+            "skos:definition": "A concise statement about how harmonic rejection is accomplished",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Mono.name",
+            "skos:prefLabel": "Mono.name",
+            "skos:definition": "A string identifying the material and diffracting plane or grating spacing of the monochromator",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Mono.d_spacing",
+            "skos:prefLabel": "Mono.d_spacing",
+            "skos:definition": "The known d-spacing of the monochromator under operating conditions.",
+            "xas:units": "\u00c5",
+            "xas:format": "float"
+        },
+        {
+            "@id": "xas:Detector.i0",
+            "skos:prefLabel": "Detector.i0",
+            "skos:definition": "A description of how the incident flux was measured",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Detector.it",
+            "skos:prefLabel": "Detector.it",
+            "skos:definition": "A description of how the tranmission flux was measured",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Detector.if",
+            "skos:prefLabel": "Detector.if",
+            "skos:definition": "A description of how the fluorescence flux was measured",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Detector.ir",
+            "skos:prefLabel": "Detector.ir",
+            "skos:definition": "A description of how the reference flux was measured",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Sample.name",
+            "skos:prefLabel": "Sample.name",
+            "skos:definition": "A string identifying the measured sample",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Sample.id",
+            "skos:prefLabel": "Sample.id",
+            "skos:definition": "A number or string uniquely identifying the measured sample. This is intended for interoperation with a database or laboratory management software. It could be, for example, a bar code number.",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Sample.stoichiometry",
+            "skos:prefLabel": "Sample.stoichiometry",
+            "skos:definition": "The stoichiometric formula of the measured sample",
+            "xas:units": "none",
+            "xas:format": "http://www.iucr.org/__data/iucr/cifdic_html/1/cif_core.dic/Cchemical_formula.html"
+        },
+        {
+            "@id": "xas:Sample.prep",
+            "skos:prefLabel": "Sample.prep",
+            "skos:definition": "A string summarizing the method of sample preparation",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Sample.experimenters",
+            "skos:prefLabel": "Sample.experimenters",
+            "skos:definition": "The names of the experimenters present for the measurement",
+            "xas:units": "none",
+            "xas:format": "free-format string"
+        },
+        {
+            "@id": "xas:Sample.temperature",
+            "skos:prefLabel": "Sample.temperature",
+            "skos:definition": "The temperature at which the sample was measured",
+            "xas:units": "degrees K, degrees C",
+            "xas:format": "float + units"
+        },
+        {
+            "@id": "xas:Scan.start_time",
+            "skos:prefLabel": "Scan.start_time",
+            "skos:definition": "The beginning time of the scan. This is recommended for use with XDI.",
+            "xas:units": "time",
+            "xas:format": "http://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations"
+        },
+        {
+            "@id": "xas:Scan.end_time",
+            "skos:prefLabel": "Scan.end_time",
+            "skos:definition": "The ending time of the scan.",
+            "xas:units": "time",
+            "xas:format": "http://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations"
+        },
+        {
+            "@id": "xas:Scan.edge_energy",
+            "skos:prefLabel": "Scan.edge_energy",
+            "skos:definition": "The absorption edge as used in the data acquisition software.",
+            "xas:units": " eV, keV, inverse U+00C5",
+            "xas:format": "float + units"
+        },
+        {
+            "@id": "xas:Element.symbol",
+            "skos:prefLabel": "Element.symbol",
+            "skos:definition": "The measured absorption edge. One of the 118 standard atomic symbols.",
+            "xas:units": "none",
+            "xas:format": "atomic symbol (string)"
+        },
+        {
+            "@id": "xas:Element.edge",
+            "skos:prefLabel": "Element.edge",
+            "skos:definition": "The measured absorption edge. One of the standard edge labels (e.g., K, L3, M5).",
+            "xas:units": "none",
+            "xas:format": "edge label (string)"
+        },
+        {
+            "@id": "xas:Element.reference",
+            "skos:prefLabel": "Element.reference",
+            "skos:definition": "The absorption edge of the reference spectrum. This is a recommended parameter for use in an XDI file containing a reference spectrum.",
+            "xas:units": "none",
+            "xas:format": "atomic symbol (string)"
+        },
+        {
+            "@id": "xas:Element.ref_edge",
+            "skos:prefLabel": "Element.ref_edge",
+            "skos:definition": " The measured edge of the reference spectrum. This is a recommended parameter for use in an XDI file containing a reference spectrum.",
+            "xas:units": "none",
+            "xas:format": "edge label (string)"
+        },
+        {
+            "@id": "xas:Column.1",
+            "skos:prefLabel": "Column.1",
+            "skos:definition": "A description of the abscissa array for the measured data.",
+            "xas:units": [
+                "eV",
+                "keV",
+                "pixel",
+                "angle in degrees",
+                "angle in radians",
+                "steps"
+            ],
+            "xas:format": "word + units"
+        },
+        {
+            "@id": "xas:Column.N",
+            "skos:prefLabel": "Column.N",
+            "skos:definition": "A description of the Nth column (where N is an integer) of the measured data. This is recommended for use in an XDI file.",
+            "xas:units": "as needed",
+            "xas:format": "word + units"
+        },
+        {
+            "@id": "xas:Column.N.energy",
+            "skos:prefLabel": "energy",
+            "skos:definition": "mono energy",
+            "xas:units": ["eV", "keV", "pixel"],
+            "xas:format": "word + units"
+        },
+         {
+            "@id": "xas:Column.N.itrans",
+            "skos:prefLabel": "itrans",
+            "skos:definition": "transmission intensity",
+            "xas:units": [],
+            "xas:format": "word"
+        },
+         {
+            "@id": "xas:Column.N.i0",
+            "skos:prefLabel": "i0",
+            "skos:definition": "monitor intensity",
+            "xas:units": [],
+            "xas:format": "word"
+        }
+    ]
+}
