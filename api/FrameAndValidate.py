@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CDIF Discovery Profile JSON-LD Framing and Validation Script
+CDIF Data Description Profile JSON-LD Framing and Validation Script
 
 Supports both the original schema and the 2026 schema with DDI-CDI and CSVW extensions.
 
@@ -57,6 +57,21 @@ ARRAY_PROPERTIES = [
     'cdi:hasPhysicalMapping',
     'cdi:uses',
     'cdi:physicalDataType',
+    # CDIF Data Description array-valued properties (cdi:->cdif: migration 2026-05)
+    # NOTE: cdif:physicalDataType is NOT here -- it is dual-context (array on
+    # cdi:InstanceVariable, string on a physical mapping); handled below.
+    'cdif:hasPhysicalMapping',
+    'cdif:uses',
+    'cdi:function',
+    'cdi:takesSentinelValuesFrom',
+    'cdif:recommendedDataType',
+    'cdif:isComposedOf',
+    'cdif:statistics',
+    'cdif:has_Statistics',
+    'cdif:has_CategoryStatistics',
+    'cdif:appliesTo',
+    'cdif:indexedBy',
+    'cdi:statistic',
 ]
 
 # Properties that are arrays only in specific contexts (not globally).
@@ -182,6 +197,20 @@ def remove_nulls_and_normalize(obj, parent_key=None):
             if new_key in ARRAY_PROPERTIES and not isinstance(new_value, list):
                 new_value = [new_value]
 
+            # coerce the JSON-LD string to a native integer before validation
+            if (new_key == "cdi:arrayBase" or 
+                new_key == "cdif:index" or
+                new_key == "cdi:minimumLength" or
+                new_key == "cdi:maximumLength") and not isinstance(new_value, int):
+                new_value = int(new_value)
+
+            # coerce the JSON-LD string to a native boolean before validation
+            if (new_key == "cdi:hasHeader" or 
+                new_key == "cdi:skipInitialSpace" or 
+                new_key == "cdi:isDelimited" or 
+                new_key == "cdi:isFixedWidth") and not isinstance(new_value, bool):
+                new_value = new_value.lower() == "true"
+
             result[new_key] = new_value
 
         # Context-aware wrapping based on @type of current node
@@ -196,6 +225,13 @@ def remove_nulls_and_normalize(obj, parent_key=None):
             pid = result.get('schema:propertyID')
             if pid is not None and not isinstance(pid, list):
                 result['schema:propertyID'] = [pid]
+
+        # cdif:physicalDataType: array on a cdi:InstanceVariable (variableMeasured item),
+        # but a plain string on a physical mapping. Only wrap in the InstanceVariable context.
+        if parent_key == 'schema:variableMeasured' or 'cdi:InstanceVariable' in type_list:
+            pdt = result.get('cdif:physicalDataType')
+            if pdt is not None and not isinstance(pdt, list):
+                result['cdif:physicalDataType'] = [pdt]
 
         # schema:measurementTechnique: array on Dataset (root), scalar inside variableMeasured
         if 'schema:Dataset' in type_list:
@@ -233,6 +269,16 @@ def remove_nulls_and_normalize(obj, parent_key=None):
         return result
 
     return obj
+
+def expand_compact_id(compact_id: str, context: dict) -> str:
+    # Expand via @type: JSON-LD always includes @type values in expansion output,
+    # whereas a node with only @id (no predicates) is stripped from the result.
+    expanded = jsonld.expand({"@context": context, "@type": compact_id})
+    if expanded and "@type" in expanded[0]:
+        types = expanded[0]["@type"]
+        if types:
+            return types[0]
+    return compact_id
 
 
 def frame_cdif_document(doc_path, frame_path=None, context_path=None):
@@ -300,6 +346,24 @@ def frame_cdif_document(doc_path, frame_path=None, context_path=None):
         if dataset:
             result = {'@context': framed.get('@context'), **dataset}
 
+    # Expand dcterms:conformsTo values
+    subject_of = {}
+    for item in framed.get("@graph", []):
+        if "schema:subjectOf" in item:
+            subject_of = item["schema:subjectOf"]
+            break
+    conforms = subject_of.get("dcterms:conformsTo", [])
+
+    context = framed.get('@context', {})
+
+    expanded_conforms = []
+    for item in conforms:
+        compact = item.get("@id") if isinstance(item, dict) else item
+        expanded_conforms.append({"@id": expand_compact_id(compact, context)})
+
+    subject_of["dcterms:conformsTo"] = expanded_conforms
+    framed["schema:subjectOf"] = subject_of
+
     # Step 5: Post-process to remove nulls, normalize terms and array properties
     print("Post-processing output...")
     result = remove_nulls_and_normalize(result)
@@ -325,7 +389,7 @@ def validate_against_schema(framed, schema_path):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='CDIF Discovery Profile JSON-LD Framing and Validation Tool',
+        description='CDIF Data Description Profile JSON-LD Framing and Validation Tool',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -333,28 +397,27 @@ Examples:
   python FrameAndValidate.py my-metadata.jsonld
 
   # Frame with custom frame and save output
-  python FrameAndValidate.py my-metadata.jsonld --frame CDIFDiscovery-frame.jsonld -o framed.json
+  python FrameAndValidate.py my-metadata.jsonld --frame CDIFDataDescription-frame.jsonld -o framed.json
 
-  # Validate against Discovery Profile schema
-  python FrameAndValidate.py my-metadata.jsonld --frame CDIFDiscovery-frame.jsonld -v --schema CDIFDiscoveryProfileStructuredSchema.json
+  # Validate against Data Description Profile schema
+  python FrameAndValidate.py my-metadata.jsonld --frame CDIFDataDescription-frame.jsonld -v --schema CDIFDataDescriptionProfileStructuredSchema.json
 
-  # Full workflow with Discovery Profile files
-  python FrameAndValidate.py my-metadata.jsonld --frame CDIFDiscovery-frame.jsonld -o framed.json -v --schema CDIFDiscoveryProfileStructuredSchema.json
+  # Full workflow with Data Description Profile files
+  python FrameAndValidate.py my-metadata.jsonld --frame CDIFDataDescription-frame.jsonld -o framed.json -v --schema CDIFDataDescriptionProfileStructuredSchema.json
 """
     )
     parser.add_argument('input', help='Input JSON-LD file to process')
-    parser.add_argument('-c', '--context', help='Provided context')
     parser.add_argument('-o', '--output', help='Write framed output to file')
     parser.add_argument('-v', '--validate', action='store_true', help='Validate against JSON Schema')
-    parser.add_argument('--schema', default=str(SCRIPT_DIR / 'CDIFDiscoveryProfileStructuredSchema.json'),
-                        help='Path to JSON Schema (default: CDIFDiscoveryProfileStructuredSchema.json)')
-    parser.add_argument('--frame', default=str(SCRIPT_DIR / 'CDIFDiscovery-frame.jsonld'),
-                        help='Path to JSON-LD frame (default: CDIFDiscovery-frame.jsonld)')
+    parser.add_argument('--schema', default=str(SCRIPT_DIR / 'CDIFDataDescriptionProfileStructuredSchema.json'),
+                        help='Path to JSON Schema (default: CDIFDataDescriptionProfileStructuredSchema.json)')
+    parser.add_argument('--frame', default=str(SCRIPT_DIR / 'CDIFDataDescription-frame.jsonld'),
+                        help='Path to JSON-LD frame (default: CDIFDataDescription-frame.jsonld)')
 
     args = parser.parse_args()
 
     try:
-        framed = frame_cdif_document(args.input, args.frame, args.context)
+        framed = frame_cdif_document(args.input, args.frame)
 
         if args.output:
             with open(args.output, 'w', encoding='utf-8') as f:

@@ -240,6 +240,13 @@
             "skos:definition": "monitor intensity",
             "xas:units": [],
             "xas:format": "word"
+        },
+        {
+            "@id": "xas:Column.N.time",
+            "skos:prefLabel": "time",
+            "skos:definition": "time",
+            "xas:units": [],
+            "xas:format": "word"
         }
     ]
 }

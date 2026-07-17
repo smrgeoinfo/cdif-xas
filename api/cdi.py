@@ -41,7 +41,7 @@ class CDI_DDI:
         self.resources = {}
         for file in os.listdir(self.resources_dir):
             if type in file:
-                print(type, file)
+                #print(type, file)
                 if file.endswith(".jsonld"):
                     self.resources[file.replace(".jsonld", "")] = self.g.parse(os.path.join(self.resources_dir, file), format="json-ld")
                 elif file.endswith(".ttl"):
@@ -64,12 +64,17 @@ class CDI_DDI:
     
     def parse_xdi(self):
         for line in self.response.text.split("\n"):
+            print("line: ", line)
             # Variables path
             if self.check_variable_name(line):
                 compound_variable_name, variable_value = self.parse_structure(line)
+                print("compound_variable_name: ", compound_variable_name)
+                print("variable_value: ", variable_value)
                 if compound_variable_name and variable_value:
                         compound_variable_name = compound_variable_name.group(1).strip('#  ') 
                         variable_value = variable_value.group(1)
+                        print("compound_variable_name_1: ", compound_variable_name)
+                        print("variable_value_1: ", variable_value)
                         if '.' in compound_variable_name:
                             compound_variable_name_uri = compound_variable_name.replace(" ", "_").replace(":", "_")
                             variables = compound_variable_name_uri.split('.')
@@ -123,8 +128,8 @@ def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Op
     )
     cdi_graph = generator.parse_xdi()
 
-    for triple in cdi_graph:
-        print("cdi_graph triple: ", triple)
+    # for triple in cdi_graph:
+    #     print("cdi_graph triple: ", triple)
 
 
     # Quick sanity/compatibility check of the CDI graph

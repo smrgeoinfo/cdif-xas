@@ -1,0 +1,991 @@
+[
+    {
+        "@id": "_:0",
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/maximumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/minimumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "https://w3id.org/cdif/format": [
+            {
+                "@value": "decimal"
+            }
+        ],
+        "https://w3id.org/cdif/formats_InstanceVariable": [
+            {
+                "@id": "https://example.org/DV/BYSPHH/iv/Column_1"
+            }
+        ],
+        "https://w3id.org/cdif/index": [
+            {
+                "@value": "1"
+            }
+        ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/DV/BYSPHH/iv/Column_1",
+        "http://schema.org/alternateName": [
+            {
+                "@value": "mono energy"
+            }
+        ],
+        "http://schema.org/description": [
+            {
+                "@value": "mono energy"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "energy"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@value": "xas:mono energy"
+            }
+        ],
+        "http://schema.org/unitText": [
+            {
+                "@value": "eV"
+            }
+        ],
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/InstanceVariable",
+            "http://schema.org/PropertyValue"
+        ],
+        "https://w3id.org/cdif/uses": [
+            {
+                "@value": "https://example.org/struct/DV/BYSPHH/rv/Column_1"
+            }
+        ]
+    },
+    {
+        "@id": "_:1",
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/maximumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/minimumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "https://w3id.org/cdif/format": [
+            {
+                "@value": "decimal"
+            }
+        ],
+        "https://w3id.org/cdif/formats_InstanceVariable": [
+            {
+                "@id": "https://example.org/DV/BYSPHH/iv/Column_2"
+            }
+        ],
+        "https://w3id.org/cdif/index": [
+            {
+                "@value": "2"
+            }
+        ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/DV/BYSPHH/iv/Column_2",
+        "http://schema.org/alternateName": [
+            {
+                "@value": "time"
+            }
+        ],
+        "http://schema.org/description": [
+            {
+                "@value": "time"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "time"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@value": "xas:time"
+            }
+        ],
+        "http://schema.org/unitText": [
+            {
+                "@value": ""
+            }
+        ],
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/InstanceVariable",
+            "http://schema.org/PropertyValue"
+        ],
+        "https://w3id.org/cdif/uses": [
+            {
+                "@value": "https://example.org/struct/DV/BYSPHH/rv/Column_2"
+            }
+        ]
+    },
+    {
+        "@id": "_:2",
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/maximumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/minimumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "https://w3id.org/cdif/format": [
+            {
+                "@value": "decimal"
+            }
+        ],
+        "https://w3id.org/cdif/formats_InstanceVariable": [
+            {
+                "@id": "https://example.org/DV/BYSPHH/iv/Column_3"
+            }
+        ],
+        "https://w3id.org/cdif/index": [
+            {
+                "@value": "3"
+            }
+        ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/DV/BYSPHH/iv/Column_3",
+        "http://schema.org/alternateName": [
+            {
+                "@value": "monitor intensity"
+            }
+        ],
+        "http://schema.org/description": [
+            {
+                "@value": "monitor intensity"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "i0"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@value": "xas:monitor intensity"
+            }
+        ],
+        "http://schema.org/unitText": [
+            {
+                "@value": ""
+            }
+        ],
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/InstanceVariable",
+            "http://schema.org/PropertyValue"
+        ],
+        "https://w3id.org/cdif/uses": [
+            {
+                "@value": "https://example.org/struct/DV/BYSPHH/rv/Column_3"
+            }
+        ]
+    },
+    {
+        "@id": "_:3",
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/maximumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/minimumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "https://w3id.org/cdif/format": [
+            {
+                "@value": "decimal"
+            }
+        ],
+        "https://w3id.org/cdif/formats_InstanceVariable": [
+            {
+                "@id": "https://example.org/DV/BYSPHH/iv/Column_4"
+            }
+        ],
+        "https://w3id.org/cdif/index": [
+            {
+                "@value": "4"
+            }
+        ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/DV/BYSPHH/iv/Column_4",
+        "http://schema.org/alternateName": [
+            {
+                "@value": "transmission intensity"
+            }
+        ],
+        "http://schema.org/description": [
+            {
+                "@value": "transmission intensity"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "itrans"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@value": "xas:transmission intensity"
+            }
+        ],
+        "http://schema.org/unitText": [
+            {
+                "@value": ""
+            }
+        ],
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/InstanceVariable",
+            "http://schema.org/PropertyValue"
+        ],
+        "https://w3id.org/cdif/uses": [
+            {
+                "@value": "https://example.org/struct/DV/BYSPHH/rv/Column_4"
+            }
+        ]
+    },
+    {
+        "@id": "_:_:beamline",
+        "http://schema.org/additionalProperty": [
+            {
+                "@id": "_:_:beamline_collimation"
+            },
+            {
+                "@id": "_:_:beamline_focusing"
+            },
+            {
+                "@id": "_:_:beamline_harmonic_rejection"
+            }
+        ],
+        "http://schema.org/identifier": [
+            {
+                "@value": "xas:Beamline/13-BM-D"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "Beamline/13-BM-D"
+            }
+        ]
+    },
+    {
+        "@id": "_:_:beamline_collimation",
+        "http://schema.org/name": [
+            {
+                "@value": "collimation"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://ada.astromat.org/metadata/xas/collimation"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "none"
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
+        "@id": "_:_:beamline_focusing",
+        "http://schema.org/name": [
+            {
+                "@value": "focusing"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://ada.astromat.org/metadata/xas/focusing"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "no"
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
+        "@id": "_:_:beamline_harmonic_rejection",
+        "http://schema.org/name": [
+            {
+                "@value": "harmonic_rejection"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://ada.astromat.org/metadata/xas/harmonic_rejection"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "Rh-coated mirror, detuned "
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
+        "@id": "_:_:detector",
+        "http://schema.org/additionalProperty": [
+            {
+                "@id": "_:_:detector_i0"
+            },
+            {
+                "@id": "_:_:detector_i1"
+            }
+        ],
+        "http://schema.org/identifier": [
+            {
+                "@value": "xas:Detector"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "Detector"
+            }
+        ]
+    },
+    {
+        "@id": "_:_:detector_i0",
+        "http://schema.org/name": [
+            {
+                "@value": "I0"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://ada.astromat.org/metadata/xas/I0"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "10cm  N2"
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
+        "@id": "_:_:detector_i1",
+        "http://schema.org/name": [
+            {
+                "@value": "I1"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://ada.astromat.org/metadata/xas/I1"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "10cm  N2 (?)"
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
+        "@id": "_:_:keywords_element_edge",
+        "http://schema.org/inDefinedTermSet": [
+            {
+                "@value": "https://github.com/XraySpectroscopy/XAS-Data-Interchange/blob/master/specification/dictionary.md"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "K-edge"
+            }
+        ],
+        "http://schema.org/termCode": [
+            {
+                "@value": "K"
+            }
+        ],
+        "@type": [
+            "http://schema.org/DefinedTerm"
+        ]
+    },
+    {
+        "@id": "_:_:keywords_element_symbol",
+        "http://schema.org/termCode": [
+            {
+                "@value": "Se"
+            }
+        ],
+        "@type": [
+            "http://schema.org/DefinedTerm"
+        ]
+    },
+    {
+        "@id": "_:_:mono",
+        "http://schema.org/additionalProperty": [
+            {
+                "@id": "_:_:mono_d_spacing"
+            }
+        ],
+        "http://schema.org/identifier": [
+            {
+                "@value": "xas:Mono/Si 111"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "Mono/Si 111"
+            }
+        ]
+    },
+    {
+        "@id": "_:_:mono_d_spacing",
+        "http://schema.org/name": [
+            {
+                "@value": "d_spacing"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://ada.astromat.org/metadata/xas/d_spacing"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "3.13550"
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
+        "@id": "_:_:nexus",
+        "http://schema.org/inDefinedTermSet": [
+            {
+                "@value": "nxs:Field/NXxas/ENTRY/DATA/mode"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "Transmission"
+            }
+        ],
+        "@type": [
+            "http://schema.org/DefinedTerm"
+        ]
+    },
+    {
+        "@id": "_:_:panet",
+        "http://schema.org/identifier": [
+            {
+                "@value": "http://purl.org/pan-science/PaNET/PaNET01196"
+            }
+        ],
+        "http://schema.org/inDefinedTermSet": [
+            {
+                "@value": "http://purl.org/pan-science/PaNET/PaNET.owl"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "X-Ray Absorption Spectroscopy"
+            }
+        ],
+        "http://schema.org/termCode": [
+            {
+                "@value": "XAS"
+            }
+        ],
+        "@type": [
+            "http://schema.org/DefinedTerm"
+        ]
+    },
+    {
+        "@id": "_:_:prov_used_entity",
+        "http://schema.org/instrument": [
+            {
+                "@id": "_:_:beamline"
+            },
+            {
+                "@id": "_:_:detector"
+            },
+            {
+                "@id": "_:_:mono"
+            }
+        ]
+    },
+    {
+        "@id": "_:_:role_author",
+        "http://schema.org/contributor": [
+            {
+                "@id": "_:_:role_author_name"
+            }
+        ],
+        "http://schema.org/roleName": [
+            {
+                "@value": "Author"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Role"
+        ]
+    },
+    {
+        "@id": "_:_:role_author_name",
+        "http://schema.org/name": [
+            {
+                "@value": "Richards, Steve"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Person"
+        ]
+    },
+    {
+        "@id": "_:_:role_creator",
+        "http://schema.org/contributor": [
+            {
+                "@id": "_:_:role_creator_name"
+            }
+        ],
+        "http://schema.org/roleName": [
+            {
+                "@value": "Creator"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Role"
+        ]
+    },
+    {
+        "@id": "_:_:role_creator_name",
+        "http://schema.org/name": [
+            {
+                "@value": "Richards, Steve"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Person"
+        ]
+    },
+    {
+        "@id": "_:_:role_facility",
+        "http://schema.org/contributor": [
+            {
+                "@id": "_:_:role_facility_name"
+            }
+        ],
+        "http://schema.org/roleName": [
+            {
+                "@value": "Facility"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Role"
+        ]
+    },
+    {
+        "@id": "_:_:role_facility_name",
+        "http://schema.org/name": [
+            {
+                "@value": "APS"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Organization"
+        ]
+    },
+    {
+        "@id": "_:_:scan_edge_energy",
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://ada.astromat.org/metadata/xas/edge_energy"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "12658.0"
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
+        "@id": "_:dv_distribution",
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/arrayBase": [
+            {
+                "@value": "1"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/commentPrefix": [
+            {
+                "@value": "#"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/hasHeader": [
+            {
+                "@value": "true"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/isDelimited": [
+            {
+                "@value": "false"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/isFixedWidth": [
+            {
+                "@value": "true"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/isStructuredBy": [
+            {
+                "@id": "https://example.org/struct/DV/BYSPHH"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/skipInitialSpace": [
+            {
+                "@value": "true"
+            }
+        ],
+        "http://purl.org/dc/terms/conformsTo": [
+            {
+                "@id": "https://github.com/XraySpectroscopy/XAS-Data-Interchange/blob/master/specification/spec.md"
+            }
+        ],
+        "http://schema.org/contentSize": [
+            {
+                "@value": "29783"
+            }
+        ],
+        "http://schema.org/contentUrl": [
+            {
+                "@value": "http://localhost:8080/api/access/datafile/29"
+            }
+        ],
+        "http://schema.org/description": [
+            {
+                "@value": "Se_Na2SeO4_rt_01.xdi"
+            }
+        ],
+        "http://schema.org/encodingFormat": [
+            {
+                "@value": "application/octet-stream"
+            }
+        ],
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/PhysicalDataSet",
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/TabularTextDataSet",
+            "http://schema.org/DataDownload"
+        ],
+        "https://w3id.org/cdif/hasPhysicalMapping": [
+            {
+                "@id": "_:0"
+            },
+            {
+                "@id": "_:1"
+            },
+            {
+                "@id": "_:2"
+            },
+            {
+                "@id": "_:3"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/BYSPHH",
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/has_DataStructureComponent": [
+            {
+                "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_1"
+            },
+            {
+                "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_2"
+            },
+            {
+                "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_3"
+            },
+            {
+                "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_4"
+            }
+        ],
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/WideDataStructure"
+        ]
+    },
+    {
+        "@id": "https://ada.astromat.org/metadata/xas/provevent",
+        "http://schema.org/additionalProperty": [
+            {
+                "@id": "_:_:scan_edge_energy"
+            }
+        ],
+        "http://schema.org/startDate": [
+            {
+                "@value": "2008-04-10T21:58:50"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Event",
+            "http://www.w3.org/ns/prov#Activity"
+        ],
+        "http://www.w3.org/ns/prov#used": [
+            {
+                "@id": "_:_:prov_used_entity"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/dataset/DV/BYSPHH",
+        "http://schema.org/contributor": [
+            {
+                "@id": "_:_:role_author"
+            },
+            {
+                "@id": "_:_:role_creator"
+            },
+            {
+                "@id": "_:_:role_facility"
+            }
+        ],
+        "http://schema.org/dateModified": [
+            {
+                "@value": "2026-06-24"
+            }
+        ],
+        "http://schema.org/description": [
+            {
+                "@value": "Se_Na2SeO4_rt_01.xdi"
+            }
+        ],
+        "http://schema.org/distribution": [
+            {
+                "@id": "_:dv_distribution"
+            }
+        ],
+        "http://schema.org/identifier": [
+            {
+                "@value": "http://localhost:8080/citation?persistentId=perma:DV/BYSPHH"
+            }
+        ],
+        "http://schema.org/keywords": [
+            {
+                "@id": "_:_:keywords_element_edge"
+            },
+            {
+                "@id": "_:_:keywords_element_symbol"
+            },
+            {
+                "@value": "Earth and Environmental Sciences"
+            }
+        ],
+        "http://schema.org/license": [
+            {
+                "@value": "http://creativecommons.org/publicdomain/zero/1.0"
+            }
+        ],
+        "http://schema.org/measurementTechnique": [
+            {
+                "@id": "_:_:nexus"
+            },
+            {
+                "@id": "_:_:panet"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "Se_Na2SeO4_rt_01"
+            }
+        ],
+        "http://schema.org/sameAs": [
+            {
+                "@value": "https://github.com/CDIF-4-XAS/XAS-CDIF/blob/main/se_na2so4_rt.xdi"
+            }
+        ],
+        "http://schema.org/subjectOf": [
+            {
+                "@id": "https://example.org/dataset/DV/BYSPHH/metadata"
+            }
+        ],
+        "http://schema.org/url": [
+            {
+                "@value": "http://localhost:8080/api/access/datafile/29"
+            }
+        ],
+        "http://schema.org/variableMeasured": [
+            {
+                "@id": "https://example.org/DV/BYSPHH/iv/Column_1"
+            },
+            {
+                "@id": "https://example.org/DV/BYSPHH/iv/Column_2"
+            },
+            {
+                "@id": "https://example.org/DV/BYSPHH/iv/Column_3"
+            },
+            {
+                "@id": "https://example.org/DV/BYSPHH/iv/Column_4"
+            }
+        ],
+        "http://schema.org/version": [
+            {
+                "@value": "5"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Dataset"
+        ],
+        "http://www.w3.org/ns/prov#wasGeneratedBy": [
+            {
+                "@id": "https://ada.astromat.org/metadata/xas/provevent"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/dataset/DV/BYSPHH/metadata",
+        "http://purl.org/dc/terms/conformsTo": [
+            {
+                "@id": "https://w3id.org/cdif/core/1.1"
+            },
+            {
+                "@id": "https://w3id.org/cdif/data_description/1.1"
+            },
+            {
+                "@id": "https://w3id.org/cdif/data_structure/1.1"
+            },
+            {
+                "@id": "https://w3id.org/cdif/discovery/1.1"
+            }
+        ],
+        "http://schema.org/about": [
+            {
+                "@id": "https://example.org/dataset/DV/BYSPHH"
+            }
+        ],
+        "http://schema.org/additionalType": [
+            {
+                "@value": "dcat:CatalogRecord"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Dataset"
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_1",
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/MeasureComponent"
+        ],
+        "https://w3id.org/cdif/isDefinedBy_RepresentedVariable": [
+            {
+                "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_1"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_2",
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/MeasureComponent"
+        ],
+        "https://w3id.org/cdif/isDefinedBy_RepresentedVariable": [
+            {
+                "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_2"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_3",
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/MeasureComponent"
+        ],
+        "https://w3id.org/cdif/isDefinedBy_RepresentedVariable": [
+            {
+                "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_3"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_4",
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/MeasureComponent"
+        ],
+        "https://w3id.org/cdif/isDefinedBy_RepresentedVariable": [
+            {
+                "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_4"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_1",
+        "https://w3id.org/cdif/name": [
+            {
+                "@value": "energy"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_2",
+        "https://w3id.org/cdif/name": [
+            {
+                "@value": "time"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_3",
+        "https://w3id.org/cdif/name": [
+            {
+                "@value": "i0"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_4",
+        "https://w3id.org/cdif/name": [
+            {
+                "@value": "itrans"
+            }
+        ]
+    }
+]

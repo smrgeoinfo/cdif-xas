@@ -1,0 +1,1502 @@
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rml: <http://w3id.org/rml/> .
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix schema: <http://schema.org/> .
+@prefix xas: <https://ada.astromat.org/metadata/xas/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix cdi: <http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/> .
+@prefix cdif: <https://w3id.org/cdif/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno: <https://w3id.org/function/ontology#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
+@prefix doi: <https://doi.org/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@base <https://example.org/> .
+
+<#TriplesMap_root> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rml:class schema:Dataset;
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['@id']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "http://localhost:8080/citation?persistentId=perma:" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "https://example.org/dataset/" ]
+        ]
+      ]
+    ];
+  rr:predicateObjectMap [ 
+    rr:predicate schema:name;
+    rr:objectMap [
+      rml:reference "$['schema:name']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:description;
+    rr:objectMap [
+      rml:reference "$['schema:description']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:url;
+    rr:objectMap [
+      rml:reference "$['schema:distribution']['schema:contentUrl']['@id']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:sameAs;
+    rr:objectMap [
+      rml:reference "$['schema:distribution']['schema:description']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:license;
+    rr:objectMap [
+      rml:reference "$['schema:license']['@id']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:version;
+    rr:objectMap [
+      rml:reference "$['schema:version']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:keywords;
+    rr:objectMap [
+      rml:reference "$['schema:keywords']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:keywords;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_keywords_element_edge>
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:keywords;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_keywords_element_symbol>
+    ]
+  ] ;
+   rr:predicateObjectMap [ 
+    rr:predicate  schema:identifier;
+    rr:objectMap [ 
+      rml:reference "$['schema:identifier']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate  schema:dateModified;
+    rr:objectMap [ 
+      rml:reference "$['schema:dateModified']['@value']"
+    ]
+  ] ;
+   rr:predicateObjectMap [ 
+    rr:predicate  schema:variableMeasured;
+    rr:objectMap [ 
+      rr:parentTriplesMap <#TriplesMap_variableMeasured>
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate  schema:subjectOf;
+    rr:objectMap [ 
+      rr:parentTriplesMap <#TriplesMap_subjectOf>
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate  schema:contributor;
+	  rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_role_facility>
+    ]
+  ]  ;
+  rr:predicateObjectMap [ 
+    rr:predicate  schema:contributor;
+	rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_dv_author_role>
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate  schema:contributor;
+	rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_dv_creator_role>
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate  schema:measurementTechnique;
+	rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_panet>
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate  schema:measurementTechnique;
+	rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_nexus>
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate  prov:wasGeneratedBy;
+    rr:objectMap [
+      rr:constant <https://ada.astromat.org/metadata/xas/provevent>;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate  schema:distribution;
+	  rr:objectMap [
+	    rr:class schema:DataDownload, cdi:PhysicalDataSet, cdi:TabularTextDataSet;
+      rr:template "_:dv_distribution"
+    ]
+  ] .
+  
+<#TriplesMap_variableMeasured> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['columns'][*]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ] ;
+  rml:subjectMap [
+    rml:class schema:PropertyValue, cdi:InstanceVariable ;
+    rml:reference "$['ivIRI']" ;
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name ;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['definition']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/ .*$/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "" ]
+        ]
+      ]
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:alternateName;
+     rr:objectMap [
+      rml:reference "$['meaning']"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:description;
+     rr:objectMap [
+      rml:reference "$['meaning']"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate cdif:uses;
+     rr:objectMap [
+      rml:reference "$['rvIRI']"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['meaning']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/^/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "xas:" ]
+        ]
+      ]
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:unitText ;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:controls_if ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:bool_b;
+          rr:objectMap [
+            a fnml:FunctionTermMap;
+            fnml:functionValue [
+              rr:predicateObjectMap [
+                rr:predicate fno:executes;
+                rr:objectMap [ rr:constant grel:string_contains ]
+              ];
+              rr:predicateObjectMap [
+                rr:predicate grel:valueParameter;
+                rr:objectMap [ rml:reference "$['definition']" ]
+              ];
+              rr:predicateObjectMap [
+                rr:predicate grel:string_sub;
+                rr:objectMap [ rr:constant " " ]
+              ]
+            ]
+          ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:any_true;
+          rr:objectMap [
+            a fnml:FunctionTermMap;
+            fnml:functionValue [
+              rr:predicateObjectMap [
+                rr:predicate fno:executes;
+                rr:objectMap [ rr:constant grel:string_replace ]
+              ];
+              rr:predicateObjectMap [
+                rr:predicate grel:valueParameter;
+                rr:objectMap [ rml:reference "$['definition']" ]
+              ];
+              rr:predicateObjectMap [
+                rr:predicate grel:p_string_find;
+                rr:objectMap [ rr:constant "/^.* /" ]
+              ];
+              rr:predicateObjectMap [
+                rr:predicate grel:p_string_replace;
+                rr:objectMap [ rr:constant "" ]
+              ]
+            ]
+          ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:any_false;
+          rr:objectMap [ rr:constant "" ]
+        ]
+      ]
+    ]
+  ] .
+
+  
+<#TriplesMap_subjectOf> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ] ;
+  rml:subjectMap [
+      rml:class schema:Dataset;
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [
+            a fnml:FunctionTermMap;
+            fnml:functionValue [
+              rr:predicateObjectMap [
+                rr:predicate fno:executes;
+                rr:objectMap [ rr:constant grel:string_replace ]
+              ];
+              rr:predicateObjectMap [
+                rr:predicate grel:valueParameter;
+                rr:objectMap [ rml:reference "$['@id']" ]
+              ];
+              rr:predicateObjectMap [
+                rr:predicate grel:p_string_find;
+                rr:objectMap [ rr:constant "http://localhost:8080/citation?persistentId=perma:" ]
+              ];
+              rr:predicateObjectMap [
+                rr:predicate grel:p_string_replace;
+                rr:objectMap [ rr:constant "https://example.org/dataset/" ]
+              ]
+            ]
+          ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/$/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "/metadata" ]
+        ]
+      ]
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant "dcat:CatalogRecord"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+        rr:predicate dcterms:conformsTo ;
+        rr:objectMap [
+            rr:constant <https://w3id.org/cdif/core/1.1> ;
+            rr:termType rr:IRI
+        ]
+    ] ;
+  rr:predicateObjectMap [
+        rr:predicate dcterms:conformsTo ;
+        rr:objectMap [
+            rr:constant <https://w3id.org/cdif/discovery/1.1> ;
+            rr:termType rr:IRI
+        ]
+    ] ;
+  rr:predicateObjectMap [
+        rr:predicate dcterms:conformsTo ;
+        rr:objectMap [
+            rr:constant <https://w3id.org/cdif/data_description/1.1> ;
+            rr:termType rr:IRI
+        ]
+    ] ;
+  rr:predicateObjectMap [
+        rr:predicate dcterms:conformsTo ;
+        rr:objectMap [
+            rr:constant <https://w3id.org/cdif/data_structure/1.1> ;
+            rr:termType rr:IRI
+        ]
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:about;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_root>;
+      rr:joinCondition [
+        rr:child "$['@id']";
+        rr:parent "$['@id']"
+      ]
+    ]
+  ] .
+ 
+
+<#TriplesMap_role_facility> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Facility')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:Role;
+      rml:template "_:role_facility"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:roleName;
+    rr:objectMap [
+      rr:constant "Facility"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:contributor;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_role_facility_name>
+    ]
+  ] .
+
+<#TriplesMap_role_facility_name> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Facility')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:Organization;
+      rml:template "_:role_facility_name"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [
+      rml:reference "$['cdi:Facility_name']['skos:definition']"
+    ]
+  ] .
+
+<#TriplesMap_keywords_element_edge> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Element')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:DefinedTerm;
+      rml:template "_:keywords_element_edge"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:termCode;
+    rr:objectMap [
+      rml:reference "$['cdi:Element_edge']['skos:definition']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:inDefinedTermSet;
+    rr:objectMap [
+      rr:constant "https://github.com/XraySpectroscopy/XAS-Data-Interchange/blob/master/specification/dictionary.md"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:name;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['cdi:Element_edge']['skos:definition']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/$/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "-edge" ]
+        ]
+      ]
+    ]
+  ] .
+
+<#TriplesMap_keywords_element_symbol> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Element')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:DefinedTerm;
+      rml:template "_:keywords_element_symbol"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:termCode;
+    rr:objectMap [
+      rml:reference "$['cdi:Element_symbol']['skos:definition']"
+    ]
+  ] .
+
+<#TriplesMap_dv_author_role> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:Role;
+      rml:template "_:role_author"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:roleName;
+    rr:objectMap [
+      rr:constant "Author"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:contributor;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_dv_author_contributor>
+    ]
+  ] .
+
+<#TriplesMap_dv_author_contributor> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:Person;
+      rml:template "_:role_author_name"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [
+      rml:reference "$['schema:author']['schema:name']"
+    ]
+  ] .
+
+<#TriplesMap_dv_creator_role> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:Role;
+      rr:template "_:role_creator"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:roleName;
+    rr:objectMap [
+      rr:constant "Creator"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:contributor;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_dv_creator_contributor>
+    ]
+  ] .
+
+<#TriplesMap_dv_creator_contributor> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:Person;
+      rml:template "_:role_creator_name"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [
+      rml:reference "$['schema:author']['schema:name']"
+    ]
+  ] .
+
+<#TriplesMap_panet> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][0]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:DefinedTerm;
+      rr:template "_:panet"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:name;
+    rr:objectMap [
+      rr:constant "X-Ray Absorption Spectroscopy"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:termCode;
+    rr:objectMap [
+      rr:constant "XAS"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:identifier;
+    rr:objectMap [
+      rr:constant "http://purl.org/pan-science/PaNET/PaNET01196"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:inDefinedTermSet;
+    rr:objectMap [
+      rr:constant "http://purl.org/pan-science/PaNET/PaNET.owl"
+    ]
+  ] .
+
+<#TriplesMap_nexus> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][0]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:DefinedTerm;
+      rr:template "_:nexus"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:name;
+    rr:objectMap [
+      rr:constant "Transmission"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:inDefinedTermSet;
+    rr:objectMap [
+      rr:constant "nxs:Field/NXxas/ENTRY/DATA/mode"
+    ]
+  ] .
+
+<#TriplesMap_scan_startdate> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Scan')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rml:class prov:Activity, schema:Event;
+      rml:template "https://ada.astromat.org/metadata/xas/provevent"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:startDate;
+    rr:objectMap [
+      rml:reference "$['skos:prefLabel'][2]"
+    ]
+  ] .
+
+<#TriplesMap_scan> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Scan')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rml:class prov:Activity, schema:Event;
+      rml:template "https://ada.astromat.org/metadata/xas/provevent"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_scan_edge_energy>
+    ]
+  ] .
+
+<#TriplesMap_scan_edge_energy> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Scan')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:scan_edge_energy"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:edge_energy ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:value;
+    rr:objectMap [
+      rml:reference "$['cdi:Scan_edge_energy']['skos:definition']"
+    ]
+  ] .
+
+<#TriplesMap_activity_used> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][0]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:class prov:Activity, schema:Event;
+      rr:template "https://ada.astromat.org/metadata/xas/provevent"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate prov:used;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_prov_used_entity>
+    ]
+  ] .
+
+<#TriplesMap_prov_used_entity> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:template "_:prov_used_entity"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:instrument;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_beamline>
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:instrument;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_mono>
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:instrument;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_detector>
+    ]
+  ] .
+
+<#TriplesMap_beamline> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:template "_:beamline"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:identifier;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['cdi:Beamline_name']['skos:definition']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/^/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "xas:Beamline/" ]
+        ]
+      ]
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['cdi:Beamline_name']['skos:definition']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/^/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "Beamline/" ]
+        ]
+      ]
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_beamline_collimation>
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_beamline_focusing>
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_beamline_harmonic_rejection>
+    ]
+  ] .
+
+<#TriplesMap_beamline_collimation> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:beamline_collimation"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:collimation ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:name;
+    rr:objectMap [
+      rr:constant "collimation"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:value;
+    rr:objectMap [
+      rml:reference "$['cdi:Beamline_collimation']['skos:definition']"
+    ]
+  ] .
+
+<#TriplesMap_beamline_focusing> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:beamline_focusing"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:focusing ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:name;
+    rr:objectMap [
+      rr:constant "focusing"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:value;
+    rr:objectMap [
+      rml:reference "$['cdi:Beamline_focusing']['skos:definition']"
+    ]
+  ] .
+
+<#TriplesMap_beamline_harmonic_rejection> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:beamline_harmonic_rejection"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:harmonic_rejection ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:name;
+    rr:objectMap [
+      rr:constant "harmonic_rejection"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:value;
+    rr:objectMap [
+      rml:reference "$['cdi:Beamline_harmonic_rejection']['skos:definition']"
+    ]
+  ] .
+
+
+<#TriplesMap_mono> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:template "_:mono"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:identifier;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['cdi:Mono_name']['skos:definition']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/^/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "xas:Mono/" ]
+        ]
+      ]
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['cdi:Mono_name']['skos:definition']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/^/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "Mono/" ]
+        ]
+      ]
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_mono_d_spacing>
+    ]
+  ] .
+
+<#TriplesMap_mono_d_spacing> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:mono_d_spacing"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:name;
+    rr:objectMap [
+      rr:constant "d_spacing"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:d_spacing ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:value;
+    rr:objectMap [
+      rml:reference "$['cdi:Mono_d_spacing']['skos:definition']"
+    ]
+  ] .
+
+<#TriplesMap_detector> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Detector')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:template "_:detector"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:identifier;
+    rr:objectMap [
+      rr:constant "xas:Detector" 
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [
+      rr:constant "Detector" 
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_detector_i0>
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_detector_i1>
+    ]
+  ] .
+
+<#TriplesMap_detector_i0> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Detector')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:detector_i0"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:I0 ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:name;
+    rr:objectMap [
+      rr:constant "I0"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:value;
+    rr:objectMap [
+      rml:reference "$['cdi:Detector_I0']['skos:definition']"
+    ]
+  ] .
+
+<#TriplesMap_detector_i1> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Detector')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:detector_i1"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:I1 ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:name;
+    rr:objectMap [
+      rr:constant "I1"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:value;
+    rr:objectMap [
+      rml:reference "$['cdi:Detector_I1']['skos:definition']"
+    ]
+  ] .
+
+<#TriplesMap_dv_distribution_description> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:class schema:DataDownload, cdi:PhysicalDataSet, cdi:TabularTextDataSet;
+      rr:template "_:dv_distribution"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:description;
+    rr:objectMap [
+      rml:reference "$['schema:description']"
+    ]
+  ] .
+
+<#TriplesMap_dv_distribution_DataDownload> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:class schema:DataDownload, cdi:PhysicalDataSet, cdi:TabularTextDataSet;
+      rr:template "_:dv_distribution"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:contentUrl;
+    rr:objectMap [
+      rml:reference "$['schema:distribution']['schema:contentUrl']['@id']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:contentSize;
+    rr:objectMap [
+      rml:reference "$['schema:distribution']['schema:contentSize']['@value']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate schema:encodingFormat;
+    rr:objectMap [
+      rml:reference "$['schema:distribution']['schema:encodingFormat']"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate dcterms:conformsTo;
+    rr:objectMap [
+      rr:constant "https://github.com/XraySpectroscopy/XAS-Data-Interchange/blob/master/specification/spec.md" ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate cdi:commentPrefix;
+    rr:objectMap [
+      rr:constant "#"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate cdi:arrayBase;
+    rr:objectMap [
+      rr:constant "1"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate cdi:hasHeader;
+    rr:objectMap [
+      rr:constant "true"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate cdi:skipInitialSpace;
+    rr:objectMap [
+      rr:constant "true"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate cdi:isDelimited;
+    rr:objectMap [
+      rr:constant "false"
+    ]
+  ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate cdi:isFixedWidth;
+    rr:objectMap [
+      rr:constant "true"
+    ]
+  ] .
+
+<#TriplesMap_dv_distribution_isStructuredBy> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][0]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:class schema:DataDownload, cdi:PhysicalDataSet, cdi:TabularTextDataSet;
+      rr:template "_:dv_distribution"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate cdi:isStructuredBy;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_wideDataStructure>
+    ]
+  ] .
+
+<#TriplesMap_wideDataStructure> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rml:class cdi:WideDataStructure;
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['@id']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "http://localhost:8080/citation?persistentId=perma:" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "https://example.org/struct/" ]
+        ]
+      ]
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate cdi:has_DataStructureComponent;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_components>
+    ]
+  ] .
+
+<#TriplesMap_components> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['columns'][*]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+    rml:class cdi:MeasureComponent ;
+    rml:reference "$['componentIRI']" ;
+    rr:termType rr:IRI
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate cdif:isDefinedBy_RepresentedVariable ;
+    rr:objectMap [
+      rml:reference "$['rvIRI']" ;
+      rr:termType rr:IRI
+    ]
+  ] .
+
+<#TriplesMap_representedVariable> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['columns'][*]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+    rml:reference "$['rvIRI']" ;
+    rr:termType rr:IRI
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate cdif:name;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['definition']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/ .*$/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "" ]
+        ]
+      ]
+    ]
+  ] .
+
+  <#TriplesMap_dv_distribution_hasPhysicalMapping> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][0]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:class schema:DataDownload, cdi:PhysicalDataSet, cdi:TabularTextDataSet;
+      rr:template "_:dv_distribution"
+    ] ;
+  rr:predicateObjectMap [ 
+    rr:predicate cdif:hasPhysicalMapping;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_physicalMapping>
+    ]
+  ] .
+
+  <#TriplesMap_physicalMapping> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['columns'][*]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+    rr:termType rr:BlankNode;
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate cdif:index;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['columnKey']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/Column_/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "" ]
+        ]
+      ]
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate cdi:minimumLength;
+    rr:objectMap [
+      rr:constant 15
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate cdi:maximumLength;
+    rr:objectMap [
+      rr:constant 15
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate cdif:format;
+    rr:objectMap [
+      rr:constant "decimal"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate cdif:physicalDataType;
+    rr:objectMap [
+      rr:constant "decimal"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate cdif:formats_InstanceVariable;
+    rr:objectMap [
+      rml:reference "$['ivIRI']" ;
+      rr:termType rr:IRI
+    ]
+  ] .

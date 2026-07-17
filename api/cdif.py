@@ -119,12 +119,19 @@ def generate_cdif(cdi_jsonld) -> dict[str, any]:
         "@graph": graph_nodes,
     }
 
+    dataset_id = payload.get("@graph", [])[0].get("@id", "").replace("http://localhost:8080/citation?persistentId=perma:", "")
+
     col_node = next(
         (n for n in payload.get("@graph", []) if n.get("@id") == "cdi:Column"),
         None
     )
+
+    # for n in payload.get("@graph", []):
+    #     print("n: ", n.get("@id", ""))
+
     columns = []
     if col_node:
+        print("col_node: ", col_node)
         for k, v in col_node.items():
             if k.startswith("cdi:Column_") and isinstance(v, dict):
                 entry = {"columnKey": k.replace("cdi:", ""), "definition": v.get("skos:definition", "")}
@@ -137,6 +144,10 @@ def generate_cdif(cdi_jsonld) -> dict[str, any]:
                 )
                 if xas_term:
                     entry["meaning"] = xas_term.get("skos:definition", "")
+                if dataset_id:
+                    entry["componentIRI"] = f"https://example.org/struct/{dataset_id}/comp/{entry['columnKey']}"
+                    entry["rvIRI"] = f"https://example.org/struct/{dataset_id}/rv/{entry['columnKey']}"
+                    entry["ivIRI"] = f"https://example.org/{dataset_id}/iv/{entry['columnKey']}"
                 columns.append(entry)
 
     payload["columns"] = columns
