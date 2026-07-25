@@ -225,6 +225,15 @@
       rml:reference "$['rvIRI']"
     ]
   ] ;
+  # cdif:physicalDataType is recommended by the CDIF Data Description
+  # SHACL. XDI columns are all decimal-typed by the XDI spec, so a
+  # static "decimal" default is safe. If a downstream XDI dialect ever
+  # allows other physical types, swap this for an rml:reference into
+  # a per-column type field.
+  rr:predicateObjectMap [
+    rr:predicate cdif:physicalDataType;
+    rr:objectMap [ rr:constant "decimal" ]
+  ] ;
   rr:predicateObjectMap [
     rr:predicate schema:propertyID;
     rr:objectMap [
