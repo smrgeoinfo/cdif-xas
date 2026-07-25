@@ -388,7 +388,7 @@
         "schema:minValue": {},
         "schema:maxValue": {},
         "schema:url": {},
-        "cdif:physicalDataType": {"@embed": "@always"},
+        "cdif:physicalDataType": {},
         "cdif:simpleUnitOfMeasure": {"@embed": "@always"},
         "cdif:uses": {"@embed": "@always"},
         "cdif:isDescribedBy_StatisticsCollection": {"@embed": "@always"},
@@ -440,8 +440,10 @@
 
     "prov:wasGeneratedBy": {
         "@embed": "@always",
+        "schema:additionalType": {"@embed": "@always"},
         "schema:name": {},
         "schema:description": {},
+        "schema:startDate": {},
         "schema:startTime": {},
         "schema:endTime": {},
         "schema:actionStatus": {},

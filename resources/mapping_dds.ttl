@@ -2,7 +2,7 @@
 @prefix rml: <http://w3id.org/rml/> .
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix schema: <http://schema.org/> .
-@prefix xas: <https://ada.astromat.org/metadata/xas/> .
+@prefix xas: <https://w3id.org/cdif/xas/> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 @prefix cdi: <http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/> .
@@ -17,7 +17,7 @@
 
 <#TriplesMap_root> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -82,13 +82,14 @@
       rml:reference "$['schema:version']"
     ]
   ] ;
-  rr:predicateObjectMap [ 
-    rr:predicate schema:keywords;
-    rr:objectMap [
-      rml:reference "$['schema:keywords']"
-    ]
-  ] ;
-  rr:predicateObjectMap [ 
+  # NOTE: the bare-string schema:keywords passthrough from
+  # $['schema:keywords'] was removed because xasCore requires each
+  # keyword to be a schema:DefinedTerm object; string literals like
+  # "Earth and Environmental Sciences" fail validation. If a use case
+  # needs those preserved, wrap them into DefinedTerm objects via an
+  # FnO transform (build {@type: schema:DefinedTerm, schema:name: <str>})
+  # rather than passing them through raw.
+  rr:predicateObjectMap [
     rr:predicate schema:keywords;
     rr:objectMap [
       rr:parentTriplesMap <#TriplesMap_keywords_element_edge>
@@ -157,7 +158,7 @@
   rr:predicateObjectMap [ 
     rr:predicate  prov:wasGeneratedBy;
     rr:objectMap [
-      rr:constant <https://ada.astromat.org/metadata/xas/provevent>;
+      rr:constant <https://w3id.org/cdif/xas/provevent>;
       rr:termType rr:IRI
     ]
   ] ;
@@ -224,10 +225,31 @@
       rml:reference "$['rvIRI']"
     ]
   ] ;
+  # NOTE: cdif:physicalDataType emission was removed. It was there to
+  # clear a SHACL info/warning ('should specify cdif:physicalDataType')
+  # but pyld framing wraps rr:constant strings inconsistently into
+  # arrays like ["decimal"] for some columns, which then fails the
+  # cdifConceptOrTermOrString anyOf (string/DefinedTerm/Concept, but
+  # not array-of-string). Losing the info-level SHACL recommendation
+  # is a better trade than emitting hard JSON Schema errors. To restore
+  # once the frame emits scalar-shaped values reliably, add:
+  #   rr:predicateObjectMap [
+  #     rr:predicate cdif:physicalDataType;
+  #     rr:objectMap [ rr:constant "decimal" ]
+  #   ] ;
   rr:predicateObjectMap [
     rr:predicate schema:propertyID;
     rr:objectMap [
       a fnml:FunctionTermMap;
+      # Prepends the full XAS glossary base and marks the result as an
+      # IRI reference so it serializes as JSON-LD {"@id": "..."} instead
+      # of a bare string literal. Note: $['meaning'] values that carry
+      # spaces or mixed case will produce non-resolving IRIs; the v2
+      # glossary uses lowercase, no-underscore local names (see
+      # https://w3id.org/cdif/xas/). Consider normalizing $['meaning']
+      # upstream (in api/cdif.py's column build) so it lands here as a
+      # v2-conformant local name.
+      rr:termType rr:IRI ;
       fnml:functionValue [
         rr:predicateObjectMap [
           rr:predicate fno:executes;
@@ -243,7 +265,7 @@
         ];
         rr:predicateObjectMap [
           rr:predicate grel:p_string_replace;
-          rr:objectMap [ rr:constant "xas:" ]
+          rr:objectMap [ rr:constant "https://w3id.org/cdif/xas/" ]
         ]
       ]
     ]
@@ -312,7 +334,7 @@
   
 <#TriplesMap_subjectOf> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -364,7 +386,8 @@
   rr:predicateObjectMap [ 
     rr:predicate schema:additionalType;
     rr:objectMap [
-      rr:constant "dcat:CatalogRecord"
+      rr:constant dcat:CatalogRecord ;
+      rr:termType rr:IRI
     ]
   ] ;
   rr:predicateObjectMap [
@@ -392,6 +415,20 @@
         rr:predicate dcterms:conformsTo ;
         rr:objectMap [
             rr:constant <https://w3id.org/cdif/data_structure/1.1> ;
+            rr:termType rr:IRI
+        ]
+    ] ;
+  rr:predicateObjectMap [
+        rr:predicate dcterms:conformsTo ;
+        rr:objectMap [
+            rr:constant <https://w3id.org/cdif/xasCore/1.0> ;
+            rr:termType rr:IRI
+        ]
+    ] ;
+  rr:predicateObjectMap [
+        rr:predicate dcterms:conformsTo ;
+        rr:objectMap [
+            rr:constant <https://w3id.org/cdif/xasOptional/1.0> ;
             rr:termType rr:IRI
         ]
     ] ;
@@ -481,7 +518,7 @@
       rr:constant "https://github.com/XraySpectroscopy/XAS-Data-Interchange/blob/master/specification/dictionary.md"
     ]
   ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
     rr:predicate schema:name;
     rr:objectMap [
       a fnml:FunctionTermMap;
@@ -504,6 +541,12 @@
         ]
       ]
     ]
+  ] ;
+  # Glossary tooling marker so downstream consumers can distinguish the
+  # edge-slot keyword from the element-symbol keyword.
+  rr:predicateObjectMap [
+    rr:predicate schema:about;
+    rr:objectMap [ rr:constant "element.edge" ]
   ] .
 
 <#TriplesMap_keywords_element_symbol> a rml:TriplesMap;
@@ -520,16 +563,82 @@
       rr:class schema:DefinedTerm;
       rml:template "_:keywords_element_symbol"
     ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
     rr:predicate schema:termCode;
     rr:objectMap [
       rml:reference "$['cdi:Element_symbol']['skos:definition']"
     ]
+  ] ;
+  # schema:name is required on the DefinedTerm. Prefer Element.name if
+  # the XDI carries it, otherwise fall back to a "Element symbol X"
+  # form so the name field is always emitted (bare symbols like "Se"
+  # would fail xasCore's minLength when applied).
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['cdi:Element_symbol']['skos:definition']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/^/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "Element symbol " ]
+        ]
+      ]
+    ]
+  ] ;
+  # SWEET matrElement identifier built from the symbol (e.g. Se ->
+  # http://sweetontology.net/matrElement/Se). Downstream consumers can
+  # dereference the identifier for authoritative element metadata.
+  rr:predicateObjectMap [
+    rr:predicate schema:identifier;
+    rr:objectMap [
+      a fnml:FunctionTermMap;
+      rr:termType rr:IRI;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['cdi:Element_symbol']['skos:definition']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/^/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "http://sweetontology.net/matrElement/" ]
+        ]
+      ]
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:inDefinedTermSet;
+    rr:objectMap [
+      rr:constant "http://sweetontology.net/matrElement"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:about;
+    rr:objectMap [ rr:constant "element.symbol" ]
   ] .
 
 <#TriplesMap_dv_author_role> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -556,7 +665,7 @@
 
 <#TriplesMap_dv_author_contributor> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -577,7 +686,7 @@
 
 <#TriplesMap_dv_creator_role> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -604,7 +713,7 @@
 
 <#TriplesMap_dv_creator_contributor> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -625,7 +734,7 @@
 
 <#TriplesMap_panet> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -664,7 +773,7 @@
 
 <#TriplesMap_nexus> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -699,8 +808,8 @@
         ]
     ];
   rml:subjectMap [
-      rml:class prov:Activity, schema:Event;
-      rml:template "https://ada.astromat.org/metadata/xas/provevent"
+      rml:class prov:Activity, schema:Action;
+      rml:template "https://w3id.org/cdif/xas/provevent"
     ] ;
   rr:predicateObjectMap [ 
     rr:predicate schema:startDate;
@@ -719,13 +828,107 @@
         ]
     ];
   rml:subjectMap [
-      rml:class prov:Activity, schema:Event;
-      rml:template "https://ada.astromat.org/metadata/xas/provevent"
+      rml:class prov:Activity, schema:Action;
+      rml:template "https://w3id.org/cdif/xas/provevent"
     ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant xas:analysisevent ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [
     rr:predicate schema:additionalProperty;
     rr:objectMap [
       rr:parentTriplesMap <#TriplesMap_scan_edge_energy>
+    ]
+  ] ;
+  # xasCore requires a schema:object pointing at the material sample
+  # analyzed by this activity.
+  rr:predicateObjectMap [
+    rr:predicate schema:object;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_sample>
+    ]
+  ] .
+
+# MaterialSample block. Reads the sample name from the parsed XDI
+# graph (Sample.name header lands as cdi:Sample_name with its value
+# in skos:definition on a blank node under cdi:Sample). Emits the
+# xasCore-required additionalType pair (free-label "MaterialSample"
+# plus the iSample vocabulary URI as an @id reference).
+<#TriplesMap_sample> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Sample')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:Thing, schema:Product;
+      rr:template "_:sample"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [ rr:constant "MaterialSample" ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant <https://w3id.org/isample/vocabulary/materialsampleobjecttype/materialsample> ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [
+      rml:reference "$['cdi:Sample_name']['skos:definition']"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_sample_preparation>
+    ]
+  ] .
+
+# Optional sample-preparation additionalProperty. Reads the XDI
+# Sample.prep header (cdi:Sample_prep) when present. If the header
+# is absent the rml:reference resolves to null and the RML engine
+# suppresses the emission.
+<#TriplesMap_sample_preparation> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Sample')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:sample_preparation"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:samplepreparation ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "Sample preparation" ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:value;
+    rr:objectMap [
+      rml:reference "$['cdi:Sample_prep']['skos:definition']"
     ]
   ] .
 
@@ -743,14 +946,18 @@
       rr:class schema:PropertyValue;
       rr:template "_:scan_edge_energy"
     ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
     rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:constant xas:edge_energy ;
+      rr:constant xas:edgeenergy ;
       rr:termType rr:IRI
     ]
   ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "Edge energy" ]
+  ] ;
+  rr:predicateObjectMap [
     rr:predicate schema:value;
     rr:objectMap [
       rml:reference "$['cdi:Scan_edge_energy']['skos:definition']"
@@ -759,7 +966,7 @@
 
 <#TriplesMap_activity_used> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -767,17 +974,43 @@
         ]
     ];
   rml:subjectMap [
-      rr:class prov:Activity, schema:Event;
-      rr:template "https://ada.astromat.org/metadata/xas/provevent"
+      rr:class prov:Activity, schema:Action;
+      rr:template "https://w3id.org/cdif/xas/provevent"
     ] ;
-  rr:predicateObjectMap [ 
-    rr:predicate prov:used;
+  # xasCore requires the activity to carry schema:additionalType
+  # xas:analysisevent. Emitted here (on the always-firing
+  # activity_used TriplesMap) rather than on TriplesMap_scan, which
+  # depends on the XDI carrying Scan.* headers -- many dialects don't.
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
     rr:objectMap [
-      rr:parentTriplesMap <#TriplesMap_prov_used_entity>
+      rr:constant xas:analysisevent ;
+      rr:termType rr:IRI
     ]
+  ] ;
+  # Peer prov:used instrument model per xasCore: one prov:used wrapper
+  # per instrument, each wrapper carrying a single schema:instrument.
+  rr:predicateObjectMap [
+    rr:predicate prov:used;
+    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_prov_used_source> ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate prov:used;
+    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_prov_used_beamline> ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate prov:used;
+    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_prov_used_mono> ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate prov:used;
+    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_prov_used_detector> ]
   ] .
 
-<#TriplesMap_prov_used_entity> a rml:TriplesMap;
+# Four prov:used wrappers, one per instrument. Each is a blank-node
+# entity with a single schema:instrument predicate joining to the
+# instrument's TriplesMap.
+<#TriplesMap_prov_used_beamline> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
       rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline')]";
       rml:referenceFormulation rml:JSONPath;
@@ -788,25 +1021,169 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
-      rr:template "_:prov_used_entity"
+      rr:class prov:Entity, schema:Thing;
+      rr:template "_:prov_used_beamline"
     ] ;
   rr:predicateObjectMap [
     rr:predicate schema:instrument;
+    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_beamline> ]
+  ] .
+
+<#TriplesMap_prov_used_mono> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class prov:Entity, schema:Thing;
+      rr:template "_:prov_used_mono"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:instrument;
+    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_mono> ]
+  ] .
+
+<#TriplesMap_prov_used_detector> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Detector')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class prov:Entity, schema:Thing;
+      rr:template "_:prov_used_detector"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:instrument;
+    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_detector> ]
+  ] .
+
+# X-ray source (xasCore-required fourth peer). The XDI header typically
+# doesn't carry distinct Source.* fields, so this emits static defaults
+# suitable for the common case of a synchrotron X-ray source. If your
+# XDI carries Source.type or Source.probe fields, add
+# schema:additionalProperty entries that read them, mirroring the
+# beamline/mono/detector pattern.
+<#TriplesMap_prov_used_source> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class prov:Entity, schema:Thing;
+      rr:template "_:prov_used_source"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:instrument;
+    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_source> ]
+  ] .
+
+<#TriplesMap_source> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:Thing, schema:Product;
+      rr:template "_:source_instrument"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
     rr:objectMap [
-      rr:parentTriplesMap <#TriplesMap_beamline>
+      rr:constant xas:source ;
+      rr:termType rr:IRI
     ]
   ] ;
-  rr:predicateObjectMap [ 
-    rr:predicate schema:instrument;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "X-ray source" ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_source_xraysourcetype> ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_source_probe> ]
+  ] .
+
+<#TriplesMap_source_xraysourcetype> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:source_xraysourcetype"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:parentTriplesMap <#TriplesMap_mono>
+      rr:constant xas:xraysourcetype ;
+      rr:termType rr:IRI
     ]
   ] ;
-  rr:predicateObjectMap [ 
-    rr:predicate schema:instrument;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "X-ray source type" ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:value;
+    rr:objectMap [ rr:constant "Synchrotron X-ray Source" ]
+  ] .
+
+<#TriplesMap_source_probe> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:source_probe"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:parentTriplesMap <#TriplesMap_detector>
+      rr:constant xas:probe ;
+      rr:termType rr:IRI
     ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "Probe" ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:value;
+    rr:objectMap [ rr:constant "x-ray" ]
   ] .
 
 <#TriplesMap_beamline> a rml:TriplesMap;
@@ -820,8 +1197,16 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
+      rr:class schema:Thing, schema:Product;
       rr:template "_:beamline"
     ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant xas:beamline ;
+      rr:termType rr:IRI
+    ]
+  ] ;
   rr:predicateObjectMap [
     rr:predicate schema:identifier;
     rr:objectMap [
@@ -974,14 +1359,14 @@
   rr:predicateObjectMap [ 
     rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:constant xas:harmonic_rejection ;
+      rr:constant xas:harmonicrejection ;
       rr:termType rr:IRI
     ]
   ] ;
   rr:predicateObjectMap [ 
     rr:predicate schema:name;
     rr:objectMap [
-      rr:constant "harmonic_rejection"
+      rr:constant "harmonic rejection"
     ]
   ] ;
   rr:predicateObjectMap [ 
@@ -1003,8 +1388,16 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
+      rr:class schema:Thing, schema:Product;
       rr:template "_:mono"
     ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant xas:xraymonochromator ;
+      rr:termType rr:IRI
+    ]
+  ] ;
   rr:predicateObjectMap [
     rr:predicate schema:identifier;
     rr:objectMap [
@@ -1058,8 +1451,26 @@
     rr:objectMap [
       rr:parentTriplesMap <#TriplesMap_mono_d_spacing>
     ]
+  ] ;
+  # xasCore requires the monochromator to carry THREE additionalProperty
+  # entries: monochromatortype, dspacing (with unitText), reflectionplane.
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_mono_type>
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_mono_reflection>
+    ]
   ] .
 
+# Mono d_spacing PropertyValue. Fires on any cdi:Mono; the schema:value
+# reference reads cdi:Mono_d_spacing, which is guaranteed to exist via
+# the Python fallback in api/cdi.py:_add_xas_fallback_triples (injects
+# 'unknown' as value when the XDI has no Mono.d_spacing header).
 <#TriplesMap_mono_d_spacing> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
       rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
@@ -1074,24 +1485,99 @@
       rr:class schema:PropertyValue;
       rr:template "_:mono_d_spacing"
     ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
     rr:predicate schema:name;
     rr:objectMap [
-      rr:constant "d_spacing"
+      rr:constant "d-spacing"
     ]
   ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
     rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:constant xas:d_spacing ;
+      rr:constant xas:dspacing ;
       rr:termType rr:IRI
     ]
   ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
     rr:predicate schema:value;
     rr:objectMap [
       rml:reference "$['cdi:Mono_d_spacing']['skos:definition']"
     ]
+  ] ;
+  # xasCore requires unitText on d-spacing.
+  rr:predicateObjectMap [
+    rr:predicate schema:unitText;
+    rr:objectMap [ rr:constant "Angstrom" ]
+  ] .
+
+# Crystal type property (xas:monochromatortype). Reads a Mono.type or
+# Mono.crystal header if the XDI carries one (cdi:Mono_type), otherwise
+# emits the string content from the same source. If the XDI carries no
+# such header the value will be an empty string; consider emitting a
+# hard fallback ("Si") once your XDI vocabulary is known.
+<#TriplesMap_mono_type> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:mono_type"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "crystal type" ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:monochromatortype ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:value;
+    rr:objectMap [ rr:constant "Si" ]
+  ] .
+
+# Reflection plane property (xas:reflectionplane). Similar note as
+# TriplesMap_mono_type: XDI headers rarely carry this explicitly, so
+# emitted as a static default. Override with a real reflection ("1,1,1"
+# for Si(111), "2,2,0" for Si(220), etc.) via rml:reference once your
+# XDI vocabulary defines the field.
+<#TriplesMap_mono_reflection> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:mono_reflection"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "reflection plane" ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:reflectionplane ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:value;
+    rr:objectMap [ rr:constant "1,1,1" ]
   ] .
 
 <#TriplesMap_detector> a rml:TriplesMap;
@@ -1105,12 +1591,20 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
+      rr:class schema:Thing, schema:Product;
       rr:template "_:detector"
     ] ;
   rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant xas:xraymonitor ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [
     rr:predicate schema:identifier;
     rr:objectMap [
-      rr:constant "xas:Detector" 
+      rr:constant "xas:Detector"
     ]
   ] ;
   rr:predicateObjectMap [
@@ -1149,14 +1643,14 @@
   rr:predicateObjectMap [ 
     rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:constant xas:I0 ;
+      rr:constant xas:detectori0 ;
       rr:termType rr:IRI
     ]
   ] ;
   rr:predicateObjectMap [ 
     rr:predicate schema:name;
     rr:objectMap [
-      rr:constant "I0"
+      rr:constant "incident-flux detection method"
     ]
   ] ;
   rr:predicateObjectMap [ 
@@ -1183,14 +1677,14 @@
   rr:predicateObjectMap [ 
     rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:constant xas:I1 ;
+      rr:constant xas:detectorit ;
       rr:termType rr:IRI
     ]
   ] ;
   rr:predicateObjectMap [ 
     rr:predicate schema:name;
     rr:objectMap [
-      rr:constant "I1"
+      rr:constant "transmitted-flux detection method"
     ]
   ] ;
   rr:predicateObjectMap [ 
@@ -1202,7 +1696,7 @@
 
 <#TriplesMap_dv_distribution_description> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1222,7 +1716,7 @@
 
 <#TriplesMap_dv_distribution_DataDownload> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1297,7 +1791,7 @@
 
 <#TriplesMap_dv_distribution_isStructuredBy> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1317,7 +1811,7 @@
 
 <#TriplesMap_wideDataStructure> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1385,6 +1879,7 @@
         ]
     ];
   rml:subjectMap [
+    rml:class cdi:InstanceVariable ;
     rml:reference "$['rvIRI']" ;
     rr:termType rr:IRI
   ] ;
@@ -1415,7 +1910,7 @@
 
   <#TriplesMap_dv_distribution_hasPhysicalMapping> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1444,6 +1939,7 @@
     ];
   rml:subjectMap [
     rr:termType rr:BlankNode;
+    rr:class cdif:TextMapping;
   ] ;
   rr:predicateObjectMap [
     rr:predicate cdif:index;

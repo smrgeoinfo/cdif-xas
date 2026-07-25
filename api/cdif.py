@@ -47,12 +47,15 @@ def generate_cdif(cdi_jsonld) -> dict[str, any]:
         "geosparql": "http://www.opengis.net/ont/geosparql#",
         "spdx": "http://spdx.org/rdf/terms#",
         "time": "http://www.w3.org/2006/time#",
-        "nx": "https://xas.org/dictionary/",
         "skos": "http://www.w3.org/2004/02/skos/core#",
         "cdifq": "https://cdif.codata.org/concept/",
         "prov": "http://www.w3.org/ns/prov#",
-        "xas": "http://ddialliance.org/Specification/XAS/",
-        "cdi": "https://ddi-cdi.org/label/"
+        "xas": "https://w3id.org/cdif/xas/",
+        "cdi": "https://ddi-cdi.org/label/",
+        # cdif: is used for stable markers on the SKOS graph
+        # (e.g. cdif:isDatasetRecord) so the RML iterators can locate
+        # the top-level Dataset node without regex-matching its @id.
+        "cdif": "https://w3id.org/cdif/"
     }
 
     # Try to embed distribution nodes instead of blank-node references using JSON-LD framing
@@ -74,7 +77,7 @@ def generate_cdif(cdi_jsonld) -> dict[str, any]:
         # Collect XAS and CDI namespace nodes from the original document that are
         # not matched by the schema:Dataset frame (e.g. SKOS concept/vocabulary terms).
         # Also include all blank nodes so their values can be inlined into CDI nodes.
-        xas_ns = "http://ddialliance.org/Specification/XAS/"
+        xas_ns = "https://w3id.org/cdif/xas/"
         cdi_label_ns = "https://ddi-cdi.org/label/"
         all_doc_nodes = doc if isinstance(doc, list) else doc.get("@graph", [])
         extra_nodes_raw = [
