@@ -136,6 +136,18 @@ class CDI_DDI:
                 if compound_variable_name and variable_value:
                         compound_variable_name = compound_variable_name.group(1).strip('#  ')
                         variable_value = variable_value.group(1)
+                        # Canonicalize XDI namespaced key case: XDI/1.0 uses
+                        # capitalized namespace + lowercase field
+                        # (Facility.name, Beamline.name, Mono.d_spacing).
+                        # Real files often use inconsistent case
+                        # (Facility.Name, Beamline.Name, Scan.Start_Time).
+                        # Lowercase everything after the first '.' so the
+                        # downstream RML mapping's canonical predicates
+                        # (cdi:Facility_name, cdi:Beamline_name, ...) match
+                        # regardless of source-side casing.
+                        if '.' in compound_variable_name:
+                            head, rest = compound_variable_name.split('.', 1)
+                            compound_variable_name = head + '.' + rest.lower()
                         if compound_variable_name in _DATETIME_KEYS:
                             iso = _normalize_datetime(variable_value)
                             if iso is not None:
@@ -214,6 +226,22 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
         if not _has_child(mono, "Mono_d_spacing"):
             _synthesize_child(mono, "Mono_d_spacing", "unknown")
 
+    # Beamline / Facility schema:name are required by the xasDocument
+    # profile (JSON Schema for the beamline peer instrument, SHACL
+    # Organization shape for the Facility). When the corresponding
+    # cdi:*_name key is absent from the SKOS graph — either because the
+    # XDI header is missing OR because it was written in a non-canonical
+    # case (e.g. `Facility.Name` with capital N never populates
+    # `cdi:Facility_name`) — synthesize a "missing" sentinel so the RML
+    # mapping's schema:name lookup finds a value.
+    for parent_local, child_local in (
+        ("Beamline", "Beamline_name"),
+        ("Facility", "Facility_name"),
+    ):
+        parent = URIRef(str(name_ns) + parent_local)
+        if (parent, None, None) in g and not _has_child(parent, child_local):
+            _synthesize_child(parent, child_local, "missing")
+
 
 def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Optional[str], datasetid: Optional[str] = None, datasetversion: Optional[str] = None, include_data: bool = True) -> None:
     from api.cdi import CDI_DDI
@@ -267,5 +295,16 @@ def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Op
         except Exception:
             # Ignore enrichment errors to not block core generation
             pass
+
+    # Stable marker for the RML iterators: tag every schema:Dataset in
+    # the merged graph with cdif:isDatasetRecord "yes". Emitted for both
+    # the local placeholder Dataset (redundant with local_input.py but
+    # harmless — same triple) and any Dataverse-enriched Dataset. RML
+    # iterators use this marker instead of a regex on the Dataverse
+    # citation-URL @id shape.
+    _SCHEMA = rdflib.Namespace("http://schema.org/")
+    _CDIF = rdflib.Namespace("https://w3id.org/cdif/")
+    for ds_subj in set(cdi_graph.subjects(rdflib.RDF.type, _SCHEMA.Dataset)):
+        cdi_graph.add((ds_subj, _CDIF.isDatasetRecord, rdflib.Literal("yes")))
 
     return cdi_graph

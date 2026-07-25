@@ -17,7 +17,7 @@
 
 <#TriplesMap_root> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -334,7 +334,7 @@
   
 <#TriplesMap_subjectOf> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -638,7 +638,7 @@
 
 <#TriplesMap_dv_author_role> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -665,7 +665,7 @@
 
 <#TriplesMap_dv_author_contributor> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -686,7 +686,7 @@
 
 <#TriplesMap_dv_creator_role> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -713,7 +713,7 @@
 
 <#TriplesMap_dv_creator_contributor> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -734,7 +734,7 @@
 
 <#TriplesMap_panet> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -773,7 +773,7 @@
 
 <#TriplesMap_nexus> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -966,7 +966,7 @@
 
 <#TriplesMap_activity_used> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1021,6 +1021,7 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
+      rr:class prov:Entity, schema:Thing;
       rr:template "_:prov_used_beamline"
     ] ;
   rr:predicateObjectMap [
@@ -1039,6 +1040,7 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
+      rr:class prov:Entity, schema:Thing;
       rr:template "_:prov_used_mono"
     ] ;
   rr:predicateObjectMap [
@@ -1057,6 +1059,7 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
+      rr:class prov:Entity, schema:Thing;
       rr:template "_:prov_used_detector"
     ] ;
   rr:predicateObjectMap [
@@ -1072,7 +1075,7 @@
 # beamline/mono/detector pattern.
 <#TriplesMap_prov_used_source> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1081,6 +1084,7 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
+      rr:class prov:Entity, schema:Thing;
       rr:template "_:prov_used_source"
     ] ;
   rr:predicateObjectMap [
@@ -1090,7 +1094,7 @@
 
 <#TriplesMap_source> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1124,7 +1128,7 @@
 
 <#TriplesMap_source_xraysourcetype> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1154,7 +1158,7 @@
 
 <#TriplesMap_source_probe> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1448,12 +1452,6 @@
       rr:parentTriplesMap <#TriplesMap_mono_d_spacing>
     ]
   ] ;
-  rr:predicateObjectMap [
-    rr:predicate schema:additionalProperty;
-    rr:objectMap [
-      rr:parentTriplesMap <#TriplesMap_mono_d_spacing_fallback>
-    ]
-  ] ;
   # xasCore requires the monochromator to carry THREE additionalProperty
   # entries: monochromatortype, dspacing (with unitText), reflectionplane.
   rr:predicateObjectMap [
@@ -1507,43 +1505,6 @@
     ]
   ] ;
   # xasCore requires unitText on d-spacing.
-  rr:predicateObjectMap [
-    rr:predicate schema:unitText;
-    rr:objectMap [ rr:constant "Angstrom" ]
-  ] .
-
-# d_spacing fallback: fires when the XDI has no Mono.d_spacing header.
-# Emits "unknown" as schema:value so the required predicate is present;
-# the value is obviously a placeholder needing manual correction.
-<#TriplesMap_mono_d_spacing_fallback> a rml:TriplesMap;
-  rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
-      rml:referenceFormulation rml:JSONPath;
-      rml:source [ a rml:RelativePathSource;
-          rml:root rml:MappingDirectory;
-          rml:path "cdif_skos.json"
-        ]
-    ];
-  rml:subjectMap [
-      rr:termType rr:BlankNode;
-      rr:class schema:PropertyValue;
-      rr:template "_:mono_d_spacing"
-    ] ;
-  rr:predicateObjectMap [
-    rr:predicate schema:name;
-    rr:objectMap [ rr:constant "d-spacing" ]
-  ] ;
-  rr:predicateObjectMap [
-    rr:predicate schema:propertyID;
-    rr:objectMap [
-      rr:constant xas:dspacing ;
-      rr:termType rr:IRI
-    ]
-  ] ;
-  rr:predicateObjectMap [
-    rr:predicate schema:value;
-    rr:objectMap [ rr:constant "unknown" ]
-  ] ;
   rr:predicateObjectMap [
     rr:predicate schema:unitText;
     rr:objectMap [ rr:constant "Angstrom" ]
@@ -1735,7 +1696,7 @@
 
 <#TriplesMap_dv_distribution_description> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1755,7 +1716,7 @@
 
 <#TriplesMap_dv_distribution_DataDownload> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1830,7 +1791,7 @@
 
 <#TriplesMap_dv_distribution_isStructuredBy> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1850,7 +1811,7 @@
 
 <#TriplesMap_wideDataStructure> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1918,6 +1879,7 @@
         ]
     ];
   rml:subjectMap [
+    rml:class cdi:InstanceVariable ;
     rml:reference "$['rvIRI']" ;
     rr:termType rr:IRI
   ] ;
@@ -1948,7 +1910,7 @@
 
   <#TriplesMap_dv_distribution_hasPhysicalMapping> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][0]";
+      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1977,6 +1939,7 @@
     ];
   rml:subjectMap [
     rr:termType rr:BlankNode;
+    rr:class cdif:TextMapping;
   ] ;
   rr:predicateObjectMap [
     rr:predicate cdif:index;

@@ -51,7 +51,11 @@ def generate_cdif(cdi_jsonld) -> dict[str, any]:
         "cdifq": "https://cdif.codata.org/concept/",
         "prov": "http://www.w3.org/ns/prov#",
         "xas": "https://w3id.org/cdif/xas/",
-        "cdi": "https://ddi-cdi.org/label/"
+        "cdi": "https://ddi-cdi.org/label/",
+        # cdif: is used for stable markers on the SKOS graph
+        # (e.g. cdif:isDatasetRecord) so the RML iterators can locate
+        # the top-level Dataset node without regex-matching its @id.
+        "cdif": "https://w3id.org/cdif/"
     }
 
     # Try to embed distribution nodes instead of blank-node references using JSON-LD framing
