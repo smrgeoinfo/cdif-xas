@@ -1437,6 +1437,12 @@
       rr:parentTriplesMap <#TriplesMap_mono_d_spacing>
     ]
   ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_mono_d_spacing_fallback>
+    ]
+  ] ;
   # xasCore requires the monochromator to carry THREE additionalProperty
   # entries: monochromatortype, dspacing (with unitText), reflectionplane.
   rr:predicateObjectMap [
@@ -1452,9 +1458,17 @@
     ]
   ] .
 
+# Mono d_spacing PropertyValue. Split into two mutually-exclusive
+# TriplesMaps so the schema:value is always emitted — either from the
+# XDI Mono.d_spacing header (when present) or a placeholder "unknown"
+# fallback (when absent). xasCore REQUIRES d_spacing to have a
+# schema:value; without either TriplesMap firing, the mono would fail
+# validation. If your XDI dialect uses a different key (e.g., 'crystal
+# cut' + a lookup table from cut to d_spacing), extend the parse_xdi
+# graph in api/cdi.py or add another synthesis step in generate_cdi.
 <#TriplesMap_mono_d_spacing> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono' && @['cdi:Mono_d_spacing'])]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1486,6 +1500,43 @@
     ]
   ] ;
   # xasCore requires unitText on d-spacing.
+  rr:predicateObjectMap [
+    rr:predicate schema:unitText;
+    rr:objectMap [ rr:constant "Angstrom" ]
+  ] .
+
+# d_spacing fallback: fires when the XDI has no Mono.d_spacing header.
+# Emits "unknown" as schema:value so the required predicate is present;
+# the value is obviously a placeholder needing manual correction.
+<#TriplesMap_mono_d_spacing_fallback> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono' && !@['cdi:Mono_d_spacing'])]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:mono_d_spacing"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "d-spacing" ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:dspacing ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:value;
+    rr:objectMap [ rr:constant "unknown" ]
+  ] ;
   rr:predicateObjectMap [
     rr:predicate schema:unitText;
     rr:objectMap [ rr:constant "Angstrom" ]
