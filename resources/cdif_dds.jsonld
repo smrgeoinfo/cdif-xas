@@ -18,7 +18,7 @@
         ],
         "https://w3id.org/cdif/formats_InstanceVariable": [
             {
-                "@id": "https://example.org/DV/BYSPHH/iv/Column_1"
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_1"
             }
         ],
         "https://w3id.org/cdif/index": [
@@ -33,17 +33,7 @@
         ]
     },
     {
-        "@id": "https://example.org/DV/BYSPHH/iv/Column_1",
-        "http://schema.org/alternateName": [
-            {
-                "@value": "mono energy"
-            }
-        ],
-        "http://schema.org/description": [
-            {
-                "@value": "mono energy"
-            }
-        ],
+        "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_1",
         "http://schema.org/name": [
             {
                 "@value": "energy"
@@ -51,16 +41,21 @@
         ],
         "http://schema.org/unitText": [
             {
-                "@value": "eV"
+                "@value": ""
             }
         ],
         "@type": [
             "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/InstanceVariable",
             "http://schema.org/PropertyValue"
         ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ],
         "https://w3id.org/cdif/uses": [
             {
-                "@value": "https://example.org/struct/DV/BYSPHH/rv/Column_1"
+                "@value": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_1"
             }
         ]
     },
@@ -83,7 +78,7 @@
         ],
         "https://w3id.org/cdif/formats_InstanceVariable": [
             {
-                "@id": "https://example.org/DV/BYSPHH/iv/Column_2"
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_2"
             }
         ],
         "https://w3id.org/cdif/index": [
@@ -98,25 +93,10 @@
         ]
     },
     {
-        "@id": "https://example.org/DV/BYSPHH/iv/Column_2",
-        "http://schema.org/alternateName": [
-            {
-                "@value": "time"
-            }
-        ],
-        "http://schema.org/description": [
-            {
-                "@value": "time"
-            }
-        ],
+        "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_2",
         "http://schema.org/name": [
             {
-                "@value": "time"
-            }
-        ],
-        "http://schema.org/propertyID": [
-            {
-                "@id": "https://w3id.org/cdif/xas/time"
+                "@value": "i0"
             }
         ],
         "http://schema.org/unitText": [
@@ -128,9 +108,14 @@
             "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/InstanceVariable",
             "http://schema.org/PropertyValue"
         ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ],
         "https://w3id.org/cdif/uses": [
             {
-                "@value": "https://example.org/struct/DV/BYSPHH/rv/Column_2"
+                "@value": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_2"
             }
         ]
     },
@@ -153,7 +138,7 @@
         ],
         "https://w3id.org/cdif/formats_InstanceVariable": [
             {
-                "@id": "https://example.org/DV/BYSPHH/iv/Column_3"
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_3"
             }
         ],
         "https://w3id.org/cdif/index": [
@@ -168,20 +153,10 @@
         ]
     },
     {
-        "@id": "https://example.org/DV/BYSPHH/iv/Column_3",
-        "http://schema.org/alternateName": [
-            {
-                "@value": "monitor intensity"
-            }
-        ],
-        "http://schema.org/description": [
-            {
-                "@value": "monitor intensity"
-            }
-        ],
+        "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_3",
         "http://schema.org/name": [
             {
-                "@value": "i0"
+                "@value": "itrans"
             }
         ],
         "http://schema.org/unitText": [
@@ -193,9 +168,14 @@
             "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/InstanceVariable",
             "http://schema.org/PropertyValue"
         ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ],
         "https://w3id.org/cdif/uses": [
             {
-                "@value": "https://example.org/struct/DV/BYSPHH/rv/Column_3"
+                "@value": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_3"
             }
         ]
     },
@@ -218,7 +198,7 @@
         ],
         "https://w3id.org/cdif/formats_InstanceVariable": [
             {
-                "@id": "https://example.org/DV/BYSPHH/iv/Column_4"
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_4"
             }
         ],
         "https://w3id.org/cdif/index": [
@@ -233,20 +213,10 @@
         ]
     },
     {
-        "@id": "https://example.org/DV/BYSPHH/iv/Column_4",
-        "http://schema.org/alternateName": [
-            {
-                "@value": "transmission intensity"
-            }
-        ],
-        "http://schema.org/description": [
-            {
-                "@value": "transmission intensity"
-            }
-        ],
+        "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_4",
         "http://schema.org/name": [
             {
-                "@value": "itrans"
+                "@value": "irefer"
             }
         ],
         "http://schema.org/unitText": [
@@ -258,9 +228,194 @@
             "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/InstanceVariable",
             "http://schema.org/PropertyValue"
         ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ],
         "https://w3id.org/cdif/uses": [
             {
-                "@value": "https://example.org/struct/DV/BYSPHH/rv/Column_4"
+                "@value": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_4"
+            }
+        ]
+    },
+    {
+        "@id": "_:4",
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/maximumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/minimumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "https://w3id.org/cdif/format": [
+            {
+                "@value": "decimal"
+            }
+        ],
+        "https://w3id.org/cdif/formats_InstanceVariable": [
+            {
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_5"
+            }
+        ],
+        "https://w3id.org/cdif/index": [
+            {
+                "@value": "5"
+            }
+        ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_5",
+        "http://schema.org/name": [
+            {
+                "@value": "mutrans"
+            }
+        ],
+        "http://schema.org/unitText": [
+            {
+                "@value": ""
+            }
+        ],
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/InstanceVariable",
+            "http://schema.org/PropertyValue"
+        ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ],
+        "https://w3id.org/cdif/uses": [
+            {
+                "@value": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_5"
+            }
+        ]
+    },
+    {
+        "@id": "_:5",
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/maximumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/minimumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "https://w3id.org/cdif/format": [
+            {
+                "@value": "decimal"
+            }
+        ],
+        "https://w3id.org/cdif/formats_InstanceVariable": [
+            {
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_6"
+            }
+        ],
+        "https://w3id.org/cdif/index": [
+            {
+                "@value": "6"
+            }
+        ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_6",
+        "http://schema.org/name": [
+            {
+                "@value": "lnitiref"
+            }
+        ],
+        "http://schema.org/unitText": [
+            {
+                "@value": ""
+            }
+        ],
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/InstanceVariable",
+            "http://schema.org/PropertyValue"
+        ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ],
+        "https://w3id.org/cdif/uses": [
+            {
+                "@value": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_6"
+            }
+        ]
+    },
+    {
+        "@id": "_:6",
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/maximumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/minimumLength": [
+            {
+                "@value": "15"
+            }
+        ],
+        "https://w3id.org/cdif/format": [
+            {
+                "@value": "decimal"
+            }
+        ],
+        "https://w3id.org/cdif/formats_InstanceVariable": [
+            {
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_7"
+            }
+        ],
+        "https://w3id.org/cdif/index": [
+            {
+                "@value": "7"
+            }
+        ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_7",
+        "http://schema.org/name": [
+            {
+                "@value": "time"
+            }
+        ],
+        "http://schema.org/unitText": [
+            {
+                "@value": ""
+            }
+        ],
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/InstanceVariable",
+            "http://schema.org/PropertyValue"
+        ],
+        "https://w3id.org/cdif/physicalDataType": [
+            {
+                "@value": "decimal"
+            }
+        ],
+        "https://w3id.org/cdif/uses": [
+            {
+                "@value": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_7"
             }
         ]
     },
@@ -282,16 +437,6 @@
                 "@id": "https://w3id.org/cdif/xas/beamline"
             }
         ],
-        "http://schema.org/identifier": [
-            {
-                "@value": "xas:Beamline/13-BM-D"
-            }
-        ],
-        "http://schema.org/name": [
-            {
-                "@value": "Beamline/13-BM-D"
-            }
-        ],
         "@type": [
             "http://schema.org/Product",
             "http://schema.org/Thing"
@@ -307,11 +452,6 @@
         "http://schema.org/propertyID": [
             {
                 "@id": "https://w3id.org/cdif/xas/collimation"
-            }
-        ],
-        "http://schema.org/value": [
-            {
-                "@value": "none"
             }
         ],
         "@type": [
@@ -330,11 +470,6 @@
                 "@id": "https://w3id.org/cdif/xas/focusing"
             }
         ],
-        "http://schema.org/value": [
-            {
-                "@value": "no"
-            }
-        ],
         "@type": [
             "http://schema.org/PropertyValue"
         ]
@@ -349,11 +484,6 @@
         "http://schema.org/propertyID": [
             {
                 "@id": "https://w3id.org/cdif/xas/harmonicrejection"
-            }
-        ],
-        "http://schema.org/value": [
-            {
-                "@value": "Rh-coated mirror, detuned "
             }
         ],
         "@type": [
@@ -402,11 +532,6 @@
                 "@id": "https://w3id.org/cdif/xas/detectori0"
             }
         ],
-        "http://schema.org/value": [
-            {
-                "@value": "10cm  N2"
-            }
-        ],
         "@type": [
             "http://schema.org/PropertyValue"
         ]
@@ -423,70 +548,8 @@
                 "@id": "https://w3id.org/cdif/xas/detectorit"
             }
         ],
-        "http://schema.org/value": [
-            {
-                "@value": "10cm  N2 (?)"
-            }
-        ],
         "@type": [
             "http://schema.org/PropertyValue"
-        ]
-    },
-    {
-        "@id": "_:_:keywords_element_edge",
-        "http://schema.org/about": [
-            {
-                "@value": "element.edge"
-            }
-        ],
-        "http://schema.org/inDefinedTermSet": [
-            {
-                "@value": "https://github.com/XraySpectroscopy/XAS-Data-Interchange/blob/master/specification/dictionary.md"
-            }
-        ],
-        "http://schema.org/name": [
-            {
-                "@value": "K-edge"
-            }
-        ],
-        "http://schema.org/termCode": [
-            {
-                "@value": "K"
-            }
-        ],
-        "@type": [
-            "http://schema.org/DefinedTerm"
-        ]
-    },
-    {
-        "@id": "_:_:keywords_element_symbol",
-        "http://schema.org/about": [
-            {
-                "@value": "element.symbol"
-            }
-        ],
-        "http://schema.org/identifier": [
-            {
-                "@id": "http://sweetontology.net/matrElement/Se"
-            }
-        ],
-        "http://schema.org/inDefinedTermSet": [
-            {
-                "@value": "http://sweetontology.net/matrElement"
-            }
-        ],
-        "http://schema.org/name": [
-            {
-                "@value": "Element symbol Se"
-            }
-        ],
-        "http://schema.org/termCode": [
-            {
-                "@value": "Se"
-            }
-        ],
-        "@type": [
-            "http://schema.org/DefinedTerm"
         ]
     },
     {
@@ -509,12 +572,12 @@
         ],
         "http://schema.org/identifier": [
             {
-                "@value": "xas:Mono/Si 111"
+                "@value": "xas:Mono/Si(311)"
             }
         ],
         "http://schema.org/name": [
             {
-                "@value": "Mono/Si 111"
+                "@value": "Mono/Si(311)"
             }
         ],
         "@type": [
@@ -537,11 +600,6 @@
         "http://schema.org/unitText": [
             {
                 "@value": "Angstrom"
-            }
-        ],
-        "http://schema.org/value": [
-            {
-                "@value": "3.13550"
             }
         ],
         "@type": [
@@ -707,11 +765,6 @@
     },
     {
         "@id": "_:_:role_author_name",
-        "http://schema.org/name": [
-            {
-                "@value": "Richards, Steve"
-            }
-        ],
         "@type": [
             "http://schema.org/Person"
         ]
@@ -734,11 +787,6 @@
     },
     {
         "@id": "_:_:role_creator_name",
-        "http://schema.org/name": [
-            {
-                "@value": "Richards, Steve"
-            }
-        ],
         "@type": [
             "http://schema.org/Person"
         ]
@@ -763,7 +811,7 @@
         "@id": "_:_:role_facility_name",
         "http://schema.org/name": [
             {
-                "@value": "APS"
+                "@value": "Diamond Light Source"
             }
         ],
         "@type": [
@@ -787,7 +835,7 @@
         ],
         "http://schema.org/name": [
             {
-                "@value": "Na2SeO4"
+                "@value": "PtSn_OCO_Abu"
             }
         ],
         "@type": [
@@ -805,32 +853,6 @@
         "http://schema.org/propertyID": [
             {
                 "@id": "https://w3id.org/cdif/xas/samplepreparation"
-            }
-        ],
-        "http://schema.org/value": [
-            {
-                "@value": "powder on tape, 6 layers"
-            }
-        ],
-        "@type": [
-            "http://schema.org/PropertyValue"
-        ]
-    },
-    {
-        "@id": "_:_:scan_edge_energy",
-        "http://schema.org/name": [
-            {
-                "@value": "Edge energy"
-            }
-        ],
-        "http://schema.org/propertyID": [
-            {
-                "@id": "https://w3id.org/cdif/xas/edgeenergy"
-            }
-        ],
-        "http://schema.org/value": [
-            {
-                "@value": "12658.0"
             }
         ],
         "@type": [
@@ -908,7 +930,7 @@
         ],
         "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/isStructuredBy": [
             {
-                "@id": "https://example.org/struct/DV/BYSPHH"
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1"
             }
         ],
         "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/skipInitialSpace": [
@@ -921,24 +943,19 @@
                 "@id": "https://github.com/XraySpectroscopy/XAS-Data-Interchange/blob/master/specification/spec.md"
             }
         ],
-        "http://schema.org/contentSize": [
-            {
-                "@value": "29783"
-            }
-        ],
         "http://schema.org/contentUrl": [
             {
-                "@value": "http://localhost:8080/api/access/datafile/29"
+                "@value": "file:///C:/GithubC/CDIF/XAS-CDIF/exampleData/XDI%20format%20of%20collection%20203/262875_PtSn_OCO_Abu_1.xdi"
             }
         ],
         "http://schema.org/description": [
             {
-                "@value": "Se_Na2SeO4_rt_01.xdi"
+                "@value": "Placeholder metadata generated by cdif-xas-UKDS local pipeline. Values normally sourced from Dataverse are stubbed; edit downstream if you need real values."
             }
         ],
         "http://schema.org/encodingFormat": [
             {
-                "@value": "application/octet-stream"
+                "@value": "application/x-xdi"
             }
         ],
         "@type": [
@@ -958,23 +975,41 @@
             },
             {
                 "@id": "_:3"
+            },
+            {
+                "@id": "_:4"
+            },
+            {
+                "@id": "_:5"
+            },
+            {
+                "@id": "_:6"
             }
         ]
     },
     {
-        "@id": "https://example.org/struct/DV/BYSPHH",
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1",
         "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/has_DataStructureComponent": [
             {
-                "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_1"
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_1"
             },
             {
-                "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_2"
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_2"
             },
             {
-                "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_3"
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_3"
             },
             {
-                "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_4"
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_4"
+            },
+            {
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_5"
+            },
+            {
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_6"
+            },
+            {
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_7"
             }
         ],
         "@type": [
@@ -982,7 +1017,7 @@
         ]
     },
     {
-        "@id": "https://example.org/dataset/DV/BYSPHH",
+        "@id": "https://example.org/dataset/DV/262875_PtSn_OCO_Abu_1",
         "http://schema.org/contributor": [
             {
                 "@id": "_:_:role_author"
@@ -994,14 +1029,9 @@
                 "@id": "_:_:role_facility"
             }
         ],
-        "http://schema.org/dateModified": [
-            {
-                "@value": "2026-06-24"
-            }
-        ],
         "http://schema.org/description": [
             {
-                "@value": "Se_Na2SeO4_rt_01.xdi"
+                "@value": "Placeholder metadata generated by cdif-xas-UKDS local pipeline. Values normally sourced from Dataverse are stubbed; edit downstream if you need real values."
             }
         ],
         "http://schema.org/distribution": [
@@ -1011,20 +1041,12 @@
         ],
         "http://schema.org/identifier": [
             {
-                "@value": "http://localhost:8080/citation?persistentId=perma:DV/BYSPHH"
-            }
-        ],
-        "http://schema.org/keywords": [
-            {
-                "@id": "_:_:keywords_element_edge"
-            },
-            {
-                "@id": "_:_:keywords_element_symbol"
+                "@value": "local:262875_PtSn_OCO_Abu_1"
             }
         ],
         "http://schema.org/license": [
             {
-                "@value": "http://creativecommons.org/publicdomain/zero/1.0"
+                "@value": "https://creativecommons.org/licenses/by/4.0/"
             }
         ],
         "http://schema.org/measurementTechnique": [
@@ -1037,41 +1059,40 @@
         ],
         "http://schema.org/name": [
             {
-                "@value": "Se_Na2SeO4_rt_01"
-            }
-        ],
-        "http://schema.org/sameAs": [
-            {
-                "@value": "https://github.com/CDIF-4-XAS/XAS-CDIF/blob/main/se_na2so4_rt.xdi"
+                "@value": "262875_PtSn_OCO_Abu_1"
             }
         ],
         "http://schema.org/subjectOf": [
             {
-                "@id": "https://example.org/dataset/DV/BYSPHH/metadata"
+                "@id": "https://example.org/dataset/DV/262875_PtSn_OCO_Abu_1/metadata"
             }
         ],
         "http://schema.org/url": [
             {
-                "@value": "http://localhost:8080/api/access/datafile/29"
+                "@value": "file:///C:/GithubC/CDIF/XAS-CDIF/exampleData/XDI%20format%20of%20collection%20203/262875_PtSn_OCO_Abu_1.xdi"
             }
         ],
         "http://schema.org/variableMeasured": [
             {
-                "@id": "https://example.org/DV/BYSPHH/iv/Column_1"
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_1"
             },
             {
-                "@id": "https://example.org/DV/BYSPHH/iv/Column_2"
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_2"
             },
             {
-                "@id": "https://example.org/DV/BYSPHH/iv/Column_3"
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_3"
             },
             {
-                "@id": "https://example.org/DV/BYSPHH/iv/Column_4"
-            }
-        ],
-        "http://schema.org/version": [
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_4"
+            },
             {
-                "@value": "5"
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_5"
+            },
+            {
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_6"
+            },
+            {
+                "@id": "https://example.org/DV/262875_PtSn_OCO_Abu_1/iv/Column_7"
             }
         ],
         "@type": [
@@ -1084,7 +1105,7 @@
         ]
     },
     {
-        "@id": "https://example.org/dataset/DV/BYSPHH/metadata",
+        "@id": "https://example.org/dataset/DV/262875_PtSn_OCO_Abu_1/metadata",
         "http://purl.org/dc/terms/conformsTo": [
             {
                 "@id": "https://w3id.org/cdif/core/1.1"
@@ -1107,7 +1128,7 @@
         ],
         "http://schema.org/about": [
             {
-                "@id": "https://example.org/dataset/DV/BYSPHH"
+                "@id": "https://example.org/dataset/DV/262875_PtSn_OCO_Abu_1"
             }
         ],
         "http://schema.org/additionalType": [
@@ -1121,26 +1142,6 @@
     },
     {
         "@id": "https://w3id.org/cdif/xas/provevent",
-        "http://schema.org/additionalProperty": [
-            {
-                "@id": "_:_:scan_edge_energy"
-            }
-        ],
-        "http://schema.org/additionalType": [
-            {
-                "@id": "https://w3id.org/cdif/xas/analysisevent"
-            }
-        ],
-        "http://schema.org/object": [
-            {
-                "@id": "_:_:sample"
-            }
-        ],
-        "http://schema.org/startDate": [
-            {
-                "@value": "2008-04-10T21:58:50"
-            }
-        ],
         "@type": [
             "http://schema.org/Action",
             "http://www.w3.org/ns/prov#Activity"
@@ -1161,51 +1162,84 @@
         ]
     },
     {
-        "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_1",
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_1",
         "@type": [
             "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/MeasureComponent"
         ],
         "https://w3id.org/cdif/isDefinedBy_RepresentedVariable": [
             {
-                "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_1"
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_1"
             }
         ]
     },
     {
-        "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_2",
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_2",
         "@type": [
             "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/MeasureComponent"
         ],
         "https://w3id.org/cdif/isDefinedBy_RepresentedVariable": [
             {
-                "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_2"
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_2"
             }
         ]
     },
     {
-        "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_3",
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_3",
         "@type": [
             "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/MeasureComponent"
         ],
         "https://w3id.org/cdif/isDefinedBy_RepresentedVariable": [
             {
-                "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_3"
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_3"
             }
         ]
     },
     {
-        "@id": "https://example.org/struct/DV/BYSPHH/comp/Column_4",
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_4",
         "@type": [
             "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/MeasureComponent"
         ],
         "https://w3id.org/cdif/isDefinedBy_RepresentedVariable": [
             {
-                "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_4"
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_4"
             }
         ]
     },
     {
-        "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_1",
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_5",
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/MeasureComponent"
+        ],
+        "https://w3id.org/cdif/isDefinedBy_RepresentedVariable": [
+            {
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_5"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_6",
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/MeasureComponent"
+        ],
+        "https://w3id.org/cdif/isDefinedBy_RepresentedVariable": [
+            {
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_6"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/comp/Column_7",
+        "@type": [
+            "http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/MeasureComponent"
+        ],
+        "https://w3id.org/cdif/isDefinedBy_RepresentedVariable": [
+            {
+                "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_7"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_1",
         "https://w3id.org/cdif/name": [
             {
                 "@value": "energy"
@@ -1213,15 +1247,7 @@
         ]
     },
     {
-        "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_2",
-        "https://w3id.org/cdif/name": [
-            {
-                "@value": "time"
-            }
-        ]
-    },
-    {
-        "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_3",
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_2",
         "https://w3id.org/cdif/name": [
             {
                 "@value": "i0"
@@ -1229,10 +1255,42 @@
         ]
     },
     {
-        "@id": "https://example.org/struct/DV/BYSPHH/rv/Column_4",
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_3",
         "https://w3id.org/cdif/name": [
             {
                 "@value": "itrans"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_4",
+        "https://w3id.org/cdif/name": [
+            {
+                "@value": "irefer"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_5",
+        "https://w3id.org/cdif/name": [
+            {
+                "@value": "mutrans"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_6",
+        "https://w3id.org/cdif/name": [
+            {
+                "@value": "lnitiref"
+            }
+        ]
+    },
+    {
+        "@id": "https://example.org/struct/DV/262875_PtSn_OCO_Abu_1/rv/Column_7",
+        "https://w3id.org/cdif/name": [
+            {
+                "@value": "time"
             }
         ]
     }

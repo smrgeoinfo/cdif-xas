@@ -388,7 +388,7 @@
         "schema:minValue": {},
         "schema:maxValue": {},
         "schema:url": {},
-        "cdif:physicalDataType": {"@embed": "@always"},
+        "cdif:physicalDataType": {},
         "cdif:simpleUnitOfMeasure": {"@embed": "@always"},
         "cdif:uses": {"@embed": "@always"},
         "cdif:isDescribedBy_StatisticsCollection": {"@embed": "@always"},

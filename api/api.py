@@ -53,8 +53,17 @@ def cdif_generate(
             "untouched."
         ),
     ),
+    include_data: bool = Query(
+        False,
+        description=(
+            "If true, include XDI data rows in the SKOS graph as rdf:List "
+            "triples. Default false — the row triples are not used by the "
+            "downstream RML mapping and add seconds-to-minutes of parse "
+            "time on real-size XDI files. Set true only for debugging."
+        ),
+    ),
 ):
-    graph = generate_cdi(url, resources, type, datasetid)
+    graph = generate_cdi(url, resources, type, datasetid, include_data=include_data)
     cdi_jsonld = graph.serialize(format="json-ld")
 
     pp_data = generate_cdif(cdi_jsonld)

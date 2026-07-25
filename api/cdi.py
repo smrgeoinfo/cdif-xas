@@ -63,32 +63,39 @@ class CDI_DDI:
         
     def parse_structure(self, value):
         if ':' in value:
-            compound_variable_name = re.search(r'#\s+(.*)\:', value)
-            variable_value = re.search(r'\:\s*(.*)', value) 
+            # NON-greedy on the name half so multi-colon values parse
+            # correctly: "# Beamline.focusing: Pitch: 2.3; Height: -6.4"
+            # -> name = "Beamline.focusing", value = "Pitch: 2.3; ...".
+            # Previously the greedy match assigned name up to the LAST
+            # colon, producing garbled cdi: predicate URIs and empty
+            # skos:definition values.
+            compound_variable_name = re.search(r'#\s+(.*?)\:', value)
+            variable_value = re.search(r'\:\s*(.*)', value)
             return compound_variable_name, variable_value
         else:
             return None, value
     
-    def parse_xdi(self):
+    def parse_xdi(self, include_data: bool = True):
+        """Parse XDI header lines (and, by default, data rows) into rdflib.
+
+        If include_data=False, data rows are skipped entirely. That drops
+        thousands of rdf:List add() calls for large XDI files and cuts
+        end-to-end /cdif time from minutes to seconds. Metadata output
+        is identical either way; only the row-by-row triples are omitted.
+        """
         for line in self.response.text.split("\n"):
-            print("line: ", line)
             # Variables path
             if self.check_variable_name(line):
                 compound_variable_name, variable_value = self.parse_structure(line)
-                print("compound_variable_name: ", compound_variable_name)
-                print("variable_value: ", variable_value)
                 if compound_variable_name and variable_value:
-                        compound_variable_name = compound_variable_name.group(1).strip('#  ') 
+                        compound_variable_name = compound_variable_name.group(1).strip('#  ')
                         variable_value = variable_value.group(1)
-                        print("compound_variable_name_1: ", compound_variable_name)
-                        print("variable_value_1: ", variable_value)
                         if '.' in compound_variable_name:
                             compound_variable_name_uri = compound_variable_name.replace(" ", "_").replace(":", "_")
                             variables = compound_variable_name_uri.split('.')
                             for variable_id in range(0,len(variables)-1):
                                 variable_name = variables[variable_id]
                                 variable_next = variables[variable_id+1]
-                                print("Compound: " + variable_name + '.' + variable_next + " = " + variable_value)
                                 self.g.add((rdflib.URIRef(self.name + variable_name), self.skos.prefLabel, rdflib.Literal(variable_name)))
                                 self.g.add((rdflib.URIRef(self.name + variable_name), self.skos.broader, rdflib.URIRef(self.name + variable_name + '_' + variable_next)))
                                 blank = rdflib.BNode()
@@ -112,6 +119,8 @@ class CDI_DDI:
                             pass
             # Data path
             else:
+                if not include_data:
+                    continue
                 if self.navigator:
                     if not self.lastvariable in self.datasets:
                         self.datasets[self.navigator] = [line.strip()]
@@ -124,7 +133,7 @@ class CDI_DDI:
 
         return self.g
 
-def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Optional[str], datasetid: Optional[str] = None, datasetversion: Optional[str] = None) -> None:
+def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Optional[str], datasetid: Optional[str] = None, datasetversion: Optional[str] = None, include_data: bool = True) -> None:
     from api.cdi import CDI_DDI
 
     resources_dir_final = resources_dir or os.path.join(Path(__file__).parent.parent, "resources")
@@ -133,7 +142,7 @@ def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Op
         resources_dir=resources_dir_final,
         type=dataset_type,
     )
-    cdi_graph = generator.parse_xdi()
+    cdi_graph = generator.parse_xdi(include_data=include_data)
 
     # for triple in cdi_graph:
     #     print("cdi_graph triple: ", triple)

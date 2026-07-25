@@ -108,7 +108,11 @@ def build_placeholder_dataset(url: str,
     )))
     g.add((ds, SCHEMA_NS.identifier, rdflib.Literal(f"local:{stem}")))
 
-    # Dates from file mtime, ISO 8601 date-only
+    # Dates from file mtime, ISO 8601 date-only. Typed as schema:Date so
+    # the JSON-LD serialization carries a {"@type": "schema:Date",
+    # "@value": "..."} shape; the RML mapping reads
+    # $['schema:dateModified']['@value'], so a plain-literal date would
+    # not be picked up.
     try:
         mtime = datetime.datetime.fromtimestamp(
             path.stat().st_mtime, tz=datetime.timezone.utc
@@ -116,8 +120,9 @@ def build_placeholder_dataset(url: str,
         date_str = mtime.date().isoformat()
     except OSError:
         date_str = datetime.date.today().isoformat()
-    g.add((ds, SCHEMA_NS.dateModified, rdflib.Literal(date_str)))
-    g.add((ds, SCHEMA_NS.datePublished, rdflib.Literal(date_str)))
+    date_typed = rdflib.Literal(date_str, datatype=SCHEMA_NS.Date)
+    g.add((ds, SCHEMA_NS.dateModified, date_typed))
+    g.add((ds, SCHEMA_NS.datePublished, date_typed))
 
     # Default CDIF metadata license
     g.add((ds, SCHEMA_NS.license,
