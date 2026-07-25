@@ -977,6 +977,17 @@
       rr:class prov:Activity, schema:Action;
       rr:template "https://w3id.org/cdif/xas/provevent"
     ] ;
+  # xasCore requires the activity to carry schema:additionalType
+  # xas:analysisevent. Emitted here (on the always-firing
+  # activity_used TriplesMap) rather than on TriplesMap_scan, which
+  # depends on the XDI carrying Scan.* headers -- many dialects don't.
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant xas:analysisevent ;
+      rr:termType rr:IRI
+    ]
+  ] ;
   # Peer prov:used instrument model per xasCore: one prov:used wrapper
   # per instrument, each wrapper carrying a single schema:instrument.
   rr:predicateObjectMap [

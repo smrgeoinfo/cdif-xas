@@ -133,6 +133,38 @@ class CDI_DDI:
 
         return self.g
 
+def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
+                              skos_ns: "rdflib.Namespace") -> None:
+    """Inject placeholder triples so the RML mapping can populate
+    xasCore-required content that many XDI dialects don't carry
+    explicitly. Each fallback fires only when the corresponding
+    real key is absent — real data from the XDI is never overwritten.
+
+    Fallbacks currently emitted:
+      cdi:Mono has no cdi:Mono_d_spacing -> synthesize with value 'unknown'
+        (correct value depends on the crystal cut; the fallback keeps
+        the schema:value predicate present so xasCore validates)
+
+    Add more as new XDI dialects surface with different gaps.
+    """
+    from rdflib import BNode, Literal, URIRef
+
+    def _has_child(subject: "URIRef", child_local: str) -> bool:
+        child_pred = URIRef(str(name_ns) + child_local)
+        return any(g.triples((subject, child_pred, None)))
+
+    def _synthesize_child(subject: "URIRef", child_local: str, value: str) -> None:
+        child_pred = URIRef(str(name_ns) + child_local)
+        blank = BNode()
+        g.add((subject, child_pred, blank))
+        g.add((blank, URIRef(str(skos_ns) + "definition"), Literal(value)))
+
+    mono = URIRef(str(name_ns) + "Mono")
+    if (mono, None, None) in g:
+        if not _has_child(mono, "Mono_d_spacing"):
+            _synthesize_child(mono, "Mono_d_spacing", "unknown")
+
+
 def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Optional[str], datasetid: Optional[str] = None, datasetversion: Optional[str] = None, include_data: bool = True) -> None:
     from api.cdi import CDI_DDI
 
@@ -144,9 +176,7 @@ def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Op
     )
     cdi_graph = generator.parse_xdi(include_data=include_data)
 
-    # for triple in cdi_graph:
-    #     print("cdi_graph triple: ", triple)
-
+    _add_xas_fallback_triples(cdi_graph, generator.name, generator.skos)
 
     # Quick sanity/compatibility check of the CDI graph
     try:
