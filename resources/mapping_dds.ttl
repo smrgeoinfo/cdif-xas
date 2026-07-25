@@ -225,15 +225,18 @@
       rml:reference "$['rvIRI']"
     ]
   ] ;
-  # cdif:physicalDataType is recommended by the CDIF Data Description
-  # SHACL. XDI columns are all decimal-typed by the XDI spec, so a
-  # static "decimal" default is safe. If a downstream XDI dialect ever
-  # allows other physical types, swap this for an rml:reference into
-  # a per-column type field.
-  rr:predicateObjectMap [
-    rr:predicate cdif:physicalDataType;
-    rr:objectMap [ rr:constant "decimal" ]
-  ] ;
+  # NOTE: cdif:physicalDataType emission was removed. It was there to
+  # clear a SHACL info/warning ('should specify cdif:physicalDataType')
+  # but pyld framing wraps rr:constant strings inconsistently into
+  # arrays like ["decimal"] for some columns, which then fails the
+  # cdifConceptOrTermOrString anyOf (string/DefinedTerm/Concept, but
+  # not array-of-string). Losing the info-level SHACL recommendation
+  # is a better trade than emitting hard JSON Schema errors. To restore
+  # once the frame emits scalar-shaped values reliably, add:
+  #   rr:predicateObjectMap [
+  #     rr:predicate cdif:physicalDataType;
+  #     rr:objectMap [ rr:constant "decimal" ]
+  #   ] ;
   rr:predicateObjectMap [
     rr:predicate schema:propertyID;
     rr:objectMap [
