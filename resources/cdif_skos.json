@@ -54,138 +54,64 @@
       "schema:name": "262875_PtSn_OCO_Abu_1"
     },
     {
-      "@id": "cdi:it_stanford_sensitivity",
-      "skos:prefLabel": "100 nA/V Offsets: 1 pA"
-    },
-    {
-      "@id": "cdi:Mono",
-      "skos:broader": {
-        "@id": "cdi:Mono_name"
-      },
-      "skos:prefLabel": [
-        "Mono",
-        "Si(311)"
-      ],
-      "cdi:Mono_name": {
-        "@id": "_:N7b376fdfeb134309a8b686a70b307ba9",
-        "skos:definition": "Si(311)"
-      }
-    },
-    {
-      "@id": "cdi:Facility",
-      "skos:broader": [
-        {
-          "@id": "cdi:Facility_name"
-        },
-        {
-          "@id": "cdi:Facility_energy"
-        },
-        {
-          "@id": "cdi:Facility_current"
-        }
-      ],
-      "skos:prefLabel": [
-        "Facility",
-        "Diamond Light Source",
-        "3.0 GeV",
-        "301.3 mA"
-      ],
-      "cdi:Facility_current": {
-        "@id": "_:N34c7fc9e0fd7443fb997567d9b65d603",
-        "skos:definition": "301.3 mA"
-      },
-      "cdi:Facility_energy": {
-        "@id": "_:Nb9001d7dd2e544de8ec0ea7969ba17ba",
-        "skos:definition": "3.0 GeV"
-      },
-      "cdi:Facility_name": {
-        "@id": "_:N7369f31ce1194fda820031d81ba0e992",
-        "skos:definition": "Diamond Light Source"
-      }
-    },
-    {
-      "@id": "cdi:mirror_2",
-      "skos:prefLabel": "Pitch:  2.3; Height: -6.4; Yaw: -1.6; Bend:  0.8;"
-    },
-    {
-      "@id": "cdi:postdcm_slits",
-      "skos:prefLabel": "vertical gap= 18.0; horizontal gap= 28.0; vertical offset= -9.1; horizontal offset= -16.5"
-    },
-    {
-      "@id": "cdi:Beamline",
-      "skos:broader": [
-        {
-          "@id": "cdi:Beamline_name"
-        },
-        {
-          "@id": "cdi:Beamline_focusing"
-        },
-        {
-          "@id": "cdi:Beamline_harmonic_rejection"
-        }
-      ],
-      "skos:prefLabel": [
-        "Beamline",
-        "B18-CORE XAS Date: Wed, 27 Jul 2016 22:00:52 BST",
-        "Pitch:  2.3; Height: -6.4; Yaw: -1.6; Bend:  0.8;",
-        "out; Y: 37.8; Pitch:  0.3; Coating: Pt"
-      ],
-      "cdi:Beamline_focusing": {
-        "@id": "_:N5dee43f0701349708bb584afe4313721",
-        "skos:definition": "Pitch:  2.3; Height: -6.4; Yaw: -1.6; Bend:  0.8;"
-      },
-      "cdi:Beamline_harmonic_rejection": {
-        "@id": "_:Nbd68f0ab8767435baaba6d4e0df20f92",
-        "skos:definition": "out; Y: 37.8; Pitch:  0.3; Coating: Pt"
-      },
-      "cdi:Beamline_name": {
-        "@id": "_:Nbf983e9d43be4b89b1a80edcf942605e",
-        "skos:definition": "B18-CORE XAS Date: Wed, 27 Jul 2016 22:00:52 BST"
-      }
-    },
-    {
-      "@id": "cdi:i0_stanford_sensitivity",
-      "skos:prefLabel": "20 nA/V Offsets: 20 pA"
-    },
-    {
-      "@id": "cdi:iref_stanford_sensitivity",
-      "skos:prefLabel": "20 nA/V Offsets: 1 pA"
-    },
-    {
-      "@id": "cdi:xml_folder_and_files",
-      "skos:prefLabel": ""
+      "@id": "cdi:secondary_slits",
+      "skos:prefLabel": "vertical gap=  3.5; horizontal gap= 23.0; vertical offset=  5.3; horizontal offset= -14.5"
     },
     {
       "@id": "cdi:primary_slits",
       "skos:prefLabel": "vertical gap=  2.4; horizontal gap= 52.0; vertical offset=  0.4; horizontal offset= -1.0"
     },
     {
-      "@id": "cdi:secondary_slits",
-      "skos:prefLabel": "vertical gap=  3.5; horizontal gap= 23.0; vertical offset=  5.3; horizontal offset= -14.5"
-    },
-    {
-      "@id": "cdi:ascii_output_file_name",
-      "skos:prefLabel": "Andrea_Sn//ascii/262875_PtSn_OCO_Abu_1.dat"
-    },
-    {
-      "@id": "cdi:nexus_output_file",
-      "skos:prefLabel": "/dls/b18/data/2016/sp10306-9/Andrea_Sn//nexus/262875_PtSn_OCO_Abu_1.nxs"
-    },
-    {
-      "@id": "cdi:white_beam_filter",
-      "skos:prefLabel": "140um PyC"
-    },
-    {
       "@id": "cdi:hr_mirror",
       "skos:prefLabel": "out; Y: 37.8; Pitch:  0.3; Coating: Pt"
     },
     {
-      "@id": "cdi:command",
-      "skos:prefLabel": "qexafs_energy 29000.0 30050.0 2094 263.53 qexafs_counterTimer01"
+      "@id": "cdi:Detector",
+      "skos:broader": [
+        {
+          "@id": "cdi:Detector_i0"
+        },
+        {
+          "@id": "cdi:Detector_it"
+        },
+        {
+          "@id": "cdi:Detector_ir"
+        }
+      ],
+      "skos:prefLabel": [
+        "Detector",
+        "20 nA/V Offsets: 20 pA",
+        "100 nA/V Offsets: 1 pA",
+        "20 nA/V Offsets: 1 pA"
+      ],
+      "cdi:Detector_i0": {
+        "@id": "_:N3b93ab99b5f04071b304294ad3cf2f97",
+        "skos:definition": "20 nA/V Offsets: 20 pA"
+      },
+      "cdi:Detector_ir": {
+        "@id": "_:N5df5c6b50b3b42a09547eb72d2af51f2",
+        "skos:definition": "20 nA/V Offsets: 1 pA"
+      },
+      "cdi:Detector_it": {
+        "@id": "_:N8ed094f081134ca9b6830d1684f3636e",
+        "skos:definition": "100 nA/V Offsets: 1 pA"
+      }
     },
     {
       "@id": "cdi:crystal_cut",
       "skos:prefLabel": "Si(311)"
+    },
+    {
+      "@id": "cdi:xml_folder_and_files",
+      "skos:prefLabel": ""
+    },
+    {
+      "@id": "cdi:mirror_2",
+      "skos:prefLabel": "Pitch:  2.3; Height: -6.4; Yaw: -1.6; Bend:  0.8;"
+    },
+    {
+      "@id": "cdi:nexus_output_file",
+      "skos:prefLabel": "/dls/b18/data/2016/sp10306-9/Andrea_Sn//nexus/262875_PtSn_OCO_Abu_1.nxs"
     },
     {
       "@id": "cdi:Column",
@@ -223,81 +149,133 @@
         "time"
       ],
       "cdi:Column_1": {
-        "@id": "_:N36e3d5adabd14170b7d0679c569c0b90",
+        "@id": "_:N9fb12a74f0f94249a75609fabb8a778f",
         "skos:definition": "energy"
       },
       "cdi:Column_2": {
-        "@id": "_:Ncc7bcd0d59884b2fb4ae4c961393d040",
+        "@id": "_:Nacb2358d94c64a43b62ae18912af32ab",
         "skos:definition": "i0"
       },
       "cdi:Column_3": {
-        "@id": "_:N469c6853ad8a4bdf800d6692ca70c37b",
+        "@id": "_:N41dda70f6da84718b3779ce5ba678025",
         "skos:definition": "itrans"
       },
       "cdi:Column_4": {
-        "@id": "_:N618175f96e3f4f36a24d325f9eb31014",
+        "@id": "_:N9eeb1bb834e247f3a0506476782c35b2",
         "skos:definition": "irefer"
       },
       "cdi:Column_5": {
-        "@id": "_:N54f702e240c940cbad220ffc4513b968",
+        "@id": "_:N3999e39d398e462d8e64d582c2293907",
         "skos:definition": "mutrans"
       },
       "cdi:Column_6": {
-        "@id": "_:N2969d5022ed24a488833b8235f616331",
+        "@id": "_:N853099144f7944919bca3b0a999244e4",
         "skos:definition": "lnitiref"
       },
       "cdi:Column_7": {
-        "@id": "_:N8adc72b6d89641ecb3608fdc09fc3e05",
+        "@id": "_:N243dbfce42a44135acf8e984b534daee",
         "skos:definition": "time"
       }
+    },
+    {
+      "@id": "cdi:Beamline",
+      "skos:broader": [
+        {
+          "@id": "cdi:Beamline_name"
+        },
+        {
+          "@id": "cdi:Beamline_focusing"
+        },
+        {
+          "@id": "cdi:Beamline_harmonic_rejection"
+        }
+      ],
+      "skos:prefLabel": [
+        "Beamline",
+        "B18-CORE XAS Date: Wed, 27 Jul 2016 22:00:52 BST",
+        "Pitch:  2.3; Height: -6.4; Yaw: -1.6; Bend:  0.8;",
+        "out; Y: 37.8; Pitch:  0.3; Coating: Pt"
+      ],
+      "cdi:Beamline_focusing": {
+        "@id": "_:Na3ff383aacd44b9d8409ec9f87115725",
+        "skos:definition": "Pitch:  2.3; Height: -6.4; Yaw: -1.6; Bend:  0.8;"
+      },
+      "cdi:Beamline_harmonic_rejection": {
+        "@id": "_:Na6fd7536649245528c3bfba9cf74b52d",
+        "skos:definition": "out; Y: 37.8; Pitch:  0.3; Coating: Pt"
+      },
+      "cdi:Beamline_name": {
+        "@id": "_:Nc1d107f804c3412a815c372535e733f3",
+        "skos:definition": "B18-CORE XAS Date: Wed, 27 Jul 2016 22:00:52 BST"
+      }
+    },
+    {
+      "@id": "cdi:postdcm_slits",
+      "skos:prefLabel": "vertical gap= 18.0; horizontal gap= 28.0; vertical offset= -9.1; horizontal offset= -16.5"
+    },
+    {
+      "@id": "cdi:ascii_output_file_name",
+      "skos:prefLabel": "Andrea_Sn//ascii/262875_PtSn_OCO_Abu_1.dat"
     },
     {
       "@id": "cdi:additional_comments",
       "skos:prefLabel": "default additional comments"
     },
     {
-      "@id": "cdi:Detector",
-      "skos:broader": [
-        {
-          "@id": "cdi:Detector_i0"
-        },
-        {
-          "@id": "cdi:Detector_it"
-        },
-        {
-          "@id": "cdi:Detector_ir"
-        }
-      ],
-      "skos:prefLabel": [
-        "Detector",
-        "20 nA/V Offsets: 20 pA",
-        "100 nA/V Offsets: 1 pA",
-        "20 nA/V Offsets: 1 pA"
-      ],
-      "cdi:Detector_i0": {
-        "@id": "_:N3f287596e2bf498d82bdc44d1fec6b34",
-        "skos:definition": "20 nA/V Offsets: 20 pA"
-      },
-      "cdi:Detector_ir": {
-        "@id": "_:N9e87708c055b489e8b75de80c522b3a9",
-        "skos:definition": "20 nA/V Offsets: 1 pA"
-      },
-      "cdi:Detector_it": {
-        "@id": "_:N4cb2cdab9dba464da9b744b00c33c548",
-        "skos:definition": "100 nA/V Offsets: 1 pA"
-      }
+      "@id": "cdi:white_beam_filter",
+      "skos:prefLabel": "140um PyC"
     },
     {
-      "@id": "cdi:source_file",
-      "skos:prefLabel": "input_data.dat"
+      "@id": "cdi:command",
+      "skos:prefLabel": "qexafs_energy 29000.0 30050.0 2094 263.53 qexafs_counterTimer01"
     },
     {
       "@id": "cdi:oh_mirror_coating",
       "skos:prefLabel": "Pt"
     },
     {
-      "@id": "cdi:experimental_slits",
-      "skos:prefLabel": "vertical gap= 28.6; horizontal gap= 45.0; vertical offset=  5.7; horizontal offset= -17.5"
+      "@id": "cdi:iref_stanford_sensitivity",
+      "skos:prefLabel": "20 nA/V Offsets: 1 pA"
+    },
+    {
+      "@id": "cdi:i0_stanford_sensitivity",
+      "skos:prefLabel": "20 nA/V Offsets: 20 pA"
+    },
+    {
+      "@id": "cdi:Facility",
+      "skos:broader": [
+        {
+          "@id": "cdi:Facility_name"
+        },
+        {
+          "@id": "cdi:Facility_energy"
+        },
+        {
+          "@id": "cdi:Facility_current"
+        }
+      ],
+      "skos:prefLabel": [
+        "Facility",
+        "Diamond Light Source",
+        "3.0 GeV",
+        "301.3 mA"
+      ],
+      "cdi:Facility_current": {
+        "@id": "_:N3abbd3b3c7a54c0d98ccbf31d7224f42",
+        "skos:definition": "301.3 mA"
+      },
+      "cdi:Facility_energy": {
+        "@id": "_:Nc457bbcde0d947aa88d943786c8c80e8",
+        "skos:definition": "3.0 GeV"
+      },
+      "cdi:Facility_name": {
+        "@id": "_:N77ba4a3a77e34ad2b1cce991eaa029c6",
+        "skos:definition": "Diamond Light Source"
+      }
+    },
+    {
+      "@id": "cdi:source_file",
+      "skos:prefLabel": "input_data.dat"
     },
     {
       "@id": "cdi:Sample",
@@ -315,13 +293,39 @@
         "default sample description"
       ],
       "cdi:Sample_description": {
-        "@id": "_:Ncbf8e0b554f142febdc6c07c490466a2",
+        "@id": "_:N5ba25215553f4a86bb38a92453a741f6",
         "skos:definition": "default sample description"
       },
       "cdi:Sample_name": {
-        "@id": "_:N1d434a6335ef4b5dbdd25b33ee05c4d1",
+        "@id": "_:N00d2bedfa83c4de6a8953c34eb4b5a5e",
         "skos:definition": "PtSn_OCO_Abu"
       }
+    },
+    {
+      "@id": "cdi:Mono",
+      "skos:broader": {
+        "@id": "cdi:Mono_name"
+      },
+      "skos:prefLabel": [
+        "Mono",
+        "Si(311)"
+      ],
+      "cdi:Mono_d_spacing": {
+        "@id": "_:Na33adfd0855a45f2b8aa2086e78f5062",
+        "skos:definition": "unknown"
+      },
+      "cdi:Mono_name": {
+        "@id": "_:Nb6fc979f23be49f899fe6c7f8ca36288",
+        "skos:definition": "Si(311)"
+      }
+    },
+    {
+      "@id": "cdi:experimental_slits",
+      "skos:prefLabel": "vertical gap= 28.6; horizontal gap= 45.0; vertical offset=  5.7; horizontal offset= -17.5"
+    },
+    {
+      "@id": "cdi:it_stanford_sensitivity",
+      "skos:prefLabel": "100 nA/V Offsets: 1 pA"
     }
   ],
   "columns": [

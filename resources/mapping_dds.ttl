@@ -1469,17 +1469,13 @@
     ]
   ] .
 
-# Mono d_spacing PropertyValue. Split into two mutually-exclusive
-# TriplesMaps so the schema:value is always emitted — either from the
-# XDI Mono.d_spacing header (when present) or a placeholder "unknown"
-# fallback (when absent). xasCore REQUIRES d_spacing to have a
-# schema:value; without either TriplesMap firing, the mono would fail
-# validation. If your XDI dialect uses a different key (e.g., 'crystal
-# cut' + a lookup table from cut to d_spacing), extend the parse_xdi
-# graph in api/cdi.py or add another synthesis step in generate_cdi.
+# Mono d_spacing PropertyValue. Fires on any cdi:Mono; the schema:value
+# reference reads cdi:Mono_d_spacing, which is guaranteed to exist via
+# the Python fallback in api/cdi.py:_add_xas_fallback_triples (injects
+# 'unknown' as value when the XDI has no Mono.d_spacing header).
 <#TriplesMap_mono_d_spacing> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono' && @['cdi:Mono_d_spacing'])]";
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
