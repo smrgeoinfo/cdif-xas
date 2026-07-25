@@ -64,12 +64,26 @@ def map(profile: str):
         mapping_file = DDS_MAPPING_FILE
         output_file = DDS_OUTPUT_FILE
 
-    subprocess.run(
+    result = subprocess.run(
         ["java", "-jar", MAPPER_JAR, "-m", mapping_file, "-o", output_file, "-s", "jsonld"],
         capture_output=True,
         text=True,
-        check=True
+        check=False,
     )
+    if result.returncode != 0:
+        # Surface the JVM stderr so the caller can diagnose. Previously
+        # subprocess.CalledProcessError swallowed the actual message.
+        print("=" * 60)
+        print(f"RMLMapper FAILED (exit {result.returncode})")
+        print("--- stdout ---")
+        print(result.stdout)
+        print("--- stderr ---")
+        print(result.stderr)
+        print("=" * 60)
+        raise subprocess.CalledProcessError(
+            result.returncode, result.args,
+            output=result.stdout, stderr=result.stderr,
+        )
     
 
 def frame(profile: str):

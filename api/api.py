@@ -75,9 +75,9 @@ def cdif_generate(
 
     pp_data = generate_cdif(cdi_jsonld)
 
-    if isinstance(pp_data, dict):
-        pp_data["xdi_validation"] = xdi_validation_summary
-
+    # Write cdif_skos.json BEFORE attaching xdi_validation so the RML
+    # pipeline (/map) sees the unadorned JSON-LD structure it expects.
+    # The xdi_validation object is response-only.
     if write_skos:
         try:
             _SKOS_JSON_PATH.write_text(
@@ -86,6 +86,9 @@ def cdif_generate(
         except Exception as e:
             # Don't fail the /cdif response over a disk write; log and continue.
             print(f"Warning: failed to write {_SKOS_JSON_PATH}: {e}")
+
+    if isinstance(pp_data, dict):
+        pp_data["xdi_validation"] = xdi_validation_summary
 
     dataexport = json.dumps(pp_data)
     return Response(content=dataexport, media_type="application/json")
