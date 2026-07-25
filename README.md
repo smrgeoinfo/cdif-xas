@@ -85,12 +85,30 @@ pyshacl -s resources/xasDocumentRules.shacl -f table \
     -df json-ld resources/cdif_dds_framed.jsonld
 ```
 
-**Note**: this branch applies UPLIFT-INSTRUCTIONS.md tasks 1–5 + 10
+**Note**: this branch applies UPLIFT-INSTRUCTIONS.md tasks 1–10 in full
 (mechanical: namespace rebind, concept renames, conformsTo additions,
 @id-form policy, xas:analysisevent + schema:Action, bundled-schema
-refresh). Editorial tasks 6–9 (peer prov:used restructure, source
-instrument, MaterialSample sample, wired-up measurementTechnique +
-keywords) are NOT yet applied — those need domain review. Expect
-residual SHACL violations from missing xasCore-required content until
-they land; see [`UPLIFT-INSTRUCTIONS.md`](./UPLIFT-INSTRUCTIONS.md) for
-the full plan.
+refresh; editorial: peer prov:used instrument model, X-ray source
+wrapper with static defaults, MaterialSample sample block reading
+XDI Sample.* headers, DefinedTerm content enrichment for element edge
+and symbol).
+
+Known conditional gaps (depend on what the XDI headers carry):
+
+- `schema:object` MaterialSample block only emits if the XDI has a
+  `# Sample.name` header (parsed to `cdi:Sample`). Missing Sample header
+  → no sample node → SHACL will flag the activity as missing
+  `schema:object`. Add a `# Sample.name: ...` header to your XDI, or
+  supply the sample name in a wrapping process.
+- The element-symbol keyword's `schema:name` reads
+  `# Element.name: ...`. If missing, the DefinedTerm lacks a name and
+  may fail xasCore's DefinedTerm shape.
+- `xas:samplepreparation` PropertyValue only emits if the XDI has a
+  `# Sample.prep` header.
+- The `schema:propertyID` on `schema:variableMeasured` items is built by
+  a GREL string_replace that prepends `https://w3id.org/cdif/xas/` to
+  whatever `$['meaning']` is. Values with spaces or mixed case (e.g.
+  "mono energy") produce non-resolving IRIs. If the column-meaning
+  build in `api/cdif.py` doesn't already normalize to v2 glossary local
+  names (lowercase, no spaces, no underscores), consider adding a
+  normalization step there.
