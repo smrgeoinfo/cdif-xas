@@ -36,7 +36,11 @@ import rdflib
 
 
 SCHEMA_NS = rdflib.Namespace("http://schema.org/")
-_URN_PREFIX = "urn:local:xdi:"
+# The RML mapping's TriplesMap iterators match dataset @ids of the shape
+# http://localhost:8080/citation?persistentId=perma:DV/...  (Dataverse's
+# local-dev citation URL). Mimic that shape so local runs feed the RML
+# pipeline without touching the mapping regexes.
+_ID_PREFIX = "http://localhost:8080/citation?persistentId=perma:DV/"
 
 
 def is_local_path(url: str) -> bool:
@@ -93,7 +97,7 @@ def build_placeholder_dataset(url: str,
     g = rdflib.Graph()
     g.bind("schema", SCHEMA_NS)
 
-    ds = rdflib.URIRef(dataset_iri or f"{_URN_PREFIX}{stem}")
+    ds = rdflib.URIRef(dataset_iri or f"{_ID_PREFIX}{stem}")
 
     g.add((ds, rdflib.RDF.type, SCHEMA_NS.Dataset))
     g.add((ds, SCHEMA_NS.name, rdflib.Literal(stem)))
@@ -120,7 +124,7 @@ def build_placeholder_dataset(url: str,
            rdflib.URIRef("https://creativecommons.org/licenses/by/4.0/")))
 
     # Distribution: the local file itself
-    dist = rdflib.URIRef(f"{_URN_PREFIX}{stem}#distribution")
+    dist = rdflib.URIRef(f"{_ID_PREFIX}{stem}#distribution")
     g.add((ds, SCHEMA_NS.distribution, dist))
     g.add((dist, rdflib.RDF.type, SCHEMA_NS.DataDownload))
     try:

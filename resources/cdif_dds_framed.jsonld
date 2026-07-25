@@ -17,20 +17,6 @@
   ],
   "schema:contributor": [
     {
-      "@id": "_:b24",
-      "@type": [
-        "schema:Role"
-      ],
-      "schema:contributor": {
-        "@id": "_:b25",
-        "@type": [
-          "schema:Person"
-        ],
-        "schema:name": "Richards, Steve"
-      },
-      "schema:roleName": "Author"
-    },
-    {
       "@id": "_:b26",
       "@type": [
         "schema:Role"
@@ -42,7 +28,7 @@
         ],
         "schema:name": "Richards, Steve"
       },
-      "schema:roleName": "Creator"
+      "schema:roleName": "Author"
     },
     {
       "@id": "_:b28",
@@ -51,6 +37,20 @@
       ],
       "schema:contributor": {
         "@id": "_:b29",
+        "@type": [
+          "schema:Person"
+        ],
+        "schema:name": "Richards, Steve"
+      },
+      "schema:roleName": "Creator"
+    },
+    {
+      "@id": "_:b30",
+      "@type": [
+        "schema:Role"
+      ],
+      "schema:contributor": {
+        "@id": "_:b31",
         "@type": [
           "schema:Organization"
         ],
@@ -63,7 +63,7 @@
   "schema:description": "Se_Na2SeO4_rt_01.xdi",
   "schema:distribution": [
     {
-      "@id": "_:b33",
+      "@id": "_:b35",
       "@type": [
         "cdi:PhysicalDataSet",
         "cdi:TabularTextDataSet",
@@ -201,19 +201,17 @@
       ],
       "schema:about": "element.symbol",
       "schema:identifier": "http://sweetontology.net/matrElement/Se",
-      "schema:inDefinedTermSet": {
-        "@id": "http://sweetontology.net/matrElement"
-      },
+      "schema:inDefinedTermSet": "http://sweetontology.net/matrElement",
+      "schema:name": "Element symbol Se",
       "schema:termCode": "Se"
-    },
-    "Earth and Environmental Sciences"
+    }
   ],
   "schema:license": [
     "http://creativecommons.org/publicdomain/zero/1.0"
   ],
   "schema:measurementTechnique": [
     {
-      "@id": "_:b15",
+      "@id": "_:b17",
       "@type": [
         "schema:DefinedTerm"
       ],
@@ -221,7 +219,7 @@
       "schema:name": "Transmission"
     },
     {
-      "@id": "_:b16",
+      "@id": "_:b18",
       "@type": [
         "schema:DefinedTerm"
       ],
@@ -351,10 +349,11 @@
       ],
       "schema:additionalProperty": [
         {
-          "@id": "_:b32",
+          "@id": "_:b34",
           "@type": [
             "schema:PropertyValue"
           ],
+          "schema:name": "Edge energy",
           "schema:propertyID": [
             {
               "@id": "xas:edgeenergy"
@@ -369,14 +368,14 @@
         }
       ],
       "schema:object": {
-        "@id": "_:b30",
+        "@id": "_:b32",
         "@type": [
           "schema:Product",
           "schema:Thing"
         ],
         "schema:additionalProperty": [
           {
-            "@id": "_:b31",
+            "@id": "_:b33",
             "@type": [
               "schema:PropertyValue"
             ],
@@ -400,7 +399,7 @@
       "schema:startDate": "2008-04-10T21:58:50",
       "prov:used": [
         {
-          "@id": "_:b17",
+          "@id": "_:b19",
           "schema:instrument": {
             "@id": "_:b4",
             "@type": [
@@ -458,7 +457,7 @@
           }
         },
         {
-          "@id": "_:b18",
+          "@id": "_:b20",
           "schema:instrument": {
             "@id": "_:b8",
             "@type": [
@@ -503,7 +502,7 @@
           }
         },
         {
-          "@id": "_:b19",
+          "@id": "_:b21",
           "schema:instrument": {
             "@id": "_:b13",
             "@type": [
@@ -522,7 +521,34 @@
                     "@id": "xas:dspacing"
                   }
                 ],
+                "schema:unitText": "Angstrom",
                 "schema:value": "3.13550"
+              },
+              {
+                "@id": "_:b15",
+                "@type": [
+                  "schema:PropertyValue"
+                ],
+                "schema:name": "reflection plane",
+                "schema:propertyID": [
+                  {
+                    "@id": "xas:reflectionplane"
+                  }
+                ],
+                "schema:value": "1,1,1"
+              },
+              {
+                "@id": "_:b16",
+                "@type": [
+                  "schema:PropertyValue"
+                ],
+                "schema:name": "crystal type",
+                "schema:propertyID": [
+                  {
+                    "@id": "xas:monochromatortype"
+                  }
+                ],
+                "schema:value": "Si"
               }
             ],
             "schema:additionalType": [
@@ -535,16 +561,16 @@
           }
         },
         {
-          "@id": "_:b20",
+          "@id": "_:b22",
           "schema:instrument": {
-            "@id": "_:b21",
+            "@id": "_:b23",
             "@type": [
               "schema:Product",
               "schema:Thing"
             ],
             "schema:additionalProperty": [
               {
-                "@id": "_:b22",
+                "@id": "_:b24",
                 "@type": [
                   "schema:PropertyValue"
                 ],
@@ -557,7 +583,7 @@
                 "schema:value": "x-ray"
               },
               {
-                "@id": "_:b23",
+                "@id": "_:b25",
                 "@type": [
                   "schema:PropertyValue"
                 ],

@@ -472,7 +472,12 @@
         ],
         "http://schema.org/inDefinedTermSet": [
             {
-                "@id": "http://sweetontology.net/matrElement"
+                "@value": "http://sweetontology.net/matrElement"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "Element symbol Se"
             }
         ],
         "http://schema.org/termCode": [
@@ -489,6 +494,12 @@
         "http://schema.org/additionalProperty": [
             {
                 "@id": "_:_:mono_d_spacing"
+            },
+            {
+                "@id": "_:_:mono_reflection"
+            },
+            {
+                "@id": "_:_:mono_type"
             }
         ],
         "http://schema.org/additionalType": [
@@ -523,9 +534,56 @@
                 "@id": "https://w3id.org/cdif/xas/dspacing"
             }
         ],
+        "http://schema.org/unitText": [
+            {
+                "@value": "Angstrom"
+            }
+        ],
         "http://schema.org/value": [
             {
                 "@value": "3.13550"
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
+        "@id": "_:_:mono_reflection",
+        "http://schema.org/name": [
+            {
+                "@value": "reflection plane"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://w3id.org/cdif/xas/reflectionplane"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "1,1,1"
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
+        "@id": "_:_:mono_type",
+        "http://schema.org/name": [
+            {
+                "@value": "crystal type"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://w3id.org/cdif/xas/monochromatortype"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "Si"
             }
         ],
         "@type": [
@@ -760,6 +818,11 @@
     },
     {
         "@id": "_:_:scan_edge_energy",
+        "http://schema.org/name": [
+            {
+                "@value": "Edge energy"
+            }
+        ],
         "http://schema.org/propertyID": [
             {
                 "@id": "https://w3id.org/cdif/xas/edgeenergy"
@@ -957,9 +1020,6 @@
             },
             {
                 "@id": "_:_:keywords_element_symbol"
-            },
-            {
-                "@value": "Earth and Environmental Sciences"
             }
         ],
         "http://schema.org/license": [
