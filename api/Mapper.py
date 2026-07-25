@@ -1,12 +1,21 @@
 import json
+import os
 import subprocess
 import sys
+from pathlib import Path
 
 from api.FrameAndValidate import frame_cdif_document, validate_against_schema
 
-BASE_DIR = "/files/"
-RESOURCES_DIR = BASE_DIR + "resources"
-MAPPER_JAR = BASE_DIR + "lib/" + "rmlmapper-8.1.0-r0-all.jar"
+# Path resolution: Docker container mounts everything under /files; a
+# local checkout runs from the repo root. Prefer env-var overrides so
+# neither environment is baked into the code.
+BASE_DIR = os.environ.get("CDIF_XAS_BASE_DIR",
+                          "/files/" if Path("/files").is_dir()
+                          else str(Path(__file__).resolve().parent.parent) + "/")
+RESOURCES_DIR = os.environ.get("CDIF_XAS_RESOURCES_DIR",
+                               BASE_DIR + "resources")
+MAPPER_JAR = os.environ.get("RMLMAPPER_JAR",
+                            BASE_DIR + "lib/rmlmapper-8.1.0-r0-all.jar")
 CONTEXT_PATH = RESOURCES_DIR + "/context.json"
 
 # Core Discovery Profile

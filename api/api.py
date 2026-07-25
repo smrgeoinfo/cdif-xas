@@ -16,10 +16,21 @@ def read_root():
 
 @app.get("/cdif")
 def cdif_generate(
-    url: str = Query(...),
+    url: str = Query(
+        ...,
+        description=(
+            "Source XDI file. HTTP(S) URL for remote files (default), or "
+            "file:// / absolute path for a local file. Local mode skips "
+            "Dataverse enrichment and generates placeholder schema.org "
+            "Dataset metadata from file name + mtime; see api/local_input.py."
+        ),
+    ),
     resources: Optional[str] = None,
     type: str = "xas",
-    datasetid: Optional[str] = Query(None)
+    datasetid: Optional[str] = Query(
+        None,
+        description="Dataverse persistent id (only used for remote URLs).",
+    ),
 ):
     graph = generate_cdi(url, resources, type, datasetid)
     cdi_jsonld = graph.serialize(format="json-ld")

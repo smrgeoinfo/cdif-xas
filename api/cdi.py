@@ -6,6 +6,8 @@ from urllib.parse import urlparse
 import requests
 import rdflib
 
+from api.local_input import is_local_path, read_local_xdi
+
 
 class CDI_DDI:
     def __init__(self, url=None, resources_dir="/app/resources", type=None):
@@ -27,7 +29,12 @@ class CDI_DDI:
         self.g.bind("label", self.label)
         self.g.bind("bind", self.bind)
         if url:
-            self.response = requests.get(url)
+            # Local paths (file:// or absolute) read off disk; anything
+            # else is treated as an HTTP URL for requests.get.
+            if is_local_path(url):
+                self.response = read_local_xdi(url)
+            else:
+                self.response = requests.get(url)
         else:
             self.response = None
         self.lastvariable = ""
@@ -138,27 +145,38 @@ def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Op
     except Exception:
         print("Warning: CDI graph serialization failed; using empty graph as fallback.")
         cdi_graph = rdflib.Graph()
-    # Also enrich the graph with schema.org JSON-LD from Dataverse
-    schema_url = None
-    if datasetid:
-        # Try to infer base site from source_url; fallback to dev codata
+    # Enrich the graph with schema.org Dataset metadata.
+    # Local mode: build placeholder metadata from the file itself
+    # (Dataverse isn't available).
+    # Otherwise: fetch the schema.org export from Dataverse.
+    if is_local_path(source_url):
         try:
-            parsed = urlparse(source_url)
-            base = parsed.scheme + "://" + parsed.netloc if parsed.scheme and parsed.netloc else "https://dataverse.dev.codata.org"
-        except Exception:
-            base = "https://dataverse.dev.codata.org"
-        schema_url = base.rstrip("/") + "/api/datasets/export?exporter=schema.org&persistentId=" + datasetid
+            from api.local_input import build_placeholder_dataset
+            for triple in build_placeholder_dataset(source_url):
+                cdi_graph.add(triple)
+        except Exception as e:
+            print(f"Warning: placeholder metadata generation failed: {e}")
     else:
-        # Default example fallback if no datasetid provided
-        schema_url = "https://dataverse.dev.codata.org/api/datasets/export?exporter=schema.org&persistentId=doi%3A10.5072/FK2/8MODGT"
-    try:
-        schema_graph = rdflib.Graph()
-        schema_graph.parse(schema_url, format="json-ld")
-        # Merge schema_graph into cdi_graph
-        for triple in schema_graph:
-            cdi_graph.add(triple)
-    except Exception:
-        # Ignore enrichment errors to not block core generation
-        pass
+        schema_url = None
+        if datasetid:
+            # Try to infer base site from source_url; fallback to dev codata
+            try:
+                parsed = urlparse(source_url)
+                base = parsed.scheme + "://" + parsed.netloc if parsed.scheme and parsed.netloc else "https://dataverse.dev.codata.org"
+            except Exception:
+                base = "https://dataverse.dev.codata.org"
+            schema_url = base.rstrip("/") + "/api/datasets/export?exporter=schema.org&persistentId=" + datasetid
+        else:
+            # Default example fallback if no datasetid provided
+            schema_url = "https://dataverse.dev.codata.org/api/datasets/export?exporter=schema.org&persistentId=doi%3A10.5072/FK2/8MODGT"
+        try:
+            schema_graph = rdflib.Graph()
+            schema_graph.parse(schema_url, format="json-ld")
+            # Merge schema_graph into cdi_graph
+            for triple in schema_graph:
+                cdi_graph.add(triple)
+        except Exception:
+            # Ignore enrichment errors to not block core generation
+            pass
 
     return cdi_graph
