@@ -59,8 +59,10 @@ verify before editing.
 | `resources/context.json` | JSON-LD prefixes for output |
 | `resources/CDIFDiscoveryDataDescriptionStructureProfileStructuredSchema.json` | Bundled schema for validation (refresh) |
 | `resources/CDIFDiscoveryDataDescriptionStructure-frame.jsonld` | JSON-LD frame |
-| `api/cdif.py` | Python framer — has hardcoded contexts to fix |
+| `api/cdif.py` | Python framer — has hardcoded contexts to fix; Task 13 adds `cdif:` prefix |
+| `api/cdi.py` | XDI parser — Tasks 11-12 add case normalization, datetime normalization, sentinel fallbacks, and a marker-tag sweep |
 | `api/Mapper.py` | Constant `DDS_SCHEMA_PATH` may need updating if schema is renamed |
+| `pyproject.toml` | Task 12 adds `xdi-validator>=0.1.0` for pre-validation |
 
 ---
 
@@ -185,6 +187,23 @@ need this treatment:
    bare strings. Either convert to IRI form with `rr:termType rr:IRI`
    or drop.
 
+4. **Audit all subject maps for a missing `rml:class`.** RML only emits
+   an `rdf:type` triple when the subject map carries `rml:class` (or
+   `rr:class`); subject maps without one emit anonymous, untyped
+   subjects. In the reference example every emitted object carries an
+   `@type` — the framing has nothing to project into `@type` if the
+   subject was untyped upstream. Grep for `rml:subjectMap` blocks and
+   confirm each has a class. Known culprits from real-world testing:
+
+   - `TriplesMap_representedVariable` — needs `rml:class cdi:InstanceVariable`
+     (a subclass of RepresentedVariable) so `cdif:isDefinedBy_RepresentedVariable`
+     objects carry `@type`.
+   - `TriplesMap_physicalMapping` — needs `rml:class cdif:TextMapping`
+     (or `cdif:PhysicalMapping` / `cdif:LocatorMapping` per your
+     dataset shape).
+   - The four peer wrappers added in Tasks 6 and 7 — see the class
+     recommendations in those tasks.
+
 ---
 
 ## Task 5 — Add `xas:analysisevent` on the activity (mechanical, additive)
@@ -230,12 +249,22 @@ Rework in `mapping_dds.ttl`:
    ```
    <#TriplesMap_prov_used_beamline> a rml:TriplesMap ;
        rml:logicalSource [ ... same source as before ... ] ;
-       rml:subjectMap [ rml:template "..." ; rml:termType rml:BlankNode ] ;
+       rml:subjectMap [
+           rml:template "..." ;
+           rml:termType rml:BlankNode ;
+           rr:class prov:Entity, schema:Thing
+       ] ;
        rr:predicateObjectMap [
            rr:predicate schema:instrument ;
            rr:objectMap [ rr:parentTriplesMap <#TriplesMap_beamline> ]
        ] .
    ```
+   The `rr:class prov:Entity, schema:Thing` line is REQUIRED — the
+   xasDocument schema description for `prov:used` items says "Inline
+   entities SHOULD carry an @type that includes prov:Entity plus a
+   schema.org type for the kind of thing used". Skipping this leaves
+   the peer wrapper subjects untyped in the JSON-LD output (see Task 4
+   note 4).
 3. Add three new `rr:predicate prov:used` predicate-object maps on
    `TriplesMap_activity_used` (or wherever `prov:used` currently is),
    each pointing at one of the three new peer TriplesMaps as its
@@ -268,9 +297,22 @@ The static-default approach is what the reference example does. Add:
 1. A `TriplesMap_source` in `mapping_dds.ttl` shaped like
    `TriplesMap_beamline` but with `xas:source` additionalType and
    the two required propertyIDs.
-2. A `TriplesMap_prov_used_source` wrapping it (see Task 6 pattern).
+2. A `TriplesMap_prov_used_source` wrapping it (Task 6 pattern —
+   remember `rr:class prov:Entity, schema:Thing` on its subject map).
 3. A fourth `rr:predicate prov:used` on the activity, pointing at the
    new source wrapper.
+
+**Sentinel-value gotcha for required fields.** xasCore requires
+`Mono.d_spacing` on the monochromator peer. If the XDI omits it, you
+have two ways to plug the hole: (a) a fallback TriplesMap in RML that
+emits a constant `"unknown"`, or (b) a Python pre-pass that injects
+the missing triple into the SKOS graph. **Pick exactly one — never
+both.** If both fire, RMLMapper generates two `schema:PropertyValue`
+subjects with the same blank-node template and framing collapses
+them into a single node with `schema:value: ["3.13", "unknown"]`,
+which fails the schema's string requirement. Task 11 introduces the
+Python approach and is preferred (Python owns the "does this key
+exist?" test, which JSONPath cannot express cleanly).
 
 ---
 
@@ -396,6 +438,225 @@ And update `DDS_FRAME_PATH` in `api/Mapper.py`.
 
 ---
 
+## Task 11 — XDI parser resilience (`api/cdi.py`)
+
+Real-world XDI files have three recurring irregularities that cause
+downstream SHACL / JSON Schema failures even when the mapping is
+correct. All three fix cleanly in `parse_xdi()` because Python owns
+the SKOS graph construction — RML sees only the normalized result.
+
+**11a. Case-normalize XDI header keys.** XDI/1.0 canonicalizes
+`Facility.name`, `Beamline.name`, `Mono.d_spacing` — capitalized
+namespace segment, lowercase field segment. Real files are
+inconsistent (`Facility.Name`, `Beamline.Name`, `Mono.D_Spacing`,
+`Scan.Start_Time`). The mapping's `cdi:Facility_name` /
+`cdi:Beamline_name` predicates never match a `Facility.Name` header,
+so Organizations and beamline peers come out with no `schema:name`.
+
+Fix — one edit in `parse_xdi()` right after the key is stripped, before
+the `.` branch:
+
+```python
+# Canonicalize: keep first segment (namespace) as-is,
+# lowercase everything after the first dot.
+if '.' in compound_variable_name:
+    head, rest = compound_variable_name.split('.', 1)
+    compound_variable_name = head + '.' + rest.lower()
+```
+
+**11b. Normalize datetime fields to ISO 8601.** XDI files carry
+`Scan.start_time` / `Scan.end_time` in space-separated ISO
+(`2008-04-10 21:58:50`), slash-date (`2001/06/26 22:27:31`), US m/d/y,
+etc. Downstream `schema:startDate` / `schema:endDate` want strict ISO
+8601 with `T` separator. Do the conversion at parse time so ordering
+of `skos:prefLabel` values (which the RML `[2]`-indexes) is preserved.
+
+Add near the top of `cdi.py`:
+
+```python
+from datetime import datetime
+
+_DATETIME_KEYS = {"Scan.start_time", "Scan.end_time"}
+_DATETIME_FALLBACK_FORMATS = (
+    "%Y/%m/%d %H:%M:%S", "%Y/%m/%d %H:%M", "%Y/%m/%dT%H:%M:%S",
+    "%m/%d/%Y %H:%M:%S", "%m/%d/%Y %H:%M",
+    "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M",
+    "%Y-%m-%d", "%Y%m%d", "%Y%m%dT%H%M%S",
+)
+
+def _normalize_datetime(value: str) -> str | None:
+    s = value.strip()
+    if not s:
+        return None
+    try:
+        return datetime.fromisoformat(s).isoformat()   # accepts space sep on 3.11+
+    except ValueError:
+        pass
+    for fmt in _DATETIME_FALLBACK_FORMATS:
+        try:
+            return datetime.strptime(s, fmt).isoformat()
+        except ValueError:
+            continue
+    return None
+```
+
+Call it in `parse_xdi()` right after 11a's case normalization:
+
+```python
+if compound_variable_name in _DATETIME_KEYS:
+    iso = _normalize_datetime(variable_value)
+    if iso is not None:
+        variable_value = iso
+```
+
+Unparseable values pass through unchanged so downstream validation
+still surfaces them.
+
+**11c. Sentinel fallbacks for required-but-missing fields.** xasCore
+requires certain content (`Mono.d_spacing`, `Beamline.name`,
+`Facility.name`) to be present. When the XDI omits them entirely,
+inject a marker triple into the SKOS graph so the RML mapping's
+predicate lookup finds a value — otherwise the emitted PropertyValue
+has no `schema:value` and fails validation. Introduce a helper that
+runs on the graph returned by `parse_xdi()` and BEFORE JSON-LD
+serialization:
+
+```python
+def _add_xas_fallback_triples(g, name_ns, skos_ns):
+    """Inject placeholders so xasCore-required content the XDI didn't
+    carry is still present in the graph. Real data is never
+    overwritten — fires only when the key is genuinely absent.
+    """
+    from rdflib import BNode, Literal, URIRef
+
+    def _has_child(subject, child_local):
+        return any(g.triples((subject, URIRef(str(name_ns) + child_local), None)))
+
+    def _synthesize_child(subject, child_local, value):
+        blank = BNode()
+        g.add((subject, URIRef(str(name_ns) + child_local), blank))
+        g.add((blank, URIRef(str(skos_ns) + "definition"), Literal(value)))
+
+    mono = URIRef(str(name_ns) + "Mono")
+    if (mono, None, None) in g and not _has_child(mono, "Mono_d_spacing"):
+        _synthesize_child(mono, "Mono_d_spacing", "unknown")
+
+    for parent_local, child_local in (
+        ("Beamline", "Beamline_name"),
+        ("Facility", "Facility_name"),
+    ):
+        parent = URIRef(str(name_ns) + parent_local)
+        if (parent, None, None) in g and not _has_child(parent, child_local):
+            _synthesize_child(parent, child_local, "missing")
+```
+
+Convention: `"unknown"` for numeric/enumerated fields that a domain
+expert must supply; `"missing"` for identifier / name fields. If a URI
+value is expected but absent, use `<http://www.opengis.net/def/nil/OGC/0/missing>`.
+
+Call it in `generate_cdi` right after `parse_xdi()` returns:
+
+```python
+cdi_graph = generator.parse_xdi()
+_add_xas_fallback_triples(cdi_graph, generator.name, generator.skos)
+```
+
+Extend the helper as new xasCore-required fields surface. See the
+Task 7 sentinel-gotcha note — do NOT also add an RML fallback
+TriplesMap for the same field.
+
+---
+
+## Task 12 — XDI pre-validation (surface spec issues before /cdif)
+
+Real XDI files often violate XDI/1.0 in ways the RML mapping can't
+detect (missing `# ---` header end line, missing `Element.symbol`,
+non-conforming date formats, out-of-vocabulary edge names). Running a
+spec-check before /cdif runs surfaces these as an `xdi_validation`
+report in the response so downstream consumers can fix the input at
+its source.
+
+Recommended package: [`xdi_validator`](https://github.com/AAAlvesJr/XDI-Validator)
+(MIT, by A. A. Alves Jr.). Warning-only integration — non-compliant
+XDI does not block CDIF generation.
+
+1. Add `xdi-validator>=0.1.0` to `pyproject.toml` and `uv sync`.
+   Requires Python 3.13; update `.python-version` if needed.
+2. Create `api/xdi_precheck.py` — a thin wrapper that reads the input
+   URL (local or HTTP), runs `xdi_validator.validate(fh)`, returns a
+   summary dict `{ok: bool, error_count: int, field_errors: {...}}`.
+3. In `api/api.py:cdif_generate`, call the precheck first. Attach the
+   summary to the response as `xdi_validation` — but **only after**
+   `cdif_skos.json` has been written to disk (the RML pipeline reads
+   that file for /map; adding a top-level key `xdi_validation` to it
+   breaks the mapping).
+
+Add an Acknowledgement section to your README citing xdi_validator
+and its Zenodo DOI. The pre-check catches issues that would otherwise
+turn into cryptic SHACL failures 30 seconds later in the pipeline.
+
+**Tip:** the AAAlves validator has an XDI/1.0 spec issue our team's
+fork corrected — `mono.d_spacing` is only required when the abscissa
+is angle or encoder (not for energy abscissae). Upstream PR at
+<https://github.com/AAAlvesJr/XDI-Validator/pull/6>; until merged you
+can install from `smrgeoinfo/XDI-Validator@conditional-mono-d-spacing`.
+
+---
+
+## Task 13 — RML iterator resilience (marker predicate)
+
+Nine of the mapping's TriplesMap iterators use a regex to locate the
+top-level Dataset:
+
+```
+rml:iterator "$['@graph'][?(@['@id'] =~ /^http:\\/\\/localhost:8080\\/citation\\?persistentId=perma:DV\\/.*/)]"
+```
+
+Another nine use `$['@graph'][0]` — positional indexing that depends
+on JSON-LD serialization order being stable. Both patterns are
+brittle: the regex couples RML to Dataverse's citation-URL format;
+the positional iterator can silently pick the wrong node if the
+serializer ever reorders.
+
+**Fix**: tag the Dataset node with a stable marker predicate in
+Python, iterate on the marker. All 18 iterators become identical:
+
+```
+rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]"
+```
+
+Implementation:
+
+1. In `api/cdif.py:frame_context`, add `"cdif": "https://w3id.org/cdif/"`
+   so the marker predicate serializes as `cdif:isDatasetRecord` (not
+   the full URI) in `cdif_skos.json`.
+2. In `api/cdi.py:generate_cdi`, after the Dataverse `schema_graph` is
+   merged into `cdi_graph`, tag every `schema:Dataset` in the merged
+   graph:
+   ```python
+   _SCHEMA = rdflib.Namespace("http://schema.org/")
+   _CDIF = rdflib.Namespace("https://w3id.org/cdif/")
+   for ds_subj in set(cdi_graph.subjects(rdflib.RDF.type, _SCHEMA.Dataset)):
+       cdi_graph.add((ds_subj, _CDIF.isDatasetRecord, rdflib.Literal("yes")))
+   ```
+3. In `resources/mapping_dds.ttl`, replace every regex iterator and
+   every `$['@graph'][0]` iterator with the marker iterator above. A
+   grep should find exactly 18 lines.
+
+GREL `string_replace` patterns that derive downstream IRIs from the
+Dataverse @id (e.g. rewriting `http://localhost:8080/citation?persistentId=perma:`
+→ `https://example.org/dataset/`) keep working unchanged — they still
+receive the real @id via `$['@id']`. Only the iteration targets change.
+
+The immediate benefit is decoupling from Dataverse's URL format; the
+larger benefit is architectural clarity — Python owns "which nodes
+should RML iterate over" via a single marker triple, instead of
+scattering that knowledge across nine regex declarations. Consider
+adopting the same pattern for any future subject class that RML needs
+to locate.
+
+---
+
 ## Validation recipe
 
 After each task, regenerate `cdif_dds_framed.jsonld` and validate.
@@ -428,50 +689,87 @@ pyshacl -s /tmp/xasDocumentRules.shacl -f table \
 **Goal**: 0 SHACL violations. Warnings are advisories, not fitness
 failures. Progress typically looks like:
 
+- After Tasks 11–12 (parser resilience + pre-validation): no CDIF
+  output changes, but any XDI files that violate the spec are
+  reported to the response as `xdi_validation`. Fewer downstream
+  surprises.
 - After Task 1–5 (mechanical): 5–15 violations, mostly from missing
   xasCore-required content (sample, keywords, measurementTechnique) —
   expected until Tasks 6–9 land.
+- After Task 4 (URI @id-form policy + `@type` audit): every emitted
+  object should carry an `@type`. If you still see untyped subjects
+  in the framed output, re-check the audit — an untyped subject means
+  its RML subject map is missing `rml:class`.
 - After Task 6: peer prov:used shape now matches; violations from that
   shape go away, but xasCore's requirement that each instrument
   entity be non-empty may fire until Task 7 adds the source.
 - After Tasks 7–9: content-completeness shapes should be quiet.
 - After Task 10 Option B: JSON Schema validation aligns with the XAS
-  document profile.
+  document profile. Real corpora reaching 0 violations at this point
+  are the goal; on a 37-file test corpus we hit 37/37 fully valid
+  after applying Tasks 11 and 13 alongside the base 1-10.
+- After Task 13 (iterator marker): no output change if Task 13's
+  Python marker-tag sweep and RML iterator updates are consistent.
+  This task is safety-net + brittleness reduction, not correctness
+  improvement.
 
 ---
 
 ## Suggested execution order
 
-1. Task 1 (namespace rebind) — no functional change, just IRI hygiene.
-2. Task 2 (concept renames) — same batch.
-3. Task 3 (conformance URIs) — one-line RML addition.
-4. Task 5 (xas:analysisevent) — one-line RML addition.
-5. Task 10 (refresh bundled schema, Option B) — now validating against
+Do the parser-side resilience work FIRST so subsequent mapping
+validation runs against normalized input:
+
+1. Task 11 (`api/cdi.py` resilience — case + datetime + sentinels).
+2. Task 12 (XDI pre-validation) — surfaces spec issues before any of
+   the below run.
+3. Task 1 (namespace rebind) — no functional change, just IRI hygiene.
+4. Task 2 (concept renames) — same batch.
+5. Task 3 (conformance URIs) — one-line RML addition.
+6. Task 5 (xas:analysisevent) — one-line RML addition.
+7. Task 10 (refresh bundled schema, Option B) — now validating against
    the right target.
-6. Task 4 (URI @id-form policy) — biggest SHACL cleanup this task
-   provides.
-7. Task 6 (peer prov:used restructure) — largest RML restructure.
-8. Task 9 (wire up measurementTechnique + keywords) — mostly additive
-   predicate-object maps on the root, with content edits on the
-   already-existing DefinedTerm TriplesMaps.
-9. Task 7 (source instrument) — additive.
-10. Task 8 (MaterialSample sample) — additive.
+8. Task 4 (URI @id-form policy + missing-`@type` audit) — biggest
+   SHACL cleanup this task provides.
+9. Task 6 (peer prov:used restructure) — largest RML restructure.
+10. Task 9 (wire up measurementTechnique + keywords) — mostly additive
+    predicate-object maps on the root, with content edits on the
+    already-existing DefinedTerm TriplesMaps.
+11. Task 7 (source instrument) — additive.
+12. Task 8 (MaterialSample sample) — additive.
+13. Task 13 (RML iterator marker) — do LAST. Structural change to 18
+    iterators; safest once the mapping's semantics are stable.
 
 Validate after each. The reference example
 (`example_dds_framed.json`) is a valid endpoint — diff against it
 whenever unsure.
 
+**Batch validation tip.** Once Tasks 1-10 are in, generating and
+validating a whole XDI corpus in one shot beats one-off `/cdif` +
+`pyshacl` runs. Two small drivers we found useful on our end:
+
+- Batch generation: for each `*.xdi` in an input directory, run
+  the `/cdif` → `/map` → `/frame` pipeline directly (no HTTP layer)
+  and drop the framed JSON-LD in an output directory. See
+  `tools/batch_generate_cdif.py` in the smrgeoinfo/cdif-xas fork on
+  the `local-xdi-input` branch for a working template.
+- Batch validation: for each `*.jsonld` in that output directory,
+  run JSON Schema (Draft 2020-12) + SHACL (pyshacl) and emit a
+  per-file report. Template at `tools/batch_validate_cdif.py` in the
+  same branch. Useful for turning the "37 files, 0 fully valid → 37
+  fully valid" iteration into a single feedback loop.
+
 ---
 
 ## Not in scope for this uplift
 
-- **The `/cdif` Python pipeline** (`api/cdi.py:parse_xdi` +
-  `api/cdif.py:generate_cdif`). It uses a SKOS-heavy intermediate
-  representation and doesn't emit xasDocument-shaped output directly.
-  Uplifting it is a larger, separate project.
-- **The XDI header parser**. Assumes the current XDI reader is
-  sufficient; the mapping is what shapes the output.
-- **Adding new XDI header fields**. Where new content (sample,
+- **The `/cdif` framing logic** in `api/cdif.py:generate_cdif`. It
+  uses a SKOS-heavy intermediate representation and doesn't emit
+  xasDocument-shaped output directly. Tasks 11-13 add resilience and
+  RML-decoupling but stop short of rewriting the framer itself. A
+  full Python-native alternative to the RML pipeline is a larger,
+  separate project.
+- **Adding new XDI header fields.** Where new content (sample,
   keywords, technique) can be derived from existing headers, prefer
   that over hardcoded defaults. Where no header carries the info,
   static defaults are acceptable — this is what the reference example
