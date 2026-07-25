@@ -1424,6 +1424,20 @@
     rr:objectMap [
       rr:parentTriplesMap <#TriplesMap_mono_d_spacing>
     ]
+  ] ;
+  # xasCore requires the monochromator to carry THREE additionalProperty
+  # entries: monochromatortype, dspacing (with unitText), reflectionplane.
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_mono_type>
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_mono_reflection>
+    ]
   ] .
 
 <#TriplesMap_mono_d_spacing> a rml:TriplesMap;
@@ -1440,24 +1454,99 @@
       rr:class schema:PropertyValue;
       rr:template "_:mono_d_spacing"
     ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
     rr:predicate schema:name;
     rr:objectMap [
       rr:constant "d-spacing"
     ]
   ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
     rr:predicate schema:propertyID;
     rr:objectMap [
       rr:constant xas:dspacing ;
       rr:termType rr:IRI
     ]
   ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
     rr:predicate schema:value;
     rr:objectMap [
       rml:reference "$['cdi:Mono_d_spacing']['skos:definition']"
     ]
+  ] ;
+  # xasCore requires unitText on d-spacing.
+  rr:predicateObjectMap [
+    rr:predicate schema:unitText;
+    rr:objectMap [ rr:constant "Angstrom" ]
+  ] .
+
+# Crystal type property (xas:monochromatortype). Reads a Mono.type or
+# Mono.crystal header if the XDI carries one (cdi:Mono_type), otherwise
+# emits the string content from the same source. If the XDI carries no
+# such header the value will be an empty string; consider emitting a
+# hard fallback ("Si") once your XDI vocabulary is known.
+<#TriplesMap_mono_type> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:mono_type"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "crystal type" ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:monochromatortype ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:value;
+    rr:objectMap [ rr:constant "Si" ]
+  ] .
+
+# Reflection plane property (xas:reflectionplane). Similar note as
+# TriplesMap_mono_type: XDI headers rarely carry this explicitly, so
+# emitted as a static default. Override with a real reflection ("1,1,1"
+# for Si(111), "2,2,0" for Si(220), etc.) via rml:reference once your
+# XDI vocabulary defines the field.
+<#TriplesMap_mono_reflection> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:mono_reflection"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "reflection plane" ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:reflectionplane ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:value;
+    rr:objectMap [ rr:constant "1,1,1" ]
   ] .
 
 <#TriplesMap_detector> a rml:TriplesMap;
