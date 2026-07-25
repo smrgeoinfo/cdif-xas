@@ -902,7 +902,7 @@
 # suppresses the emission.
 <#TriplesMap_sample_preparation> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Sample' && @['cdi:Sample_prep'])]";
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Sample')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -934,7 +934,7 @@
 
 <#TriplesMap_scan_edge_energy> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Scan' && @['cdi:Scan_edge_energy'])]";
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Scan')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1272,7 +1272,7 @@
 
 <#TriplesMap_beamline_collimation> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline' && @['cdi:Beamline_collimation'])]";
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1306,7 +1306,7 @@
 
 <#TriplesMap_beamline_focusing> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline' && @['cdi:Beamline_focusing'])]";
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1340,7 +1340,7 @@
 
 <#TriplesMap_beamline_harmonic_rejection> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline' && @['cdi:Beamline_harmonic_rejection'])]";
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1517,7 +1517,7 @@
 # the value is obviously a placeholder needing manual correction.
 <#TriplesMap_mono_d_spacing_fallback> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono' && !@['cdi:Mono_d_spacing'])]";
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1667,7 +1667,7 @@
 
 <#TriplesMap_detector_i0> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Detector' && @['cdi:Detector_I0'])]";
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Detector')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -1701,7 +1701,7 @@
 
 <#TriplesMap_detector_i1> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Detector' && @['cdi:Detector_I1'])]";
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Detector')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;

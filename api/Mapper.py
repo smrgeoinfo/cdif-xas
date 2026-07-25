@@ -86,6 +86,43 @@ def map(profile: str):
         )
     
 
+def _drop_incomplete_additional_properties(node):
+    """Recursively strip schema:additionalProperty entries that lack
+    schema:value.
+
+    Rationale: the RML mapping's optional-content TriplesMaps
+    (Beamline.collimation, Detector.i0, Sample.prep, ...) iterate on
+    the parent node's presence. When the source key is absent the
+    referenced value is null, but the subject is still emitted with
+    schema:name + schema:propertyID — a PropertyValue with no
+    schema:value, which fails the base CDIF AdditionalProperty shape
+    (schema:value is required). RMLMapper's JSONPath engine does not
+    support the compound '&&' / '!' predicates that would let us
+    skip these at iteration time, so we filter them here after framing.
+
+    Real cases where the sub-TriplesMap should keep firing but the
+    source value is legitimately absent (Mono.d_spacing on B18) are
+    handled by placeholder injection in api/cdi.py, so those items
+    have a real (if 'unknown') value and pass this filter.
+    """
+    if isinstance(node, dict):
+        aps = node.get("schema:additionalProperty")
+        if isinstance(aps, list):
+            filtered = [
+                ap for ap in aps
+                if not (isinstance(ap, dict) and "schema:value" not in ap)
+            ]
+            if filtered != aps:
+                node["schema:additionalProperty"] = filtered
+        elif isinstance(aps, dict) and "schema:value" not in aps:
+            del node["schema:additionalProperty"]
+        for v in node.values():
+            _drop_incomplete_additional_properties(v)
+    elif isinstance(node, list):
+        for x in node:
+            _drop_incomplete_additional_properties(x)
+
+
 def frame(profile: str):
     if profile == "Core Discovery":
         output_file = CD_OUTPUT_FILE
@@ -95,8 +132,9 @@ def frame(profile: str):
         output_file = DDS_OUTPUT_FILE
         frame_path = DDS_FRAME_PATH
         framed_file = DDS_FRAMED_FILE
-    
+
     framed = frame_cdif_document(output_file, frame_path, CONTEXT_PATH)
+    _drop_incomplete_additional_properties(framed)
     with open(framed_file, 'w', encoding='utf-8') as f:
         json.dump(framed, f, indent=2)
 
