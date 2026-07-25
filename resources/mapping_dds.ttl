@@ -82,13 +82,14 @@
       rml:reference "$['schema:version']"
     ]
   ] ;
-  rr:predicateObjectMap [ 
-    rr:predicate schema:keywords;
-    rr:objectMap [
-      rml:reference "$['schema:keywords']"
-    ]
-  ] ;
-  rr:predicateObjectMap [ 
+  # NOTE: the bare-string schema:keywords passthrough from
+  # $['schema:keywords'] was removed because xasCore requires each
+  # keyword to be a schema:DefinedTerm object; string literals like
+  # "Earth and Environmental Sciences" fail validation. If a use case
+  # needs those preserved, wrap them into DefinedTerm objects via an
+  # FnO transform (build {@type: schema:DefinedTerm, schema:name: <str>})
+  # rather than passing them through raw.
+  rr:predicateObjectMap [
     rr:predicate schema:keywords;
     rr:objectMap [
       rr:parentTriplesMap <#TriplesMap_keywords_element_edge>
@@ -556,14 +557,32 @@
       rml:reference "$['cdi:Element_symbol']['skos:definition']"
     ]
   ] ;
-  # schema:name is required on the DefinedTerm. Element symbols are
-  # 1-2 chars ("H", "Se") which is under the xasCore >=3 minLength;
-  # use the periodic-table full name if the XDI carries one
-  # (Element.name), otherwise fall back to the two-char symbol.
+  # schema:name is required on the DefinedTerm. Prefer Element.name if
+  # the XDI carries it, otherwise fall back to a "Element symbol X"
+  # form so the name field is always emitted (bare symbols like "Se"
+  # would fail xasCore's minLength when applied).
   rr:predicateObjectMap [
     rr:predicate schema:name;
     rr:objectMap [
-      rml:reference "$['cdi:Element_name']['skos:definition']"
+      a fnml:FunctionTermMap;
+      fnml:functionValue [
+        rr:predicateObjectMap [
+          rr:predicate fno:executes;
+          rr:objectMap [ rr:constant grel:string_replace ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:valueParameter;
+          rr:objectMap [ rml:reference "$['cdi:Element_symbol']['skos:definition']" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_find;
+          rr:objectMap [ rr:constant "/^/" ]
+        ];
+        rr:predicateObjectMap [
+          rr:predicate grel:p_string_replace;
+          rr:objectMap [ rr:constant "Element symbol " ]
+        ]
+      ]
     ]
   ] ;
   # SWEET matrElement identifier built from the symbol (e.g. Se ->
@@ -597,8 +616,7 @@
   rr:predicateObjectMap [
     rr:predicate schema:inDefinedTermSet;
     rr:objectMap [
-      rr:constant <http://sweetontology.net/matrElement> ;
-      rr:termType rr:IRI
+      rr:constant "http://sweetontology.net/matrElement"
     ]
   ] ;
   rr:predicateObjectMap [
@@ -916,14 +934,18 @@
       rr:class schema:PropertyValue;
       rr:template "_:scan_edge_energy"
     ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
     rr:predicate schema:propertyID;
     rr:objectMap [
       rr:constant xas:edgeenergy ;
       rr:termType rr:IRI
     ]
   ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "Edge energy" ]
+  ] ;
+  rr:predicateObjectMap [
     rr:predicate schema:value;
     rr:objectMap [
       rml:reference "$['cdi:Scan_edge_energy']['skos:definition']"

@@ -49,11 +49,6 @@
                 "@value": "energy"
             }
         ],
-        "http://schema.org/propertyID": [
-            {
-                "@value": "xas:mono energy"
-            }
-        ],
         "http://schema.org/unitText": [
             {
                 "@value": "eV"
@@ -121,7 +116,7 @@
         ],
         "http://schema.org/propertyID": [
             {
-                "@value": "xas:time"
+                "@id": "https://w3id.org/cdif/xas/time"
             }
         ],
         "http://schema.org/unitText": [
@@ -189,11 +184,6 @@
                 "@value": "i0"
             }
         ],
-        "http://schema.org/propertyID": [
-            {
-                "@value": "xas:monitor intensity"
-            }
-        ],
         "http://schema.org/unitText": [
             {
                 "@value": ""
@@ -259,11 +249,6 @@
                 "@value": "itrans"
             }
         ],
-        "http://schema.org/propertyID": [
-            {
-                "@value": "xas:transmission intensity"
-            }
-        ],
         "http://schema.org/unitText": [
             {
                 "@value": ""
@@ -292,6 +277,11 @@
                 "@id": "_:_:beamline_harmonic_rejection"
             }
         ],
+        "http://schema.org/additionalType": [
+            {
+                "@id": "https://w3id.org/cdif/xas/beamline"
+            }
+        ],
         "http://schema.org/identifier": [
             {
                 "@value": "xas:Beamline/13-BM-D"
@@ -301,6 +291,10 @@
             {
                 "@value": "Beamline/13-BM-D"
             }
+        ],
+        "@type": [
+            "http://schema.org/Product",
+            "http://schema.org/Thing"
         ]
     },
     {
@@ -312,7 +306,7 @@
         ],
         "http://schema.org/propertyID": [
             {
-                "@id": "https://ada.astromat.org/metadata/xas/collimation"
+                "@id": "https://w3id.org/cdif/xas/collimation"
             }
         ],
         "http://schema.org/value": [
@@ -333,7 +327,7 @@
         ],
         "http://schema.org/propertyID": [
             {
-                "@id": "https://ada.astromat.org/metadata/xas/focusing"
+                "@id": "https://w3id.org/cdif/xas/focusing"
             }
         ],
         "http://schema.org/value": [
@@ -349,12 +343,12 @@
         "@id": "_:_:beamline_harmonic_rejection",
         "http://schema.org/name": [
             {
-                "@value": "harmonic_rejection"
+                "@value": "harmonic rejection"
             }
         ],
         "http://schema.org/propertyID": [
             {
-                "@id": "https://ada.astromat.org/metadata/xas/harmonic_rejection"
+                "@id": "https://w3id.org/cdif/xas/harmonicrejection"
             }
         ],
         "http://schema.org/value": [
@@ -376,6 +370,11 @@
                 "@id": "_:_:detector_i1"
             }
         ],
+        "http://schema.org/additionalType": [
+            {
+                "@id": "https://w3id.org/cdif/xas/xraymonitor"
+            }
+        ],
         "http://schema.org/identifier": [
             {
                 "@value": "xas:Detector"
@@ -385,18 +384,22 @@
             {
                 "@value": "Detector"
             }
+        ],
+        "@type": [
+            "http://schema.org/Product",
+            "http://schema.org/Thing"
         ]
     },
     {
         "@id": "_:_:detector_i0",
         "http://schema.org/name": [
             {
-                "@value": "I0"
+                "@value": "incident-flux detection method"
             }
         ],
         "http://schema.org/propertyID": [
             {
-                "@id": "https://ada.astromat.org/metadata/xas/I0"
+                "@id": "https://w3id.org/cdif/xas/detectori0"
             }
         ],
         "http://schema.org/value": [
@@ -412,12 +415,12 @@
         "@id": "_:_:detector_i1",
         "http://schema.org/name": [
             {
-                "@value": "I1"
+                "@value": "transmitted-flux detection method"
             }
         ],
         "http://schema.org/propertyID": [
             {
-                "@id": "https://ada.astromat.org/metadata/xas/I1"
+                "@id": "https://w3id.org/cdif/xas/detectorit"
             }
         ],
         "http://schema.org/value": [
@@ -431,6 +434,11 @@
     },
     {
         "@id": "_:_:keywords_element_edge",
+        "http://schema.org/about": [
+            {
+                "@value": "element.edge"
+            }
+        ],
         "http://schema.org/inDefinedTermSet": [
             {
                 "@value": "https://github.com/XraySpectroscopy/XAS-Data-Interchange/blob/master/specification/dictionary.md"
@@ -452,6 +460,21 @@
     },
     {
         "@id": "_:_:keywords_element_symbol",
+        "http://schema.org/about": [
+            {
+                "@value": "element.symbol"
+            }
+        ],
+        "http://schema.org/identifier": [
+            {
+                "@id": "http://sweetontology.net/matrElement/Se"
+            }
+        ],
+        "http://schema.org/inDefinedTermSet": [
+            {
+                "@id": "http://sweetontology.net/matrElement"
+            }
+        ],
         "http://schema.org/termCode": [
             {
                 "@value": "Se"
@@ -468,6 +491,11 @@
                 "@id": "_:_:mono_d_spacing"
             }
         ],
+        "http://schema.org/additionalType": [
+            {
+                "@id": "https://w3id.org/cdif/xas/xraymonochromator"
+            }
+        ],
         "http://schema.org/identifier": [
             {
                 "@value": "xas:Mono/Si 111"
@@ -477,18 +505,22 @@
             {
                 "@value": "Mono/Si 111"
             }
+        ],
+        "@type": [
+            "http://schema.org/Product",
+            "http://schema.org/Thing"
         ]
     },
     {
         "@id": "_:_:mono_d_spacing",
         "http://schema.org/name": [
             {
-                "@value": "d_spacing"
+                "@value": "d-spacing"
             }
         ],
         "http://schema.org/propertyID": [
             {
-                "@id": "https://ada.astromat.org/metadata/xas/d_spacing"
+                "@id": "https://w3id.org/cdif/xas/dspacing"
             }
         ],
         "http://schema.org/value": [
@@ -543,17 +575,60 @@
         ]
     },
     {
-        "@id": "_:_:prov_used_entity",
+        "@id": "_:_:prov_used_beamline",
         "http://schema.org/instrument": [
             {
                 "@id": "_:_:beamline"
-            },
+            }
+        ]
+    },
+    {
+        "@id": "_:_:prov_used_detector",
+        "http://schema.org/instrument": [
             {
                 "@id": "_:_:detector"
-            },
+            }
+        ]
+    },
+    {
+        "@id": "_:_:prov_used_mono",
+        "http://schema.org/instrument": [
             {
                 "@id": "_:_:mono"
             }
+        ]
+    },
+    {
+        "@id": "_:_:prov_used_source",
+        "http://schema.org/instrument": [
+            {
+                "@id": "_:_:source_instrument"
+            }
+        ]
+    },
+    {
+        "@id": "_:_:source_instrument",
+        "http://schema.org/additionalProperty": [
+            {
+                "@id": "_:_:source_probe"
+            },
+            {
+                "@id": "_:_:source_xraysourcetype"
+            }
+        ],
+        "http://schema.org/additionalType": [
+            {
+                "@id": "https://w3id.org/cdif/xas/source"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "X-ray source"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Product",
+            "http://schema.org/Thing"
         ]
     },
     {
@@ -638,15 +713,103 @@
         ]
     },
     {
+        "@id": "_:_:sample",
+        "http://schema.org/additionalProperty": [
+            {
+                "@id": "_:_:sample_preparation"
+            }
+        ],
+        "http://schema.org/additionalType": [
+            {
+                "@id": "https://w3id.org/isample/vocabulary/materialsampleobjecttype/materialsample"
+            },
+            {
+                "@value": "MaterialSample"
+            }
+        ],
+        "http://schema.org/name": [
+            {
+                "@value": "Na2SeO4"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Product",
+            "http://schema.org/Thing"
+        ]
+    },
+    {
+        "@id": "_:_:sample_preparation",
+        "http://schema.org/name": [
+            {
+                "@value": "Sample preparation"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://w3id.org/cdif/xas/samplepreparation"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "powder on tape, 6 layers"
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
         "@id": "_:_:scan_edge_energy",
         "http://schema.org/propertyID": [
             {
-                "@id": "https://ada.astromat.org/metadata/xas/edge_energy"
+                "@id": "https://w3id.org/cdif/xas/edgeenergy"
             }
         ],
         "http://schema.org/value": [
             {
                 "@value": "12658.0"
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
+        "@id": "_:_:source_probe",
+        "http://schema.org/name": [
+            {
+                "@value": "Probe"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://w3id.org/cdif/xas/probe"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "x-ray"
+            }
+        ],
+        "@type": [
+            "http://schema.org/PropertyValue"
+        ]
+    },
+    {
+        "@id": "_:_:source_xraysourcetype",
+        "http://schema.org/name": [
+            {
+                "@value": "X-ray source type"
+            }
+        ],
+        "http://schema.org/propertyID": [
+            {
+                "@id": "https://w3id.org/cdif/xas/xraysourcetype"
+            }
+        ],
+        "http://schema.org/value": [
+            {
+                "@value": "Synchrotron X-ray Source"
             }
         ],
         "@type": [
@@ -756,28 +919,6 @@
         ]
     },
     {
-        "@id": "https://ada.astromat.org/metadata/xas/provevent",
-        "http://schema.org/additionalProperty": [
-            {
-                "@id": "_:_:scan_edge_energy"
-            }
-        ],
-        "http://schema.org/startDate": [
-            {
-                "@value": "2008-04-10T21:58:50"
-            }
-        ],
-        "@type": [
-            "http://schema.org/Event",
-            "http://www.w3.org/ns/prov#Activity"
-        ],
-        "http://www.w3.org/ns/prov#used": [
-            {
-                "@id": "_:_:prov_used_entity"
-            }
-        ]
-    },
-    {
         "@id": "https://example.org/dataset/DV/BYSPHH",
         "http://schema.org/contributor": [
             {
@@ -878,7 +1019,7 @@
         ],
         "http://www.w3.org/ns/prov#wasGeneratedBy": [
             {
-                "@id": "https://ada.astromat.org/metadata/xas/provevent"
+                "@id": "https://w3id.org/cdif/xas/provevent"
             }
         ]
     },
@@ -896,6 +1037,12 @@
             },
             {
                 "@id": "https://w3id.org/cdif/discovery/1.1"
+            },
+            {
+                "@id": "https://w3id.org/cdif/xasCore/1.0"
+            },
+            {
+                "@id": "https://w3id.org/cdif/xasOptional/1.0"
             }
         ],
         "http://schema.org/about": [
@@ -905,11 +1052,52 @@
         ],
         "http://schema.org/additionalType": [
             {
-                "@value": "dcat:CatalogRecord"
+                "@id": "http://www.w3.org/ns/dcat#CatalogRecord"
             }
         ],
         "@type": [
             "http://schema.org/Dataset"
+        ]
+    },
+    {
+        "@id": "https://w3id.org/cdif/xas/provevent",
+        "http://schema.org/additionalProperty": [
+            {
+                "@id": "_:_:scan_edge_energy"
+            }
+        ],
+        "http://schema.org/additionalType": [
+            {
+                "@id": "https://w3id.org/cdif/xas/analysisevent"
+            }
+        ],
+        "http://schema.org/object": [
+            {
+                "@id": "_:_:sample"
+            }
+        ],
+        "http://schema.org/startDate": [
+            {
+                "@value": "2008-04-10T21:58:50"
+            }
+        ],
+        "@type": [
+            "http://schema.org/Action",
+            "http://www.w3.org/ns/prov#Activity"
+        ],
+        "http://www.w3.org/ns/prov#used": [
+            {
+                "@id": "_:_:prov_used_beamline"
+            },
+            {
+                "@id": "_:_:prov_used_detector"
+            },
+            {
+                "@id": "_:_:prov_used_mono"
+            },
+            {
+                "@id": "_:_:prov_used_source"
+            }
         ]
     },
     {

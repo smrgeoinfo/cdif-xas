@@ -8,7 +8,7 @@
     "cdif": "https://w3id.org/cdif/",
     "ex": "https://example.org/",
     "nxs": "https://manual.nexusformat.org/classes/",
-    "xas": "https://ada.astromat.org/metadata/xas/",
+    "xas": "https://w3id.org/cdif/xas/",
     "xsd": "http://www.w3.org/2001/XMLSchema#"
   },
   "@id": "ex:dataset/DV/BYSPHH",
@@ -17,12 +17,12 @@
   ],
   "schema:contributor": [
     {
-      "@id": "_:b18",
+      "@id": "_:b24",
       "@type": [
         "schema:Role"
       ],
       "schema:contributor": {
-        "@id": "_:b19",
+        "@id": "_:b25",
         "@type": [
           "schema:Person"
         ],
@@ -31,12 +31,12 @@
       "schema:roleName": "Author"
     },
     {
-      "@id": "_:b20",
+      "@id": "_:b26",
       "@type": [
         "schema:Role"
       ],
       "schema:contributor": {
-        "@id": "_:b21",
+        "@id": "_:b27",
         "@type": [
           "schema:Person"
         ],
@@ -45,12 +45,12 @@
       "schema:roleName": "Creator"
     },
     {
-      "@id": "_:b22",
+      "@id": "_:b28",
       "@type": [
         "schema:Role"
       ],
       "schema:contributor": {
-        "@id": "_:b23",
+        "@id": "_:b29",
         "@type": [
           "schema:Organization"
         ],
@@ -63,7 +63,7 @@
   "schema:description": "Se_Na2SeO4_rt_01.xdi",
   "schema:distribution": [
     {
-      "@id": "_:b25",
+      "@id": "_:b33",
       "@type": [
         "cdi:PhysicalDataSet",
         "cdi:TabularTextDataSet",
@@ -189,6 +189,7 @@
       "@type": [
         "schema:DefinedTerm"
       ],
+      "schema:about": "element.edge",
       "schema:inDefinedTermSet": "https://github.com/XraySpectroscopy/XAS-Data-Interchange/blob/master/specification/dictionary.md",
       "schema:name": "K-edge",
       "schema:termCode": "K"
@@ -198,6 +199,11 @@
       "@type": [
         "schema:DefinedTerm"
       ],
+      "schema:about": "element.symbol",
+      "schema:identifier": "http://sweetontology.net/matrElement/Se",
+      "schema:inDefinedTermSet": {
+        "@id": "http://sweetontology.net/matrElement"
+      },
       "schema:termCode": "Se"
     },
     "Earth and Environmental Sciences"
@@ -246,13 +252,21 @@
       },
       {
         "@id": "https://w3id.org/cdif/discovery/1.1"
+      },
+      {
+        "@id": "https://w3id.org/cdif/xasCore/1.0"
+      },
+      {
+        "@id": "https://w3id.org/cdif/xasOptional/1.0"
       }
     ],
     "schema:about": {
       "@id": "ex:dataset/DV/BYSPHH"
     },
     "schema:additionalType": [
-      "dcat:CatalogRecord"
+      {
+        "@id": "dcat:CatalogRecord"
+      }
     ]
   },
   "schema:url": "http://localhost:8080/api/access/datafile/29",
@@ -268,9 +282,6 @@
       ],
       "schema:description": "mono energy",
       "schema:name": "energy",
-      "schema:propertyID": [
-        "xas:mono energy"
-      ],
       "schema:unitText": "eV",
       "cdif:uses": [
         "https://example.org/struct/DV/BYSPHH/rv/Column_1"
@@ -288,7 +299,9 @@
       "schema:description": "time",
       "schema:name": "time",
       "schema:propertyID": [
-        "xas:time"
+        {
+          "@id": "xas:time"
+        }
       ],
       "schema:unitText": "",
       "cdif:uses": [
@@ -306,9 +319,6 @@
       ],
       "schema:description": "monitor intensity",
       "schema:name": "i0",
-      "schema:propertyID": [
-        "xas:monitor intensity"
-      ],
       "schema:unitText": "",
       "cdif:uses": [
         "https://example.org/struct/DV/BYSPHH/rv/Column_3"
@@ -325,9 +335,6 @@
       ],
       "schema:description": "transmission intensity",
       "schema:name": "itrans",
-      "schema:propertyID": [
-        "xas:transmission intensity"
-      ],
       "schema:unitText": "",
       "cdif:uses": [
         "https://example.org/struct/DV/BYSPHH/rv/Column_4"
@@ -339,128 +346,237 @@
     {
       "@id": "xas:provevent",
       "@type": [
-        "schema:Event",
+        "schema:Action",
         "prov:Activity"
       ],
       "schema:additionalProperty": [
         {
-          "@id": "_:b24",
+          "@id": "_:b32",
           "@type": [
             "schema:PropertyValue"
           ],
           "schema:propertyID": [
             {
-              "@id": "xas:edge_energy"
+              "@id": "xas:edgeenergy"
             }
           ],
           "schema:value": "12658.0"
         }
       ],
+      "schema:additionalType": [
+        {
+          "@id": "xas:analysisevent"
+        }
+      ],
+      "schema:object": {
+        "@id": "_:b30",
+        "@type": [
+          "schema:Product",
+          "schema:Thing"
+        ],
+        "schema:additionalProperty": [
+          {
+            "@id": "_:b31",
+            "@type": [
+              "schema:PropertyValue"
+            ],
+            "schema:name": "Sample preparation",
+            "schema:propertyID": [
+              {
+                "@id": "xas:samplepreparation"
+              }
+            ],
+            "schema:value": "powder on tape, 6 layers"
+          }
+        ],
+        "schema:additionalType": [
+          {
+            "@id": "https://w3id.org/isample/vocabulary/materialsampleobjecttype/materialsample"
+          },
+          "MaterialSample"
+        ],
+        "schema:name": "Na2SeO4"
+      },
       "schema:startDate": "2008-04-10T21:58:50",
       "prov:used": [
         {
           "@id": "_:b17",
-          "schema:instrument": [
-            {
-              "@id": "_:b4",
-              "schema:additionalProperty": [
-                {
-                  "@id": "_:b5",
-                  "@type": [
-                    "schema:PropertyValue"
-                  ],
-                  "schema:name": "collimation",
-                  "schema:propertyID": [
-                    {
-                      "@id": "xas:collimation"
-                    }
-                  ],
-                  "schema:value": "none"
-                },
-                {
-                  "@id": "_:b6",
-                  "@type": [
-                    "schema:PropertyValue"
-                  ],
-                  "schema:name": "focusing",
-                  "schema:propertyID": [
-                    {
-                      "@id": "xas:focusing"
-                    }
-                  ],
-                  "schema:value": "no"
-                },
-                {
-                  "@id": "_:b7",
-                  "@type": [
-                    "schema:PropertyValue"
-                  ],
-                  "schema:name": "harmonic_rejection",
-                  "schema:propertyID": [
-                    {
-                      "@id": "xas:harmonic_rejection"
-                    }
-                  ],
-                  "schema:value": "Rh-coated mirror, detuned "
-                }
-              ],
-              "schema:identifier": "xas:Beamline/13-BM-D",
-              "schema:name": "Beamline/13-BM-D"
-            },
-            {
-              "@id": "_:b8",
-              "schema:additionalProperty": [
-                {
-                  "@id": "_:b9",
-                  "@type": [
-                    "schema:PropertyValue"
-                  ],
-                  "schema:name": "I0",
-                  "schema:propertyID": [
-                    {
-                      "@id": "xas:I0"
-                    }
-                  ],
-                  "schema:value": "10cm  N2"
-                },
-                {
-                  "@id": "_:b10",
-                  "@type": [
-                    "schema:PropertyValue"
-                  ],
-                  "schema:name": "I1",
-                  "schema:propertyID": [
-                    {
-                      "@id": "xas:I1"
-                    }
-                  ],
-                  "schema:value": "10cm  N2 (?)"
-                }
-              ],
-              "schema:identifier": "xas:Detector",
-              "schema:name": "Detector"
-            },
-            {
-              "@id": "_:b13",
-              "schema:additionalProperty": [
-                {
-                  "@id": "_:b14",
-                  "@type": [
-                    "schema:PropertyValue"
-                  ],
-                  "schema:name": "d_spacing",
-                  "schema:propertyID": [
-                    {
-                      "@id": "xas:d_spacing"
-                    }
-                  ],
-                  "schema:value": "3.13550"
-                }
-              ],
-              "schema:identifier": "xas:Mono/Si 111",
-              "schema:name": "Mono/Si 111"
-            }
-          ]
+          "schema:instrument": {
+            "@id": "_:b4",
+            "@type": [
+              "schema:Product",
+              "schema:Thing"
+            ],
+            "schema:additionalProperty": [
+              {
+                "@id": "_:b5",
+                "@type": [
+                  "schema:PropertyValue"
+                ],
+                "schema:name": "collimation",
+                "schema:propertyID": [
+                  {
+                    "@id": "xas:collimation"
+                  }
+                ],
+                "schema:value": "none"
+              },
+              {
+                "@id": "_:b6",
+                "@type": [
+                  "schema:PropertyValue"
+                ],
+                "schema:name": "focusing",
+                "schema:propertyID": [
+                  {
+                    "@id": "xas:focusing"
+                  }
+                ],
+                "schema:value": "no"
+              },
+              {
+                "@id": "_:b7",
+                "@type": [
+                  "schema:PropertyValue"
+                ],
+                "schema:name": "harmonic rejection",
+                "schema:propertyID": [
+                  {
+                    "@id": "xas:harmonicrejection"
+                  }
+                ],
+                "schema:value": "Rh-coated mirror, detuned "
+              }
+            ],
+            "schema:additionalType": [
+              {
+                "@id": "xas:beamline"
+              }
+            ],
+            "schema:identifier": "xas:Beamline/13-BM-D",
+            "schema:name": "Beamline/13-BM-D"
+          }
+        },
+        {
+          "@id": "_:b18",
+          "schema:instrument": {
+            "@id": "_:b8",
+            "@type": [
+              "schema:Product",
+              "schema:Thing"
+            ],
+            "schema:additionalProperty": [
+              {
+                "@id": "_:b9",
+                "@type": [
+                  "schema:PropertyValue"
+                ],
+                "schema:name": "incident-flux detection method",
+                "schema:propertyID": [
+                  {
+                    "@id": "xas:detectori0"
+                  }
+                ],
+                "schema:value": "10cm  N2"
+              },
+              {
+                "@id": "_:b10",
+                "@type": [
+                  "schema:PropertyValue"
+                ],
+                "schema:name": "transmitted-flux detection method",
+                "schema:propertyID": [
+                  {
+                    "@id": "xas:detectorit"
+                  }
+                ],
+                "schema:value": "10cm  N2 (?)"
+              }
+            ],
+            "schema:additionalType": [
+              {
+                "@id": "xas:xraymonitor"
+              }
+            ],
+            "schema:identifier": "xas:Detector",
+            "schema:name": "Detector"
+          }
+        },
+        {
+          "@id": "_:b19",
+          "schema:instrument": {
+            "@id": "_:b13",
+            "@type": [
+              "schema:Product",
+              "schema:Thing"
+            ],
+            "schema:additionalProperty": [
+              {
+                "@id": "_:b14",
+                "@type": [
+                  "schema:PropertyValue"
+                ],
+                "schema:name": "d-spacing",
+                "schema:propertyID": [
+                  {
+                    "@id": "xas:dspacing"
+                  }
+                ],
+                "schema:value": "3.13550"
+              }
+            ],
+            "schema:additionalType": [
+              {
+                "@id": "xas:xraymonochromator"
+              }
+            ],
+            "schema:identifier": "xas:Mono/Si 111",
+            "schema:name": "Mono/Si 111"
+          }
+        },
+        {
+          "@id": "_:b20",
+          "schema:instrument": {
+            "@id": "_:b21",
+            "@type": [
+              "schema:Product",
+              "schema:Thing"
+            ],
+            "schema:additionalProperty": [
+              {
+                "@id": "_:b22",
+                "@type": [
+                  "schema:PropertyValue"
+                ],
+                "schema:name": "Probe",
+                "schema:propertyID": [
+                  {
+                    "@id": "xas:probe"
+                  }
+                ],
+                "schema:value": "x-ray"
+              },
+              {
+                "@id": "_:b23",
+                "@type": [
+                  "schema:PropertyValue"
+                ],
+                "schema:name": "X-ray source type",
+                "schema:propertyID": [
+                  {
+                    "@id": "xas:xraysourcetype"
+                  }
+                ],
+                "schema:value": "Synchrotron X-ray Source"
+              }
+            ],
+            "schema:additionalType": [
+              {
+                "@id": "xas:source"
+              }
+            ],
+            "schema:name": "X-ray source"
+          }
         }
       ]
     }
