@@ -112,3 +112,59 @@ Known conditional gaps (depend on what the XDI headers carry):
   build in `api/cdif.py` doesn't already normalize to v2 glossary local
   names (lowercase, no spaces, no underscores), consider adding a
   normalization step there.
+
+## XDI pre-validation
+
+The `/cdif` endpoint runs the input file through an XDI/1.0 spec
+compliance check before generating CDIF. Results are embedded in the
+response as an `xdi_validation` object:
+
+```json
+{
+  "xdi_validation": {
+    "ok": false,
+    "error_count": 3,
+    "field_errors": {
+      "Element.symbol": ["...missing..."],
+      "Facility.energy": ["...unit must be GeV..."]
+    }
+  },
+  "@context": {...},
+  "@graph": [...],
+  "columns": [...]
+}
+```
+
+Validation is warning-only — non-compliant XDI does not block CDIF
+generation. The `ok`/`error_count`/`field_errors` structure lets
+downstream consumers decide whether to surface the report, request
+input corrections, or proceed with the CDIF output as-is. See
+[`api/xdi_precheck.py`](./api/xdi_precheck.py) for the wrapper.
+
+### Acknowledgement
+
+The pre-validation step uses the [`xdi_validator`](https://github.com/AAAlvesJr/XDI-Validator)
+Python package (MIT-licensed) by **A. A. Alves Jr.** — a standalone
+JSON-Schema-based validator that implements the
+[XAS Data Interchange Format Draft Specification, version 1.0](https://github.com/XraySpectroscopy/XAS-Data-Interchange/blob/master/specification/xdi_spec.pdf).
+`xdi_validator` is included as a runtime pip dependency; no source is
+vendored in this repository. If you use `cdif-xas` in published work,
+please cite `xdi_validator` alongside — the project has a Zenodo DOI
+at <https://doi.org/10.5281/zenodo.20018640>.
+
+## Dependencies
+
+Direct runtime dependencies (see [`pyproject.toml`](./pyproject.toml)):
+
+| Package | Role | License |
+|---|---|---|
+| [`fastapi`](https://fastapi.tiangolo.com/) | HTTP API framework | MIT |
+| [`pyld`](https://github.com/digitalbazaar/pyld) | JSON-LD framing / expansion | BSD-3 |
+| [`rdflib`](https://rdflib.readthedocs.io/) | RDF graph handling | BSD-3 |
+| [`jsonschema`](https://python-jsonschema.readthedocs.io/) | Draft 2020-12 JSON Schema validation | MIT |
+| [`requests`](https://requests.readthedocs.io/) | HTTP client for remote XDI fetch | Apache-2.0 |
+| [`xdi_validator`](https://github.com/AAAlvesJr/XDI-Validator) | XDI/1.0 spec pre-validation (see above) | MIT |
+
+The `/map` pipeline additionally uses [`rmlmapper`](https://github.com/RMLio/rmlmapper-java)
+(Apache-2.0) as an external Java jar, invoked via subprocess. Set
+`$env:RMLMAPPER_JAR` or drop the jar at `<repo>/lib/rmlmapper-*.jar`.

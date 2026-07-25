@@ -10,4 +10,5 @@ dependencies = [
     "pyld>=3.0.0",
     "rdflib>=7.6.0",
     "requests>=2.34.2",
+    "xdi-validator>=0.1.0",
 ]

@@ -8,6 +8,7 @@ from fastapi import FastAPI, Query, Response
 from api.Mapper import map, frame, validate
 from api.cdi import generate_cdi
 from api.cdif import generate_cdif
+from api.xdi_precheck import validate_xdi as _xdi_precheck
 
 app = FastAPI()
 
@@ -63,10 +64,19 @@ def cdif_generate(
         ),
     ),
 ):
+    # Pre-validation against the XDI/1.0 spec. Warning-only; failures
+    # here don't block CDIF generation. Results embedded in the response
+    # as `xdi_validation` so consumers see both what's wrong per the
+    # XDI spec and what CDIF produced.
+    xdi_validation_summary = _xdi_precheck(url)
+
     graph = generate_cdi(url, resources, type, datasetid, include_data=include_data)
     cdi_jsonld = graph.serialize(format="json-ld")
 
     pp_data = generate_cdif(cdi_jsonld)
+
+    if isinstance(pp_data, dict):
+        pp_data["xdi_validation"] = xdi_validation_summary
 
     if write_skos:
         try:
