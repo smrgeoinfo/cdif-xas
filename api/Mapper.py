@@ -14,8 +14,26 @@ BASE_DIR = os.environ.get("CDIF_XAS_BASE_DIR",
                           else str(Path(__file__).resolve().parent.parent) + "/")
 RESOURCES_DIR = os.environ.get("CDIF_XAS_RESOURCES_DIR",
                                BASE_DIR + "resources")
-MAPPER_JAR = os.environ.get("RMLMAPPER_JAR",
-                            BASE_DIR + "lib/rmlmapper-8.1.0-r0-all.jar")
+
+
+def _discover_mapper_jar() -> str:
+    """Locate the RMLMapper jar. Preference order:
+       1. RMLMAPPER_JAR env var (explicit override).
+       2. Newest rmlmapper-*.jar under <BASE_DIR>/lib/.
+       3. Hard fallback string (may not exist — will fail at subprocess.run).
+    """
+    env_val = os.environ.get("RMLMAPPER_JAR")
+    if env_val:
+        return env_val
+    lib_dir = Path(BASE_DIR) / "lib"
+    if lib_dir.is_dir():
+        jars = sorted(lib_dir.glob("rmlmapper-*.jar"), key=lambda p: p.stat().st_mtime)
+        if jars:
+            return str(jars[-1])
+    return str(lib_dir / "rmlmapper-8.1.0-r0-all.jar")
+
+
+MAPPER_JAR = _discover_mapper_jar()
 CONTEXT_PATH = RESOURCES_DIR + "/context.json"
 
 # Core Discovery Profile
