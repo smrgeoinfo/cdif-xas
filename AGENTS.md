@@ -66,6 +66,17 @@ strategies keep validation green when the source is thin:
    `schema:additionalProperty` entry that lacks `schema:value`.
    Complete entries (including placeholder `"unknown"` from strategy 2)
    pass through untouched.
+4. **Non-strict-ISO datetime headers** (space separator, slash-date,
+   US m/d/y, date-only, basic ISO) → `api/cdi.py:_normalize_datetime`
+   runs at parse time on the keys in `_DATETIME_KEYS`
+   (`Scan.start_time`, `Scan.end_time`), converting recognized forms
+   to canonical `YYYY-MM-DDTHH:MM:SS` before the SKOS triples are
+   written. Unparseable values pass through unchanged.
+   Normalize at parse-time rather than as a post-graph sweep — the
+   RML mapping picks the datetime out of `$['skos:prefLabel'][2]`,
+   which is position-sensitive, and rdflib graph edits after the
+   fact don't guarantee the JSON-LD serialization keeps the same
+   order.
 
 **XDI/1.0 spec violations** in the input → surfaced in the `/cdif`
 response as an `xdi_validation` object; do not block CDIF generation.

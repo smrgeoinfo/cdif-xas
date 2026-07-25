@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pathlib import Path
 import re
 from typing import Optional
@@ -7,6 +8,51 @@ import requests
 import rdflib
 
 from api.local_input import is_local_path, read_local_xdi
+
+
+# XDI header keys whose values are datetimes and should be normalized
+# to ISO 8601 before flowing into CDIF-XAS. The XDI/1.0 spec calls for
+# ISO 8601, but real-world files commonly use space-separated ISO or
+# slash-date variants; downstream schemas / SHACL want strict ISO.
+_DATETIME_KEYS = {"Scan.start_time", "Scan.end_time"}
+
+# Non-ISO formats we accept, tried in order after fromisoformat fails.
+_DATETIME_FALLBACK_FORMATS = (
+    "%Y/%m/%d %H:%M:%S",
+    "%Y/%m/%d %H:%M",
+    "%Y/%m/%dT%H:%M:%S",
+    "%m/%d/%Y %H:%M:%S",
+    "%m/%d/%Y %H:%M",
+    "%Y-%m-%d %H:%M",
+    "%Y-%m-%dT%H:%M",
+    "%Y-%m-%d",
+    "%Y%m%d",
+    "%Y%m%dT%H%M%S",
+)
+
+
+def _normalize_datetime(value: str) -> Optional[str]:
+    """Try to parse a raw XDI datetime string and return ISO 8601.
+
+    Returns None when the value can't be parsed by any recognized form,
+    so the caller can preserve the original string and let downstream
+    validation surface it. Non-fatal by design: the CDIF-XAS pipeline
+    should not hard-fail on a spec-noncompliant timestamp.
+    """
+    s = value.strip()
+    if not s:
+        return None
+    try:
+        # Python 3.11+ fromisoformat accepts space separator and offsets
+        return datetime.fromisoformat(s).isoformat()
+    except ValueError:
+        pass
+    for fmt in _DATETIME_FALLBACK_FORMATS:
+        try:
+            return datetime.strptime(s, fmt).isoformat()
+        except ValueError:
+            continue
+    return None
 
 
 class CDI_DDI:
@@ -90,6 +136,10 @@ class CDI_DDI:
                 if compound_variable_name and variable_value:
                         compound_variable_name = compound_variable_name.group(1).strip('#  ')
                         variable_value = variable_value.group(1)
+                        if compound_variable_name in _DATETIME_KEYS:
+                            iso = _normalize_datetime(variable_value)
+                            if iso is not None:
+                                variable_value = iso
                         if '.' in compound_variable_name:
                             compound_variable_name_uri = compound_variable_name.replace(" ", "_").replace(":", "_")
                             variables = compound_variable_name_uri.split('.')

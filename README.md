@@ -91,6 +91,16 @@ green when the source is thin:
    that strips any `schema:additionalProperty` entry missing
    `schema:value`. Complete entries (including placeholder `"unknown"`
    from strategy 2) pass through untouched.
+4. **Datetime headers not in strict ISO 8601** (e.g.,
+   `Scan.start_time: 2008-04-10 21:58:50`, `2001/06/26 22:27:31`,
+   US m/d/y) → `api/cdi.py:_normalize_datetime` runs at XDI parse
+   time on `Scan.start_time` / `Scan.end_time`, converting recognized
+   forms to canonical `YYYY-MM-DDTHH:MM:SS` before any triples are
+   written. Unparseable values pass through unchanged so downstream
+   validation surfaces them; recognized-but-non-strict inputs no
+   longer make CDIF-XAS output fail SHACL date-format checks.
+   Normalizing at parse-time (not post-graph) preserves the
+   `skos:prefLabel` ordering the RML mapping indexes.
 
 The result is an honest artifact: fields that were in the input come
 through as-is, fields synthesized by fallback are visibly marked
