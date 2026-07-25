@@ -25,7 +25,7 @@ Usage:
     python tools/batch_xdi_validate.py <input-dir> [--out <out-dir>]
 
 Examples:
-    # Report to ./batch_reports/ (relative to CWD)
+    # Report alongside the XDI files (default)
     python tools/batch_xdi_validate.py \\
         "C:/GithubC/CDIF/XAS-CDIF/exampleData/XDI format of collection 203"
 
@@ -34,7 +34,9 @@ Examples:
 
 The three report files are always named
 batch_validation_report.{txt,csv,json} in the output directory.
-Existing files are overwritten.
+Existing files are overwritten. Reports are written alongside the
+input files by default so a scanned collection carries its own
+validation record without polluting the caller's working directory.
 
 Requires: xdi-validator (installed via `uv sync` alongside the rest of
 the project's dependencies).
@@ -229,15 +231,18 @@ def main(argv=None) -> int:
     )
     ap.add_argument("input_dir", type=Path,
                     help="Directory containing *.xdi files to validate")
-    ap.add_argument("--out", type=Path, default=Path("batch_reports"),
+    ap.add_argument("--out", type=Path, default=None,
                     help="Directory for the three report files "
-                         "(default: ./batch_reports)")
+                         "(default: same as input_dir — reports "
+                         "written alongside the XDI files)")
     args = ap.parse_args(argv)
 
     if not args.input_dir.is_dir():
         sys.exit(f"Not a directory: {args.input_dir}")
 
-    return _run(args.input_dir.resolve(), args.out.resolve())
+    input_dir = args.input_dir.resolve()
+    out_dir = args.out.resolve() if args.out else input_dir
+    return _run(input_dir, out_dir)
 
 
 if __name__ == "__main__":
