@@ -44,26 +44,57 @@ SHACL are bundled at
 
 ## Graceful-degradation pattern
 
-The pipeline never hard-fails on missing metadata. When a source is
-absent, a fallback fills the gap so downstream validation can succeed:
+The pipeline never hard-fails on missing metadata. Three coordinated
+strategies keep validation green when the source is thin:
 
-- **No Dataverse instance** → `api/local_input.py:build_placeholder_dataset`
-  synthesizes a minimal `schema:Dataset` from file name + mtime.
-- **Missing `# Sample.name`** → the mapping's sample block just doesn't
-  fire; xasDocument requires `schema:object`, so this is a real gap
-  that surfaces as a SHACL violation. Not silently patched.
-- **Missing `# Mono.d_spacing`** → `api/cdi.py:_add_xas_fallback_triples`
-  injects the child with `skos:definition "unknown"` so the required
-  `schema:value` predicate is emitted.
-- **Missing XDI headers of any other kind** → the corresponding
-  optional-content TriplesMaps in `mapping_dds.ttl` iterate on
-  key-existence JSONPath predicates and simply skip.
-- **XDI/1.0 spec violations in the input** → surfaced in the `/cdif`
-  response as an `xdi_validation` object; do not block generation.
+1. **No Dataverse instance** → `api/local_input.py:build_placeholder_dataset`
+   synthesizes a minimal `schema:Dataset` from file name + mtime.
+   Emits a Dataverse-shaped `@id`
+   (`http://localhost:8080/citation?persistentId=perma:DV/<stem>`) so
+   the RML iterator matches without dialect handling.
+2. **xasCore-required content missing** (e.g., `Mono.d_spacing`) →
+   `api/cdi.py:_add_xas_fallback_triples` injects a placeholder triple
+   into the SKOS graph AFTER `parse_xdi()` and BEFORE JSON-LD
+   serialization. Fires only when the source key is genuinely absent;
+   never overwrites real data. Scaffolded to add more cases easily.
+3. **Optional sub-property TriplesMaps emit incomplete PropertyValues**
+   (e.g., `Beamline.collimation` when the header is absent — the
+   TriplesMap fires on `cdi:Beamline` existence, then its value
+   `rml:reference` resolves to null, and a `schema:PropertyValue` with
+   no `schema:value` is emitted) → `api/Mapper.py:_drop_incomplete_additional_properties`
+   runs inside `frame()` and recursively strips any
+   `schema:additionalProperty` entry that lacks `schema:value`.
+   Complete entries (including placeholder `"unknown"` from strategy 2)
+   pass through untouched.
 
-When adding new fallbacks, prefer Python-side injection in
-`_add_xas_fallback_triples` over RML-side JSONPath tricks — RMLMapper's
-support for compound iterator predicates (`&&`, `!`) is not reliable.
+**XDI/1.0 spec violations** in the input → surfaced in the `/cdif`
+response as an `xdi_validation` object; do not block CDIF generation.
+
+### Lessons from getting these to work
+
+- **RMLMapper's JSONPath does NOT support compound predicates.** The
+  parser (`org.jsfr.json.compiler.JsonPathParser`) throws
+  `ParseCancellationException` on `&&` or `!` inside `[?(...)]`
+  filters. All iterators must be simple single-predicate filters.
+  For any "fire only when X exists"-style logic, use Python injection
+  (strategy 2 above) instead of trying to filter at the iterator.
+- **`/cdif` must always run before `/map` on new XDI input.** `/map`
+  reads `resources/cdif_skos.json`, which is written by `/cdif`. A
+  stale `cdif_skos.json` means `/map` processes yesterday's data.
+  If validation errors don't respond to fixes, first check the
+  `LastWriteTime` of `cdif_skos.json` vs the current time — the most
+  common failure mode is "the fix landed but the pipeline didn't
+  actually re-run."
+- **When `/map` fails, look at the uvicorn stderr, not the endpoint
+  response.** `api/Mapper.py:map()` now prints the JVM stdout+stderr
+  around a big `============= RMLMapper FAILED =============` banner
+  when the subprocess exits non-zero, then re-raises. Prior
+  swallowed-stderr behavior turned real errors into opaque 500s.
+- **JSON-LD framing wraps values inconsistently.** A frame entry with
+  `{"@embed": "@always"}` on a scalar-valued predicate can cause pyld
+  to wrap the value in an array (e.g., `["decimal"]` instead of
+  `"decimal"`), which then fails schemas that expect a string.
+  Use bare `{}` on predicates whose target values should stay scalar.
 
 ## XDI pre-validation
 

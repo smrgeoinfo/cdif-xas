@@ -21,15 +21,18 @@ docker-compose up -d
 
 # Local run (no Docker, no Dataverse)
 
-The `/cdif` endpoint accepts a local XDI file path (via `file://` URL
-or an absolute path). Dataverse's `?exporter=schema.org` enrichment is
-skipped and the pipeline generates placeholder schema.org `Dataset`
-metadata from the file itself:
+Requires Python 3.13 (`.python-version` pinned, needed by
+`xdi_validator`) and Java (needed by `rmlmapper`).
 
-- `@id`: `urn:local:xdi:<file-stem>`
-- `schema:name`: file stem
-- `schema:identifier`: `local:<file-stem>`
-- `schema:dateModified` / `schema:datePublished`: file mtime
+The `/cdif` endpoint accepts a local XDI file path via `file://` URL
+or an absolute path. Dataverse's `?exporter=schema.org` enrichment is
+skipped and the pipeline synthesizes a minimal schema.org `Dataset`
+from the file itself:
+
+- `@id`: `http://localhost:8080/citation?persistentId=perma:DV/<file-stem>`
+  (shape chosen so the RML mapping's iterator matches without changes)
+- `schema:name`, `schema:identifier`: derived from the file stem
+- `schema:dateModified` / `schema:datePublished`: file mtime, typed as `schema:Date`
 - `schema:license`: `https://creativecommons.org/licenses/by/4.0/`
   (CDIF metadata default — distinct from any license on the payload
   data, which is unknown in local mode)
@@ -38,17 +41,61 @@ metadata from the file itself:
 
 See `api/local_input.py` for the exact placeholder shape.
 
-```bash
+```powershell
 uv sync
+$env:RMLMAPPER_JAR = "$PWD\lib\rmlmapper-8.1.0-r380-all.jar"    # or absolute path
 uv run uvicorn api.api:app --reload --port 8000
-curl "http://localhost:8000/cdif?url=file:///path/to/data.xdi&type=xas"
 ```
 
-Portable paths for the RML `/map` pipeline are also supported. Set
-`RMLMAPPER_JAR=/path/to/rmlmapper-8.1.0-r0-all.jar` (or drop the JAR
-at `<repo>/lib/rmlmapper-8.1.0-r0-all.jar`). Set
-`CDIF_XAS_RESOURCES_DIR` if the resources folder isn't at the default
-`<repo>/resources/`.
+In a second shell, chain the four endpoints. `/cdif` writes
+`resources/cdif_skos.json` as a side effect so `/map` consumes THIS
+file's data instead of the committed Se_Na2SeO4 fixture:
+
+```powershell
+curl.exe "http://localhost:8000/cdif?url=file:///C:/path/to/data.xdi&type=xas" > out.jsonld
+curl.exe "http://localhost:8000/map?profile=Data%20Description%20Structure"
+curl.exe "http://localhost:8000/frame?profile=Data%20Description%20Structure"
+curl.exe "http://localhost:8000/validate?profile=Data%20Description%20Structure"
+```
+
+All four return `null` on success (they complete side-effectfully).
+`/validate` returns an HTTP 500 when the framed JSON Schema check
+fails — the uvicorn terminal shows the specific field-level errors.
+
+Env vars honored:
+
+| Var | Default | Purpose |
+|-----|---------|---------|
+| `RMLMAPPER_JAR` | auto-discover newest `rmlmapper-*.jar` in `<repo>/lib/` | Path to the RMLMapper jar |
+| `CDIF_XAS_BASE_DIR` | repo root | Base dir (Docker uses `/files/`) |
+| `CDIF_XAS_RESOURCES_DIR` | `<CDIF_XAS_BASE_DIR>/resources` | Location of mapping, frame, schema, SKOS files |
+
+## Graceful degradation for missing input
+
+Real-world XDI files are often incomplete or spec-noncompliant. The
+pipeline never hard-fails — three fallback strategies keep validation
+green when the source is thin:
+
+1. **No Dataverse instance** → local mode synthesizes the schema.org
+   `Dataset` placeholder above (`api/local_input.py`).
+2. **XDI has no `Mono.d_spacing` header** (xasCore-required) →
+   `api/cdi.py:_add_xas_fallback_triples` injects a
+   `cdi:Mono_d_spacing` triple with value `"unknown"` after parsing
+   the XDI but before the RML mapping runs. Extend this function to
+   add fallbacks for other xasCore-required fields as new XDI dialects
+   surface. **Real data from the XDI is never overwritten** — the
+   fallback fires only when the source key is genuinely absent.
+3. **Optional sub-property TriplesMaps fire with no value** (e.g.,
+   `Beamline.collimation` when the header is absent) → `api/Mapper.py:frame()`
+   runs a post-frame filter (`_drop_incomplete_additional_properties`)
+   that strips any `schema:additionalProperty` entry missing
+   `schema:value`. Complete entries (including placeholder `"unknown"`
+   from strategy 2) pass through untouched.
+
+The result is an honest artifact: fields that were in the input come
+through as-is, fields synthesized by fallback are visibly marked
+`"unknown"`, and optional fields with no source data are omitted
+rather than emitted malformed.
 
 ## Profile validation
 
@@ -85,33 +132,36 @@ pyshacl -s resources/xasDocumentRules.shacl -f table \
     -df json-ld resources/cdif_dds_framed.jsonld
 ```
 
-**Note**: this branch applies UPLIFT-INSTRUCTIONS.md tasks 1–10 in full
-(mechanical: namespace rebind, concept renames, conformsTo additions,
-@id-form policy, xas:analysisevent + schema:Action, bundled-schema
-refresh; editorial: peer prov:used instrument model, X-ray source
-wrapper with static defaults, MaterialSample sample block reading
-XDI Sample.* headers, DefinedTerm content enrichment for element edge
-and symbol).
+**Uplift status.** This branch applies UPLIFT-INSTRUCTIONS.md tasks
+1–10 in full (mechanical: namespace rebind, v2 concept renames,
+`conformsTo` additions, `@id`-form policy, `xas:analysisevent` +
+`schema:Action`, bundled-schema refresh; editorial: peer `prov:used`
+instrument model, X-ray source wrapper with static defaults,
+MaterialSample sample block reading XDI `Sample.*` headers, DefinedTerm
+content enrichment for element edge/symbol, and the graceful-degradation
+strategies above). Confirmed end-to-end on both the committed
+Se_Na2SeO4 fixture and a real-world Diamond B18 (`262875_PtSn_OCO_Abu_1.xdi`)
+file that is itself XDI/1.0-noncompliant.
 
-Known conditional gaps (depend on what the XDI headers carry):
+Known content-dependent gaps that still need domain input to fill
+properly (rather than being masked by the fallbacks):
 
-- `schema:object` MaterialSample block only emits if the XDI has a
-  `# Sample.name` header (parsed to `cdi:Sample`). Missing Sample header
-  → no sample node → SHACL will flag the activity as missing
-  `schema:object`. Add a `# Sample.name: ...` header to your XDI, or
-  supply the sample name in a wrapping process.
-- The element-symbol keyword's `schema:name` reads
-  `# Element.name: ...`. If missing, the DefinedTerm lacks a name and
-  may fail xasCore's DefinedTerm shape.
-- `xas:samplepreparation` PropertyValue only emits if the XDI has a
-  `# Sample.prep` header.
-- The `schema:propertyID` on `schema:variableMeasured` items is built by
-  a GREL string_replace that prepends `https://w3id.org/cdif/xas/` to
-  whatever `$['meaning']` is. Values with spaces or mixed case (e.g.
-  "mono energy") produce non-resolving IRIs. If the column-meaning
-  build in `api/cdif.py` doesn't already normalize to v2 glossary local
-  names (lowercase, no spaces, no underscores), consider adding a
-  normalization step there.
+- The synthesized `Mono.d_spacing` = `"unknown"` should be a real value
+  derived from the crystal cut (`Si(111)` = 3.1355 Å, `Si(311)` = 1.6376 Å,
+  ...). A crystal-cut lookup table in `_add_xas_fallback_triples` would
+  auto-fill this.
+- XDI files with no `Element.symbol` / `Element.edge` headers (spec
+  violation) currently produce no element-keyword DefinedTerms; the
+  filter drops the incomplete PropertyValues. Downstream consumers see
+  a valid document without element/edge tags. Consider parsing the
+  sample formula (`PtSn_OCO_Abu` → Pt) or filename convention if you
+  need element info for these dialects.
+- `schema:propertyID` on `schema:variableMeasured` items is a GREL
+  string_replace that prepends `https://w3id.org/cdif/xas/` to whatever
+  `$['meaning']` is (populated by `api/cdif.py`'s column build). Values
+  with spaces or mixed case produce non-resolving IRIs. Consider adding
+  a v2-normalization step (lowercase, no spaces, no underscores) in the
+  column build.
 
 ## XDI pre-validation
 
