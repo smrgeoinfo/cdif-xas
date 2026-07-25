@@ -32,7 +32,11 @@ DDS_OUTPUT_FILE = RESOURCES_DIR + "/cdif_dds.jsonld"
 DDS_FRAMED_FILE = RESOURCES_DIR + "/cdif_dds_framed.jsonld"
 
 DDS_FRAME_PATH = RESOURCES_DIR + "/CDIFDiscoveryDataDescriptionStructure-frame.jsonld"
-DDS_SCHEMA_PATH = RESOURCES_DIR + "/CDIFDiscoveryDataDescriptionStructureProfileStructuredSchema.json"
+# Validate against the CDIF XAS document profile schema (aggregated
+# resolved schema for core + discovery + data_description + data_structure
+# + xasCore + xasOptional). Snapshot at:
+#   https://github.com/smrgeoinfo/XAS-CDIF/blob/cdifxasRelease/release/cdifXASDocumentResolvedSchema.json
+DDS_SCHEMA_PATH = RESOURCES_DIR + "/cdifXASDocumentResolvedSchema.json"
 
 def map(profile: str):
     if profile == "Core Discovery":

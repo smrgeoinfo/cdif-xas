@@ -50,8 +50,47 @@ at `<repo>/lib/rmlmapper-8.1.0-r0-all.jar`). Set
 `CDIF_XAS_RESOURCES_DIR` if the resources folder isn't at the default
 `<repo>/resources/`.
 
-**Note**: the mapping output still needs the content-correctness uplift
-described in [`UPLIFT-INSTRUCTIONS.md`](./UPLIFT-INSTRUCTIONS.md) to
-validate against the current `xasDocument/1.0` profile. Local mode gets
-you a running pipeline against your XDI files; it does not change what
-the mapping produces.
+## Profile validation
+
+Bundled artifacts (`resources/cdifXASDocumentResolvedSchema.json` and
+`resources/xasDocumentRules.shacl`) target the CDIF XAS document
+profile at `https://w3id.org/cdif/xasDocument/1.0` — the six-profile
+composite (core + discovery + data_description + data_structure +
+xasCore + xasOptional). Regenerate them from the release:
+
+```bash
+curl -sL -o resources/cdifXASDocumentResolvedSchema.json \
+    https://raw.githubusercontent.com/smrgeoinfo/XAS-CDIF/cdifxasRelease/release/cdifXASDocumentResolvedSchema.json
+curl -sL -o resources/xasDocumentRules.shacl \
+    https://raw.githubusercontent.com/smrgeoinfo/XAS-CDIF/cdifxasRelease/release/xasDocumentRules.shacl
+```
+
+Validate a framed output:
+
+```bash
+# JSON Schema
+python -c "
+import json
+from jsonschema import Draft202012Validator
+schema = json.load(open('resources/cdifXASDocumentResolvedSchema.json'))
+doc = json.load(open('resources/cdif_dds_framed.jsonld'))
+errs = list(Draft202012Validator(schema).iter_errors(doc))
+print(f'{len(errs)} errors')
+for e in errs[:10]:
+    print(f'  {\"/\".join(str(p) for p in e.absolute_path)}: {e.message[:160]}')
+"
+
+# SHACL
+pyshacl -s resources/xasDocumentRules.shacl -f table \
+    -df json-ld resources/cdif_dds_framed.jsonld
+```
+
+**Note**: this branch applies UPLIFT-INSTRUCTIONS.md tasks 1–5 + 10
+(mechanical: namespace rebind, concept renames, conformsTo additions,
+@id-form policy, xas:analysisevent + schema:Action, bundled-schema
+refresh). Editorial tasks 6–9 (peer prov:used restructure, source
+instrument, MaterialSample sample, wired-up measurementTechnique +
+keywords) are NOT yet applied — those need domain review. Expect
+residual SHACL violations from missing xasCore-required content until
+they land; see [`UPLIFT-INSTRUCTIONS.md`](./UPLIFT-INSTRUCTIONS.md) for
+the full plan.

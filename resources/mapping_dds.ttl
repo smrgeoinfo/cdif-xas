@@ -2,7 +2,7 @@
 @prefix rml: <http://w3id.org/rml/> .
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix schema: <http://schema.org/> .
-@prefix xas: <https://ada.astromat.org/metadata/xas/> .
+@prefix xas: <https://w3id.org/cdif/xas/> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix dcat: <http://www.w3.org/ns/dcat#> .
 @prefix cdi: <http://ddialliance.org/Specification/DDI-CDI/1.0/RDF/> .
@@ -157,7 +157,7 @@
   rr:predicateObjectMap [ 
     rr:predicate  prov:wasGeneratedBy;
     rr:objectMap [
-      rr:constant <https://ada.astromat.org/metadata/xas/provevent>;
+      rr:constant <https://w3id.org/cdif/xas/provevent>;
       rr:termType rr:IRI
     ]
   ] ;
@@ -228,6 +228,15 @@
     rr:predicate schema:propertyID;
     rr:objectMap [
       a fnml:FunctionTermMap;
+      # Prepends the full XAS glossary base and marks the result as an
+      # IRI reference so it serializes as JSON-LD {"@id": "..."} instead
+      # of a bare string literal. Note: $['meaning'] values that carry
+      # spaces or mixed case will produce non-resolving IRIs; the v2
+      # glossary uses lowercase, no-underscore local names (see
+      # https://w3id.org/cdif/xas/). Consider normalizing $['meaning']
+      # upstream (in api/cdif.py's column build) so it lands here as a
+      # v2-conformant local name.
+      rr:termType rr:IRI ;
       fnml:functionValue [
         rr:predicateObjectMap [
           rr:predicate fno:executes;
@@ -243,7 +252,7 @@
         ];
         rr:predicateObjectMap [
           rr:predicate grel:p_string_replace;
-          rr:objectMap [ rr:constant "xas:" ]
+          rr:objectMap [ rr:constant "https://w3id.org/cdif/xas/" ]
         ]
       ]
     ]
@@ -364,7 +373,8 @@
   rr:predicateObjectMap [ 
     rr:predicate schema:additionalType;
     rr:objectMap [
-      rr:constant "dcat:CatalogRecord"
+      rr:constant dcat:CatalogRecord ;
+      rr:termType rr:IRI
     ]
   ] ;
   rr:predicateObjectMap [
@@ -392,6 +402,20 @@
         rr:predicate dcterms:conformsTo ;
         rr:objectMap [
             rr:constant <https://w3id.org/cdif/data_structure/1.1> ;
+            rr:termType rr:IRI
+        ]
+    ] ;
+  rr:predicateObjectMap [
+        rr:predicate dcterms:conformsTo ;
+        rr:objectMap [
+            rr:constant <https://w3id.org/cdif/xasCore/1.0> ;
+            rr:termType rr:IRI
+        ]
+    ] ;
+  rr:predicateObjectMap [
+        rr:predicate dcterms:conformsTo ;
+        rr:objectMap [
+            rr:constant <https://w3id.org/cdif/xasOptional/1.0> ;
             rr:termType rr:IRI
         ]
     ] ;
@@ -699,8 +723,8 @@
         ]
     ];
   rml:subjectMap [
-      rml:class prov:Activity, schema:Event;
-      rml:template "https://ada.astromat.org/metadata/xas/provevent"
+      rml:class prov:Activity, schema:Action;
+      rml:template "https://w3id.org/cdif/xas/provevent"
     ] ;
   rr:predicateObjectMap [ 
     rr:predicate schema:startDate;
@@ -719,10 +743,17 @@
         ]
     ];
   rml:subjectMap [
-      rml:class prov:Activity, schema:Event;
-      rml:template "https://ada.astromat.org/metadata/xas/provevent"
+      rml:class prov:Activity, schema:Action;
+      rml:template "https://w3id.org/cdif/xas/provevent"
     ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant xas:analysisevent ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [
     rr:predicate schema:additionalProperty;
     rr:objectMap [
       rr:parentTriplesMap <#TriplesMap_scan_edge_energy>
@@ -746,7 +777,7 @@
   rr:predicateObjectMap [ 
     rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:constant xas:edge_energy ;
+      rr:constant xas:edgeenergy ;
       rr:termType rr:IRI
     ]
   ] ;
@@ -767,8 +798,8 @@
         ]
     ];
   rml:subjectMap [
-      rr:class prov:Activity, schema:Event;
-      rr:template "https://ada.astromat.org/metadata/xas/provevent"
+      rr:class prov:Activity, schema:Action;
+      rr:template "https://w3id.org/cdif/xas/provevent"
     ] ;
   rr:predicateObjectMap [ 
     rr:predicate prov:used;
@@ -974,14 +1005,14 @@
   rr:predicateObjectMap [ 
     rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:constant xas:harmonic_rejection ;
+      rr:constant xas:harmonicrejection ;
       rr:termType rr:IRI
     ]
   ] ;
   rr:predicateObjectMap [ 
     rr:predicate schema:name;
     rr:objectMap [
-      rr:constant "harmonic_rejection"
+      rr:constant "harmonic rejection"
     ]
   ] ;
   rr:predicateObjectMap [ 
@@ -1077,13 +1108,13 @@
   rr:predicateObjectMap [ 
     rr:predicate schema:name;
     rr:objectMap [
-      rr:constant "d_spacing"
+      rr:constant "d-spacing"
     ]
   ] ;
   rr:predicateObjectMap [ 
     rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:constant xas:d_spacing ;
+      rr:constant xas:dspacing ;
       rr:termType rr:IRI
     ]
   ] ;
@@ -1149,14 +1180,14 @@
   rr:predicateObjectMap [ 
     rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:constant xas:I0 ;
+      rr:constant xas:detectori0 ;
       rr:termType rr:IRI
     ]
   ] ;
   rr:predicateObjectMap [ 
     rr:predicate schema:name;
     rr:objectMap [
-      rr:constant "I0"
+      rr:constant "incident-flux detection method"
     ]
   ] ;
   rr:predicateObjectMap [ 
@@ -1183,14 +1214,14 @@
   rr:predicateObjectMap [ 
     rr:predicate schema:propertyID;
     rr:objectMap [
-      rr:constant xas:I1 ;
+      rr:constant xas:detectorit ;
       rr:termType rr:IRI
     ]
   ] ;
   rr:predicateObjectMap [ 
     rr:predicate schema:name;
     rr:objectMap [
-      rr:constant "I1"
+      rr:constant "transmitted-flux detection method"
     ]
   ] ;
   rr:predicateObjectMap [ 

@@ -7,6 +7,6 @@
 	"cdif": "https://w3id.org/cdif/",
 	"ex": "https://example.org/",
     "nxs": "https://manual.nexusformat.org/classes/",
-    "xas": "https://ada.astromat.org/metadata/xas/",
+    "xas": "https://w3id.org/cdif/xas/",
 	"xsd": "http://www.w3.org/2001/XMLSchema#"
 }
