@@ -44,25 +44,48 @@ SHACL are bundled at
 
 ## Graceful-degradation pattern
 
-The pipeline never hard-fails on missing metadata. Three coordinated
-strategies keep validation green when the source is thin:
+The pipeline never hard-fails on missing metadata. Seven coordinated
+strategies keep validation green when the source is thin. Verified
+37/37 fully valid on the XAS-CDIF/exampleData corpus (JSON Schema +
+SHACL against the smrgeoinfo/XAS-CDIF@cdifxasRelease release/
+artifacts).
+
+**Sentinel-value conventions used throughout:**
+
+- `"Missing"` — text placeholder for a required `schema:name` /
+  identifier-string field when the source is genuinely absent.
+- `"unknown"` — text placeholder for a required numeric / enumerated
+  field where a domain expert must supply the real value later.
+- `<http://www.opengis.net/def/nil/OGC/0/missing>` — IRI sentinel
+  (OGC Rainbow nil-value vocabulary) for required URI-shape values
+  like an absent `schema:identifier` on a DefinedTerm or an absent
+  Role `schema:contributor`.
+
+**Strategies:**
 
 1. **No Dataverse instance** → `api/local_input.py:build_placeholder_dataset`
    synthesizes a minimal `schema:Dataset` from file name + mtime.
    Emits a Dataverse-shaped `@id`
    (`http://localhost:8080/citation?persistentId=perma:DV/<stem>`) so
-   the RML iterator matches without dialect handling.
-2. **xasCore-required content missing** (e.g., `Mono.d_spacing`) →
-   `api/cdi.py:_add_xas_fallback_triples` injects a placeholder triple
-   into the SKOS graph AFTER `parse_xdi()` and BEFORE JSON-LD
-   serialization. Fires only when the source key is genuinely absent;
-   never overwrites real data. Scaffolded to add more cases easily.
+   the RML iterator matches without dialect handling. Also emits a
+   placeholder `schema:author` (Person with `schema:name = "Missing"`)
+   and a `schema:distribution` with `schema:contentUrl` =
+   `https://w3id.org/cdif/testing/{filename}` (a dereferenceable
+   HTTPS placeholder — real data comes from Dataverse in production).
+2. **xasCore-required content missing** (e.g., `Mono.d_spacing`,
+   `Beamline.name`, `Facility.name`) → `api/cdi.py:_add_xas_fallback_triples`
+   injects a placeholder triple into the SKOS graph AFTER
+   `parse_xdi()` and BEFORE JSON-LD serialization. Fires only when
+   the source key is genuinely absent; never overwrites real data.
+   Uses `"unknown"` for numeric/enumerated fields, `"missing"` for
+   identifier/name fields. Scaffolded to add more cases easily.
 3. **Optional sub-property TriplesMaps emit incomplete PropertyValues**
    (e.g., `Beamline.collimation` when the header is absent — the
    TriplesMap fires on `cdi:Beamline` existence, then its value
-   `rml:reference` resolves to null, and a `schema:PropertyValue` with
-   no `schema:value` is emitted) → `api/Mapper.py:_drop_incomplete_additional_properties`
-   runs inside `frame()` and recursively strips any
+   `rml:reference` resolves to null, and a `schema:PropertyValue`
+   with no `schema:value` is emitted) →
+   `api/Mapper.py:_drop_incomplete_additional_properties` runs
+   inside `frame()` and recursively strips any
    `schema:additionalProperty` entry that lacks `schema:value`.
    Complete entries (including placeholder `"unknown"` from strategy 2)
    pass through untouched.
@@ -71,12 +94,43 @@ strategies keep validation green when the source is thin:
    runs at parse time on the keys in `_DATETIME_KEYS`
    (`Scan.start_time`, `Scan.end_time`), converting recognized forms
    to canonical `YYYY-MM-DDTHH:MM:SS` before the SKOS triples are
-   written. Unparseable values pass through unchanged.
-   Normalize at parse-time rather than as a post-graph sweep — the
-   RML mapping picks the datetime out of `$['skos:prefLabel'][2]`,
-   which is position-sensitive, and rdflib graph edits after the
-   fact don't guarantee the JSON-LD serialization keeps the same
-   order.
+   written. Unparseable values pass through unchanged. Normalize at
+   parse-time rather than as a post-graph sweep — the RML mapping
+   picks the datetime out of `$['skos:prefLabel'][2]`, which is
+   position-sensitive, and rdflib graph edits after the fact don't
+   guarantee the JSON-LD serialization keeps the same order.
+5. **Non-canonical XDI header case + missing `# Column.N:` headers**
+   (`api/cdi.py:parse_xdi`) — real files vary. Two parse-time
+   normalizations:
+   - **Case**: everything after the first `.` in a compound key
+     lowercases, so `Facility.Name` / `Beamline.Name` /
+     `Mono.D_Spacing` / `Scan.Start_Time` all populate the
+     canonical `cdi:Facility_name` / `cdi:Beamline_name` /
+     `cdi:Mono_d_spacing` predicates the RML mapping expects.
+     First segment stays capitalized (the RML vocab has
+     `cdi:Beamline`, `cdi:Mono`, `cdi:Facility`).
+   - **Array-labels-line back-fill**: capture the last `#`-comment
+     line before the first data row; if the graph has no
+     `cdi:Column` subject after header parsing, synthesize
+     `cdi:Column` + `cdi:Column_N` triples from whitespace-separated
+     tokens in that line. XDI files that omit `# Column.N:` headers
+     but carry column names on the array-labels line still produce a
+     complete data structure.
+6. **Shape name-or-identifier constraints on Person / Organization /
+   Role / DefinedTerm** — four post-frame passes in
+   `api/Mapper.py` inject sentinels only when both alternatives are
+   absent:
+   - `_ensure_person_has_name_or_identifier` → `schema:name = "Missing"`
+   - `_ensure_organization_has_name_or_identifier` → `schema:name = "Missing"`
+   - `_ensure_role_has_contributor` → `schema:contributor = {@id: OGC nil}`
+   - `_ensure_definedterm_has_name_or_identifier` → `schema:identifier = {@id: OGC nil}`
+7. **JSON-LD blank-node identifiers rejected by plain-JSON validators**
+   → `api/Mapper.py:_materialize_blank_node_ids` rewrites every
+   `_:xxx` `@id` (both node subjects and object references) to
+   `ex:blank/xxx` so tools like Oxygen JSON validation don't flag
+   the `_:` syntax as an invalid URI. Uses the `ex: https://example.org/`
+   prefix bound in `resources/context.json`. Runs last inside
+   `frame()` so all other passes still see the original blank IDs.
 
 **XDI/1.0 spec violations** in the input → surfaced in the `/cdif`
 response as an `xdi_validation` object; do not block CDIF generation.

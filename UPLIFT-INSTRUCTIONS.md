@@ -565,6 +565,47 @@ Extend the helper as new xasCore-required fields surface. See the
 Task 7 sentinel-gotcha note — do NOT also add an RML fallback
 TriplesMap for the same field.
 
+**11d. Array-labels-line column back-fill.** XDI/1.0 specifies both
+`# Column.N:` compound headers AND a whitespace-separated array-labels
+line right after `# ---` (header end). Real files often carry only
+the array-labels line. Without `Column.N:` headers, the mapping
+emits no `cdi:Column_N` triples, no data structure — which breaks
+the `cdifDataDescription/1.1` and `cdifDataStructure/1.1` conformance
+declarations.
+
+Capture the last `#`-prefixed comment line before the first data row
+during `parse_xdi()`:
+
+```python
+self.array_labels_line = None    # add to __init__
+# In parse_xdi's for-loop, before dispatching to variable/data path:
+pending_last_comment = None    # top of parse_xdi
+# ...for each '#' line that isn't a structural marker or compound key:
+if (stripped and stripped != '#'
+    and not stripped.startswith('# ---') and not stripped.startswith('#---')
+    and not stripped.startswith('# ///') and not stripped.startswith('#///')
+    and ':' not in stripped):
+    pending_last_comment = stripped.lstrip('#').strip()
+# ...at the FIRST non-'#' line (data path):
+if self.array_labels_line is None and pending_last_comment:
+    self.array_labels_line = pending_last_comment
+```
+
+Then in `generate_cdi`, before `_add_xas_fallback_triples`:
+
+```python
+if generator.array_labels_line:
+    _synthesize_columns_from_array_labels(
+        cdi_graph, generator.name, generator.skos,
+        generator.array_labels_line,
+    )
+```
+
+`_synthesize_columns_from_array_labels` fires only when the graph has
+no `cdi:Column` subject (real Column headers were parsed → do
+nothing). Otherwise emits `cdi:Column` + one `cdi:Column_N` per
+whitespace token, each carrying the token as `skos:definition`.
+
 ---
 
 ## Task 12 — XDI pre-validation (surface spec issues before /cdif)
@@ -657,6 +698,166 @@ to locate.
 
 ---
 
+## Task 14 — Shape safety nets (name-or-identifier constraints)
+
+Several CDIF shapes require ONE of {name, identifier} to be present.
+Add four small post-frame passes in `api/Mapper.py` alongside the
+existing `_drop_incomplete_additional_properties`, each walking the
+framed dict and injecting a sentinel only when both alternatives are
+absent. Real data is never overwritten.
+
+**Sentinel-value conventions:**
+
+- `"Missing"` — text placeholder for a required `schema:name`.
+- `<http://www.opengis.net/def/nil/OGC/0/missing>` — IRI sentinel
+  (OGC Rainbow nil-value vocabulary) for required URI-shape values.
+
+**The four passes** (call each from `frame()` after
+`_drop_incomplete_additional_properties`):
+
+| Function | Target `@type` | Sentinel |
+|----------|---------------|----------|
+| `_ensure_person_has_name_or_identifier` | `schema:Person` | `schema:name = "Missing"` |
+| `_ensure_organization_has_name_or_identifier` | `schema:Organization` | `schema:name = "Missing"` |
+| `_ensure_role_has_contributor` | `schema:Role` | `schema:contributor = {"@id": OGC_NIL_MISSING}` |
+| `_ensure_definedterm_has_name_or_identifier` | `schema:DefinedTerm` | `schema:identifier = {"@id": OGC_NIL_MISSING}` |
+
+Skeleton (all four share the same shape):
+
+```python
+OGC_NIL_MISSING = "http://www.opengis.net/def/nil/OGC/0/missing"
+
+def _has_type(node_types, target):
+    if isinstance(node_types, str):
+        return node_types == target
+    if isinstance(node_types, list):
+        return target in node_types
+    return False
+
+def _ensure_person_has_name_or_identifier(node):
+    if isinstance(node, dict):
+        if _has_type(node.get("@type"), "schema:Person"):
+            if not node.get("schema:name") and not node.get("schema:identifier"):
+                node["schema:name"] = "Missing"
+        for v in node.values():
+            _ensure_person_has_name_or_identifier(v)
+    elif isinstance(node, list):
+        for x in node:
+            _ensure_person_has_name_or_identifier(x)
+```
+
+Reference: `_sources/schemaorgProperties/{person,organization,agentInRole}/rules.shacl`
+in the CDIF metadataBuildingBlocks repo enumerate the shapes.
+
+---
+
+## Task 15 — Blank-node identifier materialization
+
+JSON-LD framing typically leaves blank-node `@id` values in the
+`_:xxx` syntax. This is valid RDF but fails plain-JSON URI-format
+validators (e.g. Oxygen JSON validation). Rewrite each unique
+`_:xxx` to a real IRI under the `ex:` namespace already bound in
+`resources/context.json`:
+
+```
+_:b14  →  ex:blank/b14
+```
+
+Add a post-frame pass in `api/Mapper.py` that walks the framed dict
+and rewrites both node subjects (`@id` field) and object references
+(`{"@id": "_:xxx"}` shape). Same substitution everywhere so
+references still resolve to the same subject.
+
+```python
+def _materialize_blank_node_ids(node):
+    def _rewrite(val):
+        if isinstance(val, str) and val.startswith("_:"):
+            return "ex:blank/" + val[2:]
+        return val
+
+    if isinstance(node, dict):
+        if "@id" in node:
+            node["@id"] = _rewrite(node["@id"])
+        for v in node.values():
+            _materialize_blank_node_ids(v)
+    elif isinstance(node, list):
+        for x in node:
+            _materialize_blank_node_ids(x)
+```
+
+Call it LAST in `frame()` so the other safety-net passes still see
+the original blank IDs when walking the dict.
+
+---
+
+## Task 16 — CDIF Core creator alignment (schema:creator, not contributor)
+
+Per CDIF Core: `schema:creator` holds the author/creator (intellectual
+originator) of the dataset; `schema:contributor` is reserved for
+OTHER roles like Facility, Funder, etc. — those keep the Role wrapper
+pattern.
+
+The current UKDS mapping puts BOTH Author and Creator into
+`schema:contributor` with Role wrappers (`TriplesMap_dv_author_role` /
+`TriplesMap_dv_creator_role`), each pointing at a schema:Person via
+another Role's `schema:contributor`. This is legacy shape from the
+DataCite-style role model and doesn't match CDIF Core.
+
+**Cleanup:**
+
+1. On `TriplesMap_root` (`mapping_dds.ttl`, around line 128), replace
+   the two `schema:contributor` predicate-object maps that reference
+   `TriplesMap_dv_author_role` / `TriplesMap_dv_creator_role` with a
+   single `schema:creator` predicate-object map pointing at a new
+   `TriplesMap_dv_creator`.
+2. Delete `TriplesMap_dv_author_role`,
+   `TriplesMap_dv_author_contributor`, `TriplesMap_dv_creator_role`,
+   `TriplesMap_dv_creator_contributor` (four blocks around lines
+   639-733 in the pre-uplift mapping).
+3. Add one new TriplesMap that emits the Person directly (no Role
+   wrapper) with `schema:name` from `$['schema:author']['schema:name']`:
+
+   ```
+   <#TriplesMap_dv_creator> a rml:TriplesMap;
+     rml:logicalSource [ ... same source, uses the Task 13 marker iterator ...] ;
+     rml:subjectMap [
+         rr:termType rr:BlankNode;
+         rr:class schema:Person;
+         rml:template "_:dv_creator"
+       ] ;
+     rr:predicateObjectMap [
+       rr:predicate schema:name;
+       rr:objectMap [
+         rml:reference "$['schema:author']['schema:name']"
+       ]
+     ] .
+   ```
+4. The `schema:contributor` predicate on `TriplesMap_root` for the
+   Facility Organization stays as-is — Facility is correctly a
+   contributor per CDIF Core.
+
+**Frame update** (`resources/CDIFDiscoveryDataDescriptionStructure-frame.jsonld`):
+the `schema:creator` sub-frame currently lists `schema:affiliation`,
+`schema:identifier`, `schema:contactPoint`, but NOT `schema:name`.
+Add `"schema:name": {}` — without it, pyld's framer drops the
+creator Person entirely when the Person only has a name (as our
+placeholder does):
+
+```
+"schema:creator": {
+    "@embed": "@always",
+    "schema:name": {},                     ← add this line
+    "schema:affiliation": { ... },
+    "schema:identifier": {"@embed": "@always"},
+    "schema:contactPoint": {"@embed": "@always"}
+},
+```
+
+The `schema:contributor` sub-frame already has `"schema:name": {}` —
+symmetric fix.
+
+---
+
 ## Validation recipe
 
 After each task, regenerate `cdif_dds_framed.jsonld` and validate.
@@ -707,7 +908,17 @@ failures. Progress typically looks like:
 - After Task 10 Option B: JSON Schema validation aligns with the XAS
   document profile. Real corpora reaching 0 violations at this point
   are the goal; on a 37-file test corpus we hit 37/37 fully valid
-  after applying Tasks 11 and 13 alongside the base 1-10.
+  after applying Tasks 11, 13, 14, 15, 16 alongside the base 1-10.
+- After Task 14 (shape safety nets): SHACL violations from missing
+  name/identifier on Person / Organization / DefinedTerm / Role
+  clear. Sentinel-value convention (`"Missing"`, OGC nil IRI) makes
+  placeholder values visibly distinct from real content.
+- After Task 15 (blank-node materialization): no SHACL / JSON Schema
+  change (both accept blank nodes and IRIs), but plain-JSON
+  validators like Oxygen stop flagging `_:xxx` as invalid URI.
+- After Task 16 (creator alignment): the framed dataset's
+  `schema:contributor` now contains only OTHER roles (Facility,
+  Funder, etc.); the author/creator lives on `schema:creator`.
 - After Task 13 (iterator marker): no output change if Task 13's
   Python marker-tag sweep and RML iterator updates are consistent.
   This task is safety-net + brittleness reduction, not correctness
@@ -737,7 +948,14 @@ validation runs against normalized input:
     already-existing DefinedTerm TriplesMaps.
 11. Task 7 (source instrument) — additive.
 12. Task 8 (MaterialSample sample) — additive.
-13. Task 13 (RML iterator marker) — do LAST. Structural change to 18
+13. Task 16 (CDIF Core creator alignment) — schema.org shape cleanup;
+    do after Task 6 so you're not re-editing the contributor block.
+14. Task 14 (shape safety nets) — defensive post-frame passes; small,
+    idempotent; run once you have real Persons/Orgs flowing through.
+15. Task 15 (blank-node materialization) — cosmetic fix for JSON
+    validator compatibility; do near the end so you don't
+    re-materialize identifiers you're still inspecting as `_:xxx`.
+16. Task 13 (RML iterator marker) — do LAST. Structural change to 18
     iterators; safest once the mapping's semantics are stable.
 
 Validate after each. The reference example

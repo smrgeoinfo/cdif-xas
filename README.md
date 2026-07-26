@@ -73,39 +73,60 @@ Env vars honored:
 ## Graceful degradation for missing input
 
 Real-world XDI files are often incomplete or spec-noncompliant. The
-pipeline never hard-fails — three fallback strategies keep validation
-green when the source is thin:
+pipeline never hard-fails — seven fallback strategies keep validation
+green when the source is thin. Verified 37/37 fully valid on the
+XAS-CDIF/exampleData corpus (JSON Schema + SHACL). Full detail of
+each strategy is in [AGENTS.md](./AGENTS.md#graceful-degradation-pattern);
+brief summary here.
 
-1. **No Dataverse instance** → local mode synthesizes the schema.org
-   `Dataset` placeholder above (`api/local_input.py`).
-2. **XDI has no `Mono.d_spacing` header** (xasCore-required) →
-   `api/cdi.py:_add_xas_fallback_triples` injects a
-   `cdi:Mono_d_spacing` triple with value `"unknown"` after parsing
-   the XDI but before the RML mapping runs. Extend this function to
-   add fallbacks for other xasCore-required fields as new XDI dialects
-   surface. **Real data from the XDI is never overwritten** — the
-   fallback fires only when the source key is genuinely absent.
-3. **Optional sub-property TriplesMaps fire with no value** (e.g.,
-   `Beamline.collimation` when the header is absent) → `api/Mapper.py:frame()`
-   runs a post-frame filter (`_drop_incomplete_additional_properties`)
-   that strips any `schema:additionalProperty` entry missing
-   `schema:value`. Complete entries (including placeholder `"unknown"`
-   from strategy 2) pass through untouched.
-4. **Datetime headers not in strict ISO 8601** (e.g.,
-   `Scan.start_time: 2008-04-10 21:58:50`, `2001/06/26 22:27:31`,
-   US m/d/y) → `api/cdi.py:_normalize_datetime` runs at XDI parse
-   time on `Scan.start_time` / `Scan.end_time`, converting recognized
-   forms to canonical `YYYY-MM-DDTHH:MM:SS` before any triples are
-   written. Unparseable values pass through unchanged so downstream
-   validation surfaces them; recognized-but-non-strict inputs no
-   longer make CDIF-XAS output fail SHACL date-format checks.
-   Normalizing at parse-time (not post-graph) preserves the
-   `skos:prefLabel` ordering the RML mapping indexes.
+**Sentinel-value conventions:**
+
+- `"Missing"` for absent required text/name fields.
+- `"unknown"` for absent required numeric/enumerated fields where a
+  domain expert must supply the real value later.
+- `<http://www.opengis.net/def/nil/OGC/0/missing>` (OGC Rainbow
+  nil-value IRI) for absent required URI-shape values.
+
+**Strategies:**
+
+1. **No Dataverse instance** → `api/local_input.py:build_placeholder_dataset`
+   synthesizes a minimal `schema:Dataset` (identifier, name,
+   dateModified, license, distribution, placeholder author with name
+   "Missing", contentUrl `https://w3id.org/cdif/testing/{filename}`).
+2. **xasCore-required content missing** (`Mono.d_spacing`,
+   `Beamline.name`, `Facility.name`) → `api/cdi.py:_add_xas_fallback_triples`
+   injects sentinel triples into the SKOS graph. Real data is never
+   overwritten. Scaffolded to add more fields easily.
+3. **Optional sub-property TriplesMaps emit incomplete PropertyValues**
+   → `api/Mapper.py:_drop_incomplete_additional_properties` strips
+   any `schema:additionalProperty` entry missing `schema:value`.
+4. **Non-strict-ISO datetimes** on `Scan.start_time` /
+   `Scan.end_time` → `api/cdi.py:_normalize_datetime` converts
+   recognized forms (space-separated ISO, slash-date, US m/d/y,
+   date-only, basic ISO) to canonical `YYYY-MM-DDTHH:MM:SS` at
+   parse time. Preserves `skos:prefLabel` order the RML indexes.
+5. **Non-canonical XDI header case + missing `# Column.N:` headers**
+   → parse-time normalization in `api/cdi.py:parse_xdi`. Case:
+   lowercase everything after the first `.` so `Facility.Name` /
+   `Beamline.Name` populate canonical `cdi:*_name` predicates.
+   Array-labels-line: synthesize `cdi:Column_N` from whitespace tokens
+   in the last `#`-comment before data when the graph has no
+   `cdi:Column`.
+6. **Shape name-or-identifier constraints** on Person / Organization
+   / Role / DefinedTerm → four post-frame passes in
+   `api/Mapper.py` (`_ensure_person_has_name_or_identifier`, etc.)
+   inject `"Missing"` or an OGC nil IRI only when both alternatives
+   are absent.
+7. **JSON-LD blank-node identifiers** (`_:xxx`) rejected by
+   plain-JSON validators → `api/Mapper.py:_materialize_blank_node_ids`
+   rewrites them to `ex:blank/xxx` IRIs (uses the `ex:` prefix
+   bound in `resources/context.json`).
 
 The result is an honest artifact: fields that were in the input come
-through as-is, fields synthesized by fallback are visibly marked
-`"unknown"`, and optional fields with no source data are omitted
-rather than emitted malformed.
+through as-is, fields synthesized by fallback are visibly marked with
+sentinel values (`"Missing"`, `"unknown"`, or the OGC nil IRI), and
+optional fields with no source data are omitted rather than emitted
+malformed.
 
 ## Profile validation
 
