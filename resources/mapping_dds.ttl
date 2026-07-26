@@ -131,16 +131,14 @@
       rr:parentTriplesMap <#TriplesMap_role_facility>
     ]
   ]  ;
-  rr:predicateObjectMap [ 
-    rr:predicate  schema:contributor;
+  # CDIF Core: schema:creator holds the author/creator (intellectual
+  # originator) of the dataset; schema:contributor is reserved for
+  # OTHER roles (facility, funder, etc.) - those keep the Role wrapper
+  # pattern. Dataverse's schema:author becomes schema:creator here.
+  rr:predicateObjectMap [
+    rr:predicate  schema:creator;
 	rr:objectMap [
-      rr:parentTriplesMap <#TriplesMap_dv_author_role>
-    ]
-  ] ;
-  rr:predicateObjectMap [ 
-    rr:predicate  schema:contributor;
-	rr:objectMap [
-      rr:parentTriplesMap <#TriplesMap_dv_creator_role>
+      rr:parentTriplesMap <#TriplesMap_dv_creator>
     ]
   ] ;
   rr:predicateObjectMap [ 
@@ -636,34 +634,12 @@
     rr:objectMap [ rr:constant "element.symbol" ]
   ] .
 
-<#TriplesMap_dv_author_role> a rml:TriplesMap;
-  rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
-      rml:referenceFormulation rml:JSONPath;
-      rml:source [ a rml:RelativePathSource;
-          rml:root rml:MappingDirectory;
-          rml:path "cdif_skos.json"
-        ]
-    ];
-  rml:subjectMap [
-      rr:termType rr:BlankNode;
-      rr:class schema:Role;
-      rml:template "_:role_author"
-    ] ;
-  rr:predicateObjectMap [ 
-    rr:predicate schema:roleName;
-    rr:objectMap [
-      rr:constant "Author"
-    ]
-  ] ;
-  rr:predicateObjectMap [
-    rr:predicate schema:contributor;
-    rr:objectMap [
-      rr:parentTriplesMap <#TriplesMap_dv_author_contributor>
-    ]
-  ] .
-
-<#TriplesMap_dv_author_contributor> a rml:TriplesMap;
+# CDIF Core creator/author: emit the Person directly (no Role wrapper).
+# Attached to the root Dataset via schema:creator, not schema:contributor.
+# The Dataverse-exported schema:author.schema:name flows through as the
+# Person's schema:name; local mode's build_placeholder_dataset writes
+# 'unknown' for that field so the base SHACL Person shape stays satisfied.
+<#TriplesMap_dv_creator> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
       rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
       rml:referenceFormulation rml:JSONPath;
@@ -675,55 +651,7 @@
   rml:subjectMap [
       rr:termType rr:BlankNode;
       rr:class schema:Person;
-      rml:template "_:role_author_name"
-    ] ;
-  rr:predicateObjectMap [
-    rr:predicate schema:name;
-    rr:objectMap [
-      rml:reference "$['schema:author']['schema:name']"
-    ]
-  ] .
-
-<#TriplesMap_dv_creator_role> a rml:TriplesMap;
-  rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
-      rml:referenceFormulation rml:JSONPath;
-      rml:source [ a rml:RelativePathSource;
-          rml:root rml:MappingDirectory;
-          rml:path "cdif_skos.json"
-        ]
-    ];
-  rml:subjectMap [
-      rr:termType rr:BlankNode;
-      rr:class schema:Role;
-      rr:template "_:role_creator"
-    ] ;
-  rr:predicateObjectMap [ 
-    rr:predicate schema:roleName;
-    rr:objectMap [
-      rr:constant "Creator"
-    ]
-  ] ;
-  rr:predicateObjectMap [
-    rr:predicate schema:contributor;
-    rr:objectMap [
-      rr:parentTriplesMap <#TriplesMap_dv_creator_contributor>
-    ]
-  ] .
-
-<#TriplesMap_dv_creator_contributor> a rml:TriplesMap;
-  rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
-      rml:referenceFormulation rml:JSONPath;
-      rml:source [ a rml:RelativePathSource;
-          rml:root rml:MappingDirectory;
-          rml:path "cdif_skos.json"
-        ]
-    ];
-  rml:subjectMap [
-      rr:termType rr:BlankNode;
-      rr:class schema:Person;
-      rml:template "_:role_creator_name"
+      rml:template "_:dv_creator"
     ] ;
   rr:predicateObjectMap [
     rr:predicate schema:name;

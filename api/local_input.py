@@ -123,7 +123,7 @@ def build_placeholder_dataset(url: str,
     author = rdflib.BNode()
     g.add((ds, SCHEMA_NS.author, author))
     g.add((author, rdflib.RDF.type, SCHEMA_NS.Person))
-    g.add((author, SCHEMA_NS.name, rdflib.Literal("unknown")))
+    g.add((author, SCHEMA_NS.name, rdflib.Literal("Missing")))
 
     # Dates from file mtime, ISO 8601 date-only. Typed as schema:Date so
     # the JSON-LD serialization carries a {"@type": "schema:Date",
@@ -145,14 +145,21 @@ def build_placeholder_dataset(url: str,
     g.add((ds, SCHEMA_NS.license,
            rdflib.URIRef("https://creativecommons.org/licenses/by/4.0/")))
 
-    # Distribution: the local file itself
+    # Distribution: the local file itself.
+    # schema:contentUrl is a hard CDIF Core requirement (DataDownload
+    # must resolve to a fetchable representation). A file:// URI is
+    # only meaningful on the machine that generated the metadata; when
+    # the metadata is shared, downstream consumers can't dereference
+    # it. Emit a testing-namespace placeholder URL that resolves to a
+    # static "prototype / testing" page under w3id.org/cdif/testing/,
+    # so shared metadata carries a syntactically valid, dereferenceable
+    # contentUrl even in the local (no-Dataverse) path. In Dataverse
+    # mode the exported schema:distribution/schema:contentUrl already
+    # carries the real production URL.
     dist = rdflib.URIRef(f"{_ID_PREFIX}{stem}#distribution")
     g.add((ds, SCHEMA_NS.distribution, dist))
     g.add((dist, rdflib.RDF.type, SCHEMA_NS.DataDownload))
-    try:
-        content_url = path.resolve().as_uri()
-    except (OSError, ValueError):
-        content_url = f"file://{path}"
+    content_url = f"https://w3id.org/cdif/testing/{path.name}"
     g.add((dist, SCHEMA_NS.contentUrl, rdflib.URIRef(content_url)))
     g.add((dist, SCHEMA_NS.encodingFormat,
            rdflib.Literal("application/x-xdi")))

@@ -89,6 +89,12 @@ class CDI_DDI:
         self.navigator = None
         self.session_triples = []
         self.triples_memory = []
+        # Array-labels line: the last '#'-prefixed comment line before the
+        # first data row. XDI files that omit the '# Column.N:' headers
+        # (spec-noncompliant but common) usually still carry column names
+        # on this line; captured so _synthesize_columns_from_array_labels
+        # can back-fill the missing cdi:Column_N triples after parse.
+        self.array_labels_line = None
 
     def load_resources(self, type):
         self.resources = {}
@@ -129,9 +135,27 @@ class CDI_DDI:
         end-to-end /cdif time from minutes to seconds. Metadata output
         is identical either way; only the row-by-row triples are omitted.
         """
+        # Track the most recent '#'-prefixed line that isn't a compound
+        # header ('Namespace.field: value') or a structural marker
+        # ('# ---', '# ///'). When we hit the first data row this holds
+        # the array-labels line for column-name back-fill.
+        pending_last_comment = None
         for line in self.response.text.split("\n"):
             # Variables path
             if self.check_variable_name(line):
+                stripped = line.strip()
+                # Ignore structural markers ('# ---' end-of-header,
+                # '# ///' free-form-comment separator, blank '#').
+                if (stripped and stripped != '#'
+                        and not stripped.startswith('# ---')
+                        and not stripped.startswith('#---')
+                        and not stripped.startswith('# ///')
+                        and not stripped.startswith('#///')
+                        # Only remember comments WITHOUT ':' — a compound
+                        # header ('Namespace.field: value') is real data,
+                        # not an array-labels candidate.
+                        and ':' not in stripped):
+                    pending_last_comment = stripped.lstrip('#').strip()
                 compound_variable_name, variable_value = self.parse_structure(line)
                 if compound_variable_name and variable_value:
                         compound_variable_name = compound_variable_name.group(1).strip('#  ')
@@ -181,6 +205,11 @@ class CDI_DDI:
                             pass
             # Data path
             else:
+                # Stash the last '#'-comment as the array-labels line the
+                # first time we transition into data. Subsequent data
+                # rows leave it untouched.
+                if self.array_labels_line is None and pending_last_comment:
+                    self.array_labels_line = pending_last_comment
                 if not include_data:
                     continue
                 if self.navigator:
@@ -194,6 +223,41 @@ class CDI_DDI:
                             self.g.add((self.navigator, rdflib.URIRef(self.rdf.List), rdflib.Literal(row)))
 
         return self.g
+
+def _synthesize_columns_from_array_labels(g: "rdflib.Graph",
+                                          name_ns: "rdflib.Namespace",
+                                          skos_ns: "rdflib.Namespace",
+                                          labels_line: str) -> None:
+    """Back-fill cdi:Column / cdi:Column_N SKOS triples from an
+    XDI array-labels line when the file omits '# Column.N: ...' headers.
+
+    Rationale: XDI/1.0 specifies both '# Column.N:' compound headers
+    AND a whitespace-separated array-labels line right after '# ---'.
+    Real files often carry only the array-labels line. Without
+    Column.N headers the mapping emits no data structure, which then
+    fails xasCore's conformsTo declarations for data_description /
+    data_structure. Reconstruct the missing headers here from the
+    array-labels line so those profile URIs stay honest.
+
+    Fires only when the graph has no cdi:Column subject yet (real
+    Column headers were parsed → do nothing).
+    """
+    from rdflib import BNode, Literal, URIRef
+    column_uri = URIRef(str(name_ns) + "Column")
+    if (column_uri, None, None) in g:
+        return
+    tokens = labels_line.split()
+    if not tokens:
+        return
+    g.add((column_uri, URIRef(str(skos_ns) + "prefLabel"), Literal("Column")))
+    for i, tok in enumerate(tokens, start=1):
+        child_pred = URIRef(str(name_ns) + f"Column_{i}")
+        broader = URIRef(str(skos_ns) + "broader")
+        g.add((column_uri, broader, child_pred))
+        blank = BNode()
+        g.add((column_uri, child_pred, blank))
+        g.add((blank, URIRef(str(skos_ns) + "definition"), Literal(tok)))
+
 
 def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
                               skos_ns: "rdflib.Namespace") -> None:
@@ -253,6 +317,14 @@ def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Op
         type=dataset_type,
     )
     cdi_graph = generator.parse_xdi(include_data=include_data)
+
+    # Back-fill Column headers from the array-labels line when the XDI
+    # omits '# Column.N:' comments (spec-noncompliant but common).
+    if generator.array_labels_line:
+        _synthesize_columns_from_array_labels(
+            cdi_graph, generator.name, generator.skos,
+            generator.array_labels_line,
+        )
 
     _add_xas_fallback_triples(cdi_graph, generator.name, generator.skos)
 

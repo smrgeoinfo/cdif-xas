@@ -38,6 +38,7 @@
 
     "schema:creator": {
         "@embed": "@always",
+        "schema:name": {},
         "schema:affiliation": {
             "@embed": "@always",
             "schema:identifier": {"@embed": "@always"}
