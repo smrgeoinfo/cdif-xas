@@ -89,6 +89,55 @@ So the choice is not *declarative versus imperative*. It is
 **Python + RML + Java + FastAPI** versus **Python**. The declarative
 layer is handling the easy parts and adding a runtime to do it.
 
+### Three bugs of one shape
+
+Scanning all 40 TriplesMaps for `rr:constant` on a value-bearing
+predicate turned up three defects, all found in a single afternoon and
+all now fixed:
+
+| TriplesMap | asserted | correct for | wrong for |
+|---|---|---|---|
+| `mono_reflection` | `"1,1,1"` | 42 of 55 | **13** — every `Si(220)` and `Si(311)` |
+| `mono_type` | `"Si"` | 55 of 55 | the first `Ge(220)` that arrives |
+| `nexus` | `"Transmission"` | 54 of 55 | **1** — `xdl_pyrite2_rt_01`, an `ifluor` file |
+
+The pattern matters more than any one of them.
+
+**Each produced plausible metadata.** None was malformed, none failed
+validation, and all 55 documents validated 55/55 both before and after.
+A silicon monochromator and a transmission measurement are what these
+files usually contain, so the wrong values looked exactly like right
+ones. They were found by comparing two implementations, not by anything
+the pipeline itself could have reported.
+
+**Each had the same cause.** RML cannot parse a string or branch on a
+condition. `Si(311)` holds a crystal and a reflection; which detection
+mode a scan used follows from which columns are present. Neither is
+expressible in the mapping language, so a constant was the only thing on
+offer, and a constant is what got written. The `mono_reflection` comment
+said so outright: *"emitted as a static default … until your XDI
+vocabulary defines the field."*
+
+**Each was fixed the same way** — derive the value in `api/cdi.py`,
+expose a key, point the mapping at it. That is now the pattern for
+datetimes, temperatures, energy units, reflection planes, crystal types
+and detection modes. Six transformations, all in Python, with RML
+carrying the assignment.
+
+**One hid because of where it sat.** The detection mode is on
+`schema:name`, where 15 of the mapping's 16 constants are property
+labels and entirely correct. Only its `inDefinedTermSet` —
+`nxs:Field/NXxas/ENTRY/DATA/mode` — reveals that this `schema:name`
+carries data. A scan that categorised by predicate nearly filed it as
+benign, which is a fair indication of how legible the mapping is to
+review.
+
+This is not an argument that the mapping was written carelessly. It is
+an argument that the language pushes toward constants wherever the data
+needs interpreting, that constants of this kind fail silently, and that
+the interpretation has been migrating into Python one fix at a time
+regardless.
+
 ## What RML genuinely gives you
 
 Stating the other side plainly, because it is not nothing:
