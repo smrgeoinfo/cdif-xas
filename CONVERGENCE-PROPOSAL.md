@@ -178,6 +178,86 @@ by side and ask which you would rather maintain, and which you would
 rather debug at 5pm when a Ge monochromator turns up. Your answer to
 that is better evidence than any sentence I can write here.
 
+### The intermediate, both ways
+
+The section above compares the mapping. This compares the thing the
+mapping reads, which is where the architectural difference actually
+lives.
+
+`api/cdi.py` writes `cdif_skos.json`. For the monochromator it produces:
+
+```json
+{
+  "@id": "cdi:Mono",
+  "skos:broader": [ {"@id": "cdi:Mono_name"},
+                    {"@id": "cdi:Mono_d_spacing"} ],
+  "skos:prefLabel": [ "Mono", "Si 111", "3.13550" ],
+  "cdi:Mono_name":      { "@id": "_:N21a5fce9724b41b3...",
+                          "skos:definition": "Si 111" },
+  "cdi:Mono_d_spacing": { "@id": "_:N86709123e522459f...",
+                          "skos:definition": "3.13550" },
+  "cdi:Mono_reflection": { "@id": "_:Naed454d6e4b3485...",
+                           "skos:definition": "1,1,1" }
+}
+```
+
+`hdf5metadata` produces, from the same header:
+
+```json
+{
+  "cdifxas:monochromatortype": [{
+    "value": "Si",
+    "source_path": "#Mono.name",
+    "predicate": "skos:closeMatch",
+    "confidence": 0.8,
+    "note": "XDI Mono.name conflates crystal material and reflection
+             (e.g. 'Si(111)'); the CDIF concept is the material type
+             alone. [converter key: cdi:Mono_name]; reflection split
+             out into reflectionplane"
+  }],
+  "cdifxas:reflectionplane": [{
+    "value": "1 1 1",
+    "source_path": "#Mono.name",
+    "confidence": 0.9,
+    "note": "read out of Mono.name ('Si(111)'), which XDI uses for the
+             crystal material and the reflection together"
+  }]
+}
+```
+
+Five differences, in rough order of consequence.
+
+**The key names the field, or it names the concept.** `cdi:Mono_name`
+says *what XDI called it*. `cdifxas:monochromatortype` says *what it is*.
+The first has no second slot: when the same fact arrives from
+`NXcrystal/chemical_formula` in an HDF5 file, there is nowhere to put it
+that does not lie about where it came from.
+
+**Provenance is the key, or it travels beside the value.** In the graph,
+the only record of origin *is* the key — so a concept can have exactly
+one origin. In the record, `source_path` is a field, so the same concept
+can carry values from several places, each saying where it came from.
+
+**Confidence and predicate exist in one and not the other.** The record
+says this mapping is a `skos:closeMatch` at 0.8, because `Mono.name`
+conflates two things. The graph has no way to express that; every value
+is equally authoritative, and a downstream consumer cannot be more
+careful with the shakier ones.
+
+**`skos:prefLabel` is a bag.** `["Mono", "Si 111", "3.13550"]` mixes a
+node label with values from two unrelated fields. Nothing downstream can
+tell which is which without going back to the typed keys.
+
+**Blank-node identifiers are regenerated every run.**
+`_:N21a5fce9724b41b3...` changes on each invocation, so a diff of two
+runs over unchanged input is mostly noise. The record has no identifiers
+at this stage; identity is assigned once, at emission, from stable values.
+
+Note the crosswalk keeps `[converter key: cdi:Mono_name]` in the note.
+The link back to your vocabulary is not discarded — it becomes
+provenance rather than structure, which is what makes a second binding
+possible.
+
 ## The proposal
 
 **Change `api/cdi.py` to emit `ConceptRecord` objects instead of an
