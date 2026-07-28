@@ -56,6 +56,46 @@ _QUALITATIVE_TEMPERATURES = {
 # XDI header keys carrying a temperature, normalised as above.
 _TEMPERATURE_KEYS = {"Sample.temperature"}
 
+# XDI header keys carrying an energy that should name its unit.
+# Scan.edge_energy is a defined field; ScanParameters.e0 is an extension
+# field that beamline software writes for the same quantity. Both arrive
+# as bare numbers often enough to need handling.
+#
+# Note the key spelling: header keys are lower-cased after the first '.'
+# before they reach here, so the file's "ScanParameters.E0" is matched
+# as "ScanParameters.e0".
+_ENERGY_KEYS = {"Scan.edge_energy", "ScanParameters.e0"}
+
+# What to say when a number arrives with no unit. Deliberately not "eV",
+# even though every edge energy in this corpus is in eV and the guess
+# would be right every time: the file does not say so, and a converter
+# that supplies units nobody wrote is indistinguishable from one that
+# read them. Flagging the absence keeps the gap visible to whoever can
+# actually resolve it.
+_UNITS_NOT_REPORTED = "units not reported"
+
+# A number and nothing else -- including "7112." with a trailing point,
+# which real files write. A value that already carries a unit, or that
+# has already been flagged, does not match and is left alone, so this is
+# safe to run repeatedly.
+_BARE_NUMBER = re.compile(
+    r"^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$"
+)
+
+
+def _normalize_energy(value: str) -> str:
+    """Flag an energy that arrives without a unit.
+
+    This used to be done by editing the XDI files themselves, which
+    worked for the files that were edited and for no others. Doing it
+    here means the next corpus is handled without touching its data.
+    """
+    raw = (value or "").strip()
+    if _BARE_NUMBER.match(raw):
+        return f"{raw} {_UNITS_NOT_REPORTED}"
+    return raw
+
+
 # A numeric temperature and its unit, however they are spaced. Anchored,
 # so anything with trailing text ("10 K (nominal)") falls through
 # untouched rather than being silently truncated to the part that parsed.
@@ -244,6 +284,8 @@ class CDI_DDI:
                             iso = _normalize_datetime(variable_value)
                             if iso is not None:
                                 variable_value = iso
+                        if compound_variable_name in _ENERGY_KEYS:
+                            variable_value = _normalize_energy(variable_value)
                         if compound_variable_name in _TEMPERATURE_KEYS:
                             variable_value, note = _normalize_temperature(
                                 variable_value)
