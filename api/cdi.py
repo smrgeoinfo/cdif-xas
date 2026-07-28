@@ -31,6 +31,51 @@ _DATETIME_FALLBACK_FORMATS = (
 )
 
 
+# Qualitative Sample.temperature values, and the number they stand for.
+# XDI requires "float + units" for this field -- the dictionary is
+# explicit about it -- so these values do not conform, and the validator
+# is right to reject them. But they are what the data says: 188 of the
+# 272 files in the XAS Data Library give a qualitative temperature and
+# no number at all. Refusing to convert them would discard the only
+# temperature information those files carry.
+#
+# 295 K is the conventional value for "room temperature" in the XAS
+# literature (~22 C). It is a substitution, not a measurement, which is
+# why every use of it is recorded in the dataset description rather than
+# quietly replacing the original words.
+_ROOM_TEMPERATURE_K = "295.0 K"
+_QUALITATIVE_TEMPERATURES = {
+    "room temperature": _ROOM_TEMPERATURE_K,
+    "room temp": _ROOM_TEMPERATURE_K,
+    "roomtemperature": _ROOM_TEMPERATURE_K,
+    "rt": _ROOM_TEMPERATURE_K,
+    "ambient": _ROOM_TEMPERATURE_K,
+    "ambient temperature": _ROOM_TEMPERATURE_K,
+}
+
+# XDI header keys carrying a temperature, normalised as above.
+_TEMPERATURE_KEYS = {"Sample.temperature"}
+
+
+def _normalize_temperature(value: str) -> tuple[str, Optional[str]]:
+    """Return (value, note).
+
+    A recognised qualitative temperature becomes a float-plus-unit and a
+    note saying what the file actually said. Anything else is returned
+    unchanged with no note -- including a numeric value this code has no
+    business rewriting, and an unrecognised phrase, which is better left
+    for validation to report than guessed at.
+    """
+    raw = (value or "").strip()
+    key = re.sub(r"[\s_]+", " ", raw).strip().lower().rstrip(".")
+    if key in _QUALITATIVE_TEMPERATURES:
+        return (
+            _QUALITATIVE_TEMPERATURES[key],
+            f'temperature reported as "{raw}"',
+        )
+    return raw, None
+
+
 def _normalize_datetime(value: str) -> Optional[str]:
     """Try to parse a raw XDI datetime string and return ISO 8601.
 
@@ -95,6 +140,10 @@ class CDI_DDI:
         # on this line; captured so _synthesize_columns_from_array_labels
         # can back-fill the missing cdi:Column_N triples after parse.
         self.array_labels_line = None
+        # Substitutions made while reading the header, surfaced in the
+        # dataset description so a consumer can see that a value was
+        # derived rather than measured.
+        self.conversion_notes = []
 
     def load_resources(self, type):
         self.resources = {}
@@ -176,6 +225,11 @@ class CDI_DDI:
                             iso = _normalize_datetime(variable_value)
                             if iso is not None:
                                 variable_value = iso
+                        if compound_variable_name in _TEMPERATURE_KEYS:
+                            variable_value, note = _normalize_temperature(
+                                variable_value)
+                            if note and note not in self.conversion_notes:
+                                self.conversion_notes.append(note)
                         if '.' in compound_variable_name:
                             compound_variable_name_uri = compound_variable_name.replace(" ", "_").replace(":", "_")
                             variables = compound_variable_name_uri.split('.')
@@ -307,6 +361,27 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
             _synthesize_child(parent, child_local, "missing")
 
 
+def _append_conversion_notes(graph, notes) -> None:
+    """Record header substitutions on the dataset's schema:description.
+
+    The note travels with the record rather than only in a log, because
+    the thing a consumer needs to know -- that 295.0 K is a stand-in for
+    the words "room temperature" and not a reading off an instrument --
+    is invisible in the value itself.
+    """
+    if not notes:
+        return
+    schema = rdflib.Namespace("http://schema.org/")
+    suffix = " Conversion notes: " + "; ".join(notes) + "."
+    for subject, existing in list(graph.subject_objects(schema.description)):
+        text = str(existing)
+        if suffix.strip() in text:
+            continue
+        graph.remove((subject, schema.description, existing))
+        graph.add((subject, schema.description,
+                   rdflib.Literal(text.rstrip() + suffix)))
+
+
 def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Optional[str], datasetid: Optional[str] = None, datasetversion: Optional[str] = None, include_data: bool = True) -> None:
     from api.cdi import CDI_DDI
 
@@ -345,6 +420,7 @@ def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Op
                 cdi_graph.add(triple)
         except Exception as e:
             print(f"Warning: placeholder metadata generation failed: {e}")
+        _append_conversion_notes(cdi_graph, generator.conversion_notes)
     else:
         schema_url = None
         if datasetid:
