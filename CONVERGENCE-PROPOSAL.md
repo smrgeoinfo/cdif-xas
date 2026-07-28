@@ -95,11 +95,88 @@ Stating the other side plainly, because it is not nothing:
 
 - It is a standards-track mapping language, which matters for a
   standards project.
-- The mapping is inspectable as data by people who do not read Python.
+- **The mapping is data**, so it can be diffed, validated and
+  version-controlled as a mapping rather than as source code. That is a
+  real governance property and it does not depend on who can read it.
 - It is the artifact that has been reviewed.
 
-If those outweigh the costs for your governance, that is a legitimate
-answer and this proposal fails on its merits rather than on argument.
+I had written here that the mapping is "inspectable by people who do not
+read Python". Having re-read it, that claim is too strong and I withdraw
+it. Reading `mapping_dds.ttl` requires RML/R2RML vocabulary, JSONPath,
+Turtle blank-node syntax, and the shape of the intermediate
+`cdif_skos.json` it queries — four things, none of them Python, none of
+them common knowledge. The set of people who can read it is smaller and
+more specialised than "non-programmers", and plausibly smaller than the
+set who can read the equivalent Python.
+
+If the governance properties above outweigh the costs, that is a
+legitimate answer and this proposal fails on its merits rather than on
+argument.
+
+### The same job, both ways
+
+`TriplesMap_mono_type` emits one `schema:PropertyValue` saying what the
+monochromator crystal is. In full, 29 lines:
+
+```turtle
+<#TriplesMap_mono_type> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json" ] ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:mono_type" ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "crystal type" ] ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:propertyID;
+    rr:objectMap [ rr:constant xas:monochromatortype ;
+                   rr:termType rr:IRI ] ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:value;
+    rr:objectMap [ rr:constant "Si" ] ] .
+```
+
+The equivalent in `hdf5metadata` is one crosswalk row:
+
+```
+xdi:Mono.name   skos:closeMatch   cdifxas:monochromatortype
+```
+
+and one line saying where the concept goes in the output:
+
+```python
+"cdifxas:monochromatortype": Slot("monochromator", "monochromatortype",
+                                  "monochromator crystal"),
+```
+
+Two points, and the second matters more than the line count.
+
+**The RML version does not read the value.** The last clause is
+`rr:constant "Si"`. Every file gets `Si` whatever its `Mono.name` says.
+That is correct for all 55 files in the corpus, because they all use
+silicon monochromators, and it would be wrong for the first Ge(220) file
+that arrives. It is the same failure as the `rr:constant "1,1,1"`
+reflection plane, which *was* wrong, for 13 of 55.
+
+That is not a criticism of whoever wrote it. It is a symptom: RML cannot
+parse `Si(111)` into a crystal and a reflection, so a constant is the
+only thing the language offers, and a constant is what got written.
+
+The crosswalk row above maps `Mono.name` at `skos:closeMatch` rather
+than `exactMatch` precisely because XDI conflates the two, and the
+splitting happens in twelve lines of Python that record the original
+string in a note. The value is read; nothing is asserted.
+
+**Judge this yourselves rather than taking my summary.** Put the two side
+by side and ask which you would rather maintain, and which you would
+rather debug at 5pm when a Ge monochromator turns up. Your answer to
+that is better evidence than any sentence I can write here.
 
 ## The proposal
 
