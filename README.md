@@ -128,6 +128,57 @@ sentinel values (`"Missing"`, `"unknown"`, or the OGC nil IRI), and
 optional fields with no source data are omitted rather than emitted
 malformed.
 
+## Header normalisation
+
+`api/cdi.py` normalises several XDI header values before the RML
+mapping sees them, because real files do not always conform and the
+downstream schemas do not bend.
+
+| header | normalisation |
+|---|---|
+| `Scan.start_time`, `Scan.end_time` | non-ISO forms parsed to ISO 8601 |
+| `Sample.temperature` | `room temperature` → `295.0 K`, recorded in the dataset description; `10K` → `10 K` |
+| `Scan.edge_energy`, `ScanParameters.E0` | a bare number gains `units not reported` |
+| `Mono.name` | split into `cdi:Mono_crystal` and `cdi:Mono_reflection` |
+| Column headers | detection mode derived as `cdi:Scan_mode` |
+
+Two of these are worth understanding rather than just knowing about.
+
+**`Sample.temperature` is genuinely non-conformant, not a validator
+bug.** The XDI dictionary specifies *float + units* for that tag, so
+`room temperature` does not conform and the validator is right to reject
+it. But 188 of the 272 files in the XAS Data Library give a qualitative
+temperature and nothing else, so refusing to convert them would discard
+the only temperature information they carry. The substitution is
+recorded in `schema:description` rather than applied silently — 295 K is
+a stand-in, not a reading.
+
+**Unit-less energies are flagged, not filled in.** Deliberately not
+`eV`, though every edge energy in this corpus is in eV and the guess
+would be right every time. The file does not say so, and a converter
+that supplies units nobody wrote is indistinguishable from one that read
+them.
+
+### Before adding an `rr:constant`
+
+Three constants in `mapping_dds.ttl` turned out to be latent data bugs:
+the reflection plane (`"1,1,1"`, wrong for 13 of 55 files), the crystal
+type (`"Si"`, right for all 55 by luck), and the detection mode
+(`"Transmission"`, wrong for the one fluorescence file). Each produced
+plausible metadata that validated cleanly, and none could have been
+caught by the pipeline itself.
+
+They share a cause: RML cannot parse a string or branch on a condition,
+so a constant is the only thing available wherever the data needs
+interpreting. The fix in each case was to derive the value in
+`api/cdi.py`, expose a key, and reference it — which is the pattern the
+table above documents.
+
+A constant is right for a property **label** and for a value the
+**format itself** determines. It is wrong anywhere the answer varies
+with the file. See `AGENTS.md` for the full account, and
+`CONVERGENCE-PROPOSAL.md` for what it implies architecturally.
+
 ## Profile validation
 
 Bundled artifacts (`resources/cdifXASDocumentResolvedSchema.json` and
