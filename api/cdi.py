@@ -374,6 +374,37 @@ def _synthesize_columns_from_array_labels(g: "rdflib.Graph",
         g.add((blank, URIRef(str(skos_ns) + "definition"), Literal(tok)))
 
 
+# "Si(311)", "Si 111", "Si (111)" -- the crystal and the reflection in
+# one string, in the spellings real files use.
+_MONO_NAME_RE = re.compile(
+    r"^\s*\[?\s*'?\s*[A-Za-z][A-Za-z0-9]*\s*[\(\[]?\s*"
+    r"(?P<reflection>\d\s*\d\s*\d|\d+(?:\s+\d+){2})"
+    r"\s*[\)\]]?\s*'?\s*\]?\s*$"
+)
+
+
+def _reflection_from_mono_name(g, name_ns, skos_ns) -> Optional[str]:
+    """Read the reflection out of Mono.name, comma-separated.
+
+    Returns None when Mono.name is absent or does not carry one, so the
+    caller falls back to a sentinel rather than to a wrong constant.
+    """
+    from rdflib import URIRef
+
+    mono = URIRef(str(name_ns) + "Mono")
+    definition = URIRef(str(skos_ns) + "definition")
+    for _s, _p, blank in g.triples(
+            (mono, URIRef(str(name_ns) + "Mono_name"), None)):
+        for value in g.objects(blank, definition):
+            m = _MONO_NAME_RE.match(str(value))
+            if m:
+                digits = m.group("reflection").split()
+                if len(digits) == 1:
+                    digits = list(digits[0])
+                return ",".join(digits)
+    return None
+
+
 def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
                               skos_ns: "rdflib.Namespace") -> None:
     """Inject placeholder triples so the RML mapping can populate
@@ -404,6 +435,17 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
     if (mono, None, None) in g:
         if not _has_child(mono, "Mono_d_spacing"):
             _synthesize_child(mono, "Mono_d_spacing", "unknown")
+        # The reflection plane is inside Mono.name -- XDI writes "Si(311)"
+        # for what CDIF keeps as crystal type and reflection separately.
+        # The RML mapping used to emit a constant "1,1,1" for every file,
+        # which is wrong for the eight Si(311) files in the corpus and
+        # for every Si(220) file in the wider library. Deriving it here
+        # and referencing it from the mapping is the same shape as the
+        # datetime and temperature normalisers.
+        if not _has_child(mono, "Mono_reflection"):
+            _synthesize_child(
+                mono, "Mono_reflection",
+                _reflection_from_mono_name(g, name_ns, skos_ns) or "unknown")
 
     # Beamline / Facility schema:name are required by the xasDocument
     # profile (JSON Schema for the beamline peer instrument, SHACL
