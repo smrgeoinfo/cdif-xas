@@ -377,17 +377,18 @@ def _synthesize_columns_from_array_labels(g: "rdflib.Graph",
 # "Si(311)", "Si 111", "Si (111)" -- the crystal and the reflection in
 # one string, in the spellings real files use.
 _MONO_NAME_RE = re.compile(
-    r"^\s*\[?\s*'?\s*[A-Za-z][A-Za-z0-9]*\s*[\(\[]?\s*"
+    r"^\s*\[?\s*'?\s*(?P<material>[A-Za-z][A-Za-z0-9]*)\s*[\(\[]?\s*"
     r"(?P<reflection>\d\s*\d\s*\d|\d+(?:\s+\d+){2})"
     r"\s*[\)\]]?\s*'?\s*\]?\s*$"
 )
 
 
-def _reflection_from_mono_name(g, name_ns, skos_ns) -> Optional[str]:
-    """Read the reflection out of Mono.name, comma-separated.
+def _from_mono_name(g, name_ns, skos_ns, part: str) -> Optional[str]:
+    """Read one half of Mono.name -- "Si(311)" holds two facts.
 
-    Returns None when Mono.name is absent or does not carry one, so the
-    caller falls back to a sentinel rather than to a wrong constant.
+    `part` is "material" or "reflection". Returns None when Mono.name is
+    absent or does not carry that part, so the caller falls back to a
+    sentinel rather than to a wrong constant.
     """
     from rdflib import URIRef
 
@@ -397,11 +398,14 @@ def _reflection_from_mono_name(g, name_ns, skos_ns) -> Optional[str]:
             (mono, URIRef(str(name_ns) + "Mono_name"), None)):
         for value in g.objects(blank, definition):
             m = _MONO_NAME_RE.match(str(value))
-            if m:
-                digits = m.group("reflection").split()
-                if len(digits) == 1:
-                    digits = list(digits[0])
-                return ",".join(digits)
+            if not m:
+                continue
+            if part == "material":
+                return m.group("material")
+            digits = m.group("reflection").split()
+            if len(digits) == 1:
+                digits = list(digits[0])
+            return ",".join(digits)
     return None
 
 
@@ -445,7 +449,18 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
         if not _has_child(mono, "Mono_reflection"):
             _synthesize_child(
                 mono, "Mono_reflection",
-                _reflection_from_mono_name(g, name_ns, skos_ns) or "unknown")
+                _from_mono_name(g, name_ns, skos_ns, "reflection")
+                or "unknown")
+        # The crystal material is the other half of Mono.name. The
+        # mapping used to emit a constant "Si", which is right for every
+        # file in this corpus and wrong for the first Ge(220) that shows
+        # up -- the same failure as the "1,1,1" reflection, and the same
+        # cause: RML cannot split "Si(311)".
+        if not _has_child(mono, "Mono_crystal"):
+            _synthesize_child(
+                mono, "Mono_crystal",
+                _from_mono_name(g, name_ns, skos_ns, "material")
+                or "unknown")
 
     # Beamline / Facility schema:name are required by the xasDocument
     # profile (JSON Schema for the beamline peer instrument, SHACL

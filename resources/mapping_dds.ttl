@@ -1470,7 +1470,9 @@
   ] ;
   rr:predicateObjectMap [
     rr:predicate schema:value;
-    rr:objectMap [ rr:constant "Si" ]
+    rr:objectMap [
+      rml:reference "$['cdi:Mono_crystal']['skos:definition']"
+    ]
   ] .
 
 # Reflection plane property (xas:reflectionplane). XDI has no field for
