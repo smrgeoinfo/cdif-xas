@@ -56,6 +56,14 @@ _QUALITATIVE_TEMPERATURES = {
 # XDI header keys carrying a temperature, normalised as above.
 _TEMPERATURE_KEYS = {"Sample.temperature"}
 
+# A numeric temperature and its unit, however they are spaced. Anchored,
+# so anything with trailing text ("10 K (nominal)") falls through
+# untouched rather than being silently truncated to the part that parsed.
+_TEMPERATURE_VALUE_UNIT = re.compile(
+    r"^(?P<value>[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)"
+    r"\s*(?P<unit>[KkCc])$"
+)
+
 
 def _normalize_temperature(value: str) -> tuple[str, Optional[str]]:
     """Return (value, note).
@@ -73,6 +81,17 @@ def _normalize_temperature(value: str) -> tuple[str, Optional[str]]:
             _QUALITATIVE_TEMPERATURES[key],
             f'temperature reported as "{raw}"',
         )
+
+    # "10K" -> "10 K". XDI wants the value and its unit separated by
+    # whitespace, and files routinely run them together. Unlike the
+    # substitution above this changes only the spacing, so it carries no
+    # note: nothing about the measurement is being asserted that the file
+    # did not already say. The unit is upper-cased to the two the
+    # dictionary allows, K and C.
+    m = _TEMPERATURE_VALUE_UNIT.match(raw)
+    if m:
+        return f"{m.group('value')} {m.group('unit').upper()}", None
+
     return raw, None
 
 
