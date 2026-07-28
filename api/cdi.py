@@ -383,6 +383,40 @@ _MONO_NAME_RE = re.compile(
 )
 
 
+# Which intensity column implies which detection mode. XDI has no mode
+# field -- not one of the 272 files in the XAS Data Library carries one
+# -- so the columns are the only evidence, and this is the inference
+# every XDI reader makes to plot a spectrum. Ordered, because a file
+# recording both is a transmission measurement with fluorescence
+# alongside.
+_MODE_BY_COLUMN = (
+    ("itrans", "Transmission"),
+    ("mutrans", "Transmission"),
+    ("ifluor", "Fluorescence"),
+    ("mufluor", "Fluorescence"),
+)
+
+
+def _detection_mode(g, name_ns, skos_ns) -> Optional[str]:
+    """The detection mode, read off the Column headers.
+
+    Returns None when no intensity column is recognised, so the caller
+    falls back to a sentinel rather than to a wrong constant.
+    """
+    from rdflib import URIRef
+
+    column = URIRef(str(name_ns) + "Column")
+    definition = URIRef(str(skos_ns) + "definition")
+    labels = set()
+    for _s, _p, blank in g.triples((column, None, None)):
+        for value in g.objects(blank, definition):
+            labels.add(str(value).split()[0].lower() if str(value) else "")
+    for token, mode in _MODE_BY_COLUMN:
+        if token in labels:
+            return mode
+    return None
+
+
 def _from_mono_name(g, name_ns, skos_ns, part: str) -> Optional[str]:
     """Read one half of Mono.name -- "Si(311)" holds two facts.
 
@@ -461,6 +495,19 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
                 mono, "Mono_crystal",
                 _from_mono_name(g, name_ns, skos_ns, "material")
                 or "unknown")
+
+    # Detection mode. TriplesMap_nexus emitted a constant "Transmission"
+    # for every file, which is wrong for any fluorescence measurement --
+    # 32 of the 272 files in the XAS Data Library, and one already in
+    # this corpus. Derived from the Column headers instead.
+    # The node is created if absent: not every XDI file has Scan.*
+    # headers, but every one has columns, so the mode is always
+    # derivable and the mapping's reference must always resolve.
+    scan = URIRef(str(name_ns) + "Scan")
+    if not _has_child(scan, "Scan_mode"):
+        _synthesize_child(
+            scan, "Scan_mode",
+            _detection_mode(g, name_ns, skos_ns) or "unknown")
 
     # Beamline / Facility schema:name are required by the xasDocument
     # profile (JSON Schema for the beamline peer instrument, SHACL

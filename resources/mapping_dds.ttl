@@ -701,7 +701,7 @@
 
 <#TriplesMap_nexus> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Scan')]";
       rml:referenceFormulation rml:JSONPath;
       rml:source [ a rml:RelativePathSource;
           rml:root rml:MappingDirectory;
@@ -716,7 +716,7 @@
   rr:predicateObjectMap [ 
     rr:predicate schema:name;
     rr:objectMap [
-      rr:constant "Transmission"
+      rml:reference "$['cdi:Scan_mode']['skos:definition']"
     ]
   ] ;
   rr:predicateObjectMap [ 
