@@ -169,6 +169,44 @@ response as an `xdi_validation` object; do not block CDIF generation.
 Results embed as `xdi_validation` in the response. Wrapper at
 `api/xdi_precheck.py`. See README for citation and license note.
 
+## Derive in Python, assign in RML
+
+Every non-trivial transformation in this pipeline happens in
+`api/cdi.py` before rmlmapper sees the data, and the mapping references
+the derived key. This is the established pattern, not an exception:
+
+| derived in `cdi.py` | key | why RML cannot |
+|---|---|---|
+| ISO datetimes | `Scan.start_time`, `Scan.end_time` | date parsing |
+| qualitative temperature | `Sample.temperature` | `room temperature` → `295.0 K` |
+| value/unit spacing | `Sample.temperature` | `10K` → `10 K` |
+| unit-less energies | `Scan.edge_energy`, `ScanParameters.e0` | flagging absence |
+| reflection plane | `cdi:Mono_reflection` | splitting `Si(311)` |
+| crystal material | `cdi:Mono_crystal` | splitting `Si(311)` |
+| detection mode | `cdi:Scan_mode` | branching on which columns exist |
+
+**Before adding `rr:constant` to a value-bearing predicate, stop.** Three
+constants in `mapping_dds.ttl` were latent data bugs, found by comparing
+against a second implementation:
+
+- `rr:constant "1,1,1"` for the reflection plane — wrong for 13 of 55
+  files, every `Si(220)` and `Si(311)`.
+- `rr:constant "Si"` for the crystal type — right for all 55 by luck,
+  wrong for the first `Ge(220)`.
+- `rr:constant "Transmission"` for the detection mode — wrong for
+  `xdl_pyrite2_rt_01`, which has `ifluor` and no `itrans`.
+
+All three produced plausible metadata and validated cleanly before and
+after. None could have been caught by the pipeline itself. The last hid
+longest because it sits on `schema:name`, where 15 of 16 constants are
+correct property labels — only its `inDefinedTermSet` reveals it carries
+data.
+
+A constant is right for a **property label** (`"d-spacing"`, `"Probe"`)
+and for a value the **format itself** determines (`"x-ray"` as the probe,
+since XDI is the X-ray Absorption Data Interchange format). It is wrong
+anywhere the answer varies with the file.
+
 ## Key files
 
 | File | Role |
