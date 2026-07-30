@@ -3,6 +3,34 @@
 An updated copy of CDI-XAS:
 https://github.com/codata/cdi-xas
 
+## Quickstart — convert the XAS-CDIF corpus
+
+No Docker and no Dataverse needed. Requires Python 3.13 (pinned in
+`.python-version`, needed by `xdi_validator`) and Java (needed by
+`rmlmapper`).
+
+```bash
+git clone https://github.com/smrgeoinfo/cdif-xas
+cd cdif-xas
+uv sync
+git clone https://github.com/CDIF-4-XAS/XAS-CDIF -b cdifxasRelease1.1 ../XAS-CDIF
+```
+
+Convert all 55 XDI files, then validate them against the profile:
+
+```bash
+uv run python tools/batch_generate_cdif.py ../XAS-CDIF/exampleData ../XAS-CDIF/exampleMetadata
+uv run python tools/batch_validate_cdif.py ../XAS-CDIF/exampleMetadata
+```
+
+Expect `55 ok, 0 error(s)` then `55/55 fully valid`. **Read both lines.**
+Generation and validation are reported separately, so a failed
+generation followed by `55/55 fully valid` means the validator checked
+the previous run's files.
+
+For the API server, per-file endpoints and the Dataverse path, see
+"Local run" and the sections below.
+
 # Initialize
 ```
 cp .env_sample .env
