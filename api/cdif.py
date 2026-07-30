@@ -3,6 +3,28 @@ import json
 from pyld import jsonld as jsonldlib
 
 
+
+#: XDI column label -> CDIF XAS concept local name.
+#:
+#: These are the Column.* rows of xdi-to-cdifxas.sssom.tsv, the crosswalk
+#: built and validated by crosswalk/build_crosswalk.py in XAS-CDIF --
+#: which checks every concept against the glossary, so a name that is not
+#: a real concept fails that build rather than producing a propertyID
+#: here that resolves to nothing.
+#:
+#: Held as a table rather than read from the TSV so the service stays
+#: self-contained. If it drifts, the crosswalk is the authority.
+COLUMN_CONCEPTS = {
+    "energy": "monochromatorenergy",
+    "i0": "incidentintensity",
+    "itrans": "transmittedintensity",
+    "irefer": "referenceintensity",
+    "mutrans": "absorptioncoefficient",
+    "ifluor": "fluorescenceintensity",
+    "mufluor": "fluorescenceabsorptioncoefficient",
+    "murefer": "referenceabsorptioncoefficient",
+}
+
 def generate_cdif(cdi_jsonld) -> dict[str, any]:
     datajson = cdi_jsonld
 
@@ -147,6 +169,16 @@ def generate_cdif(cdi_jsonld) -> dict[str, any]:
                 )
                 if xas_term:
                     entry["meaning"] = xas_term.get("skos:definition", "")
+                # The concept this column measures, as the glossary's own
+                # local name. schema:propertyID is built from this: it was
+                # built from $['meaning'] before, which is a definition
+                # sentence, so the IRI it produced could not resolve --
+                # and $['meaning'] is only set when a xas:Column.N.* node
+                # happens to be in the graph, which it never is, so no
+                # propertyID was emitted at all.
+                concept = COLUMN_CONCEPTS.get(col_name.lower())
+                if concept:
+                    entry["conceptLocalName"] = concept
                 if dataset_id:
                     entry["componentIRI"] = f"https://example.org/struct/{dataset_id}/comp/{entry['columnKey']}"
                     entry["rvIRI"] = f"https://example.org/struct/{dataset_id}/rv/{entry['columnKey']}"

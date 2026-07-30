@@ -241,12 +241,14 @@
       a fnml:FunctionTermMap;
       # Prepends the full XAS glossary base and marks the result as an
       # IRI reference so it serializes as JSON-LD {"@id": "..."} instead
-      # of a bare string literal. Note: $['meaning'] values that carry
-      # spaces or mixed case will produce non-resolving IRIs; the v2
-      # glossary uses lowercase, no-underscore local names (see
-      # https://w3id.org/cdif/xas/). Consider normalizing $['meaning']
-      # upstream (in api/cdif.py's column build) so it lands here as a
-      # v2-conformant local name.
+      # of a bare string literal.
+      #
+      # Reads $['conceptLocalName'], which api/cdif.py sets from the
+      # Column.* rows of the XAS crosswalk -- a v2-conformant local name,
+      # lowercase and without underscores. It used to read $['meaning'],
+      # which is a definition sentence and would have produced an IRI
+      # that could not resolve; in practice $['meaning'] was never set,
+      # so no propertyID was emitted at all.
       rr:termType rr:IRI ;
       fnml:functionValue [
         rr:predicateObjectMap [
@@ -255,7 +257,7 @@
         ];
         rr:predicateObjectMap [
           rr:predicate grel:valueParameter;
-          rr:objectMap [ rml:reference "$['meaning']" ]
+          rr:objectMap [ rml:reference "$['conceptLocalName']" ]
         ];
         rr:predicateObjectMap [
           rr:predicate grel:p_string_find;
