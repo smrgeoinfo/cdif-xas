@@ -201,6 +201,12 @@ class CDI_DDI:
         self.data = []
         self.datasets = {}
         self.navigator = None
+        #: Column number -> the blank node carrying that column's label,
+        #: so measured widths can be attached once the data is read.
+        self.column_nodes = {}
+        #: Column number -> (min, max) field width in characters.
+        self.column_widths = {}
+        self._pending_column = None
         self.session_triples = []
         self.triples_memory = []
         # Array-labels line: the last '#'-prefixed comment line before the
@@ -245,6 +251,21 @@ class CDI_DDI:
         else:
             return None, value
     
+    def _measure_fields(self, line):
+        """Widen each column's observed field extent by one data row.
+
+        Measured to the end of the field rather than the length of the
+        token, because a fixed-width layout pads on the left: in
+        `       12508.00` the value is 8 characters and the field is 15,
+        and 15 is what a reader slices on.
+        """
+        previous_end = 0
+        for position, match in enumerate(re.finditer(r"\S+", line), start=1):
+            width = match.end() - previous_end
+            previous_end = match.end()
+            low, high = self.column_widths.get(position, (width, width))
+            self.column_widths[position] = (min(low, width), max(high, width))
+
     def parse_xdi(self, include_data: bool = True):
         """Parse XDI header lines (and, by default, data rows) into rdflib.
 
@@ -287,6 +308,15 @@ class CDI_DDI:
                         # downstream RML mapping's canonical predicates
                         # (cdi:Facility_name, cdi:Beamline_name, ...) match
                         # regardless of source-side casing.
+                        if (compound_variable_name.lower()
+                                .startswith("column.")):
+                            # Remember the column number so the measured
+                            # field width can be attached after the data
+                            # rows have been read.
+                            self._pending_column = (
+                                compound_variable_name.split(".", 1)[1])
+                        else:
+                            self._pending_column = None
                         if '.' in compound_variable_name:
                             head, rest = compound_variable_name.split('.', 1)
                             compound_variable_name = head + '.' + rest.lower()
@@ -315,6 +345,10 @@ class CDI_DDI:
                                 self.g.add((rdflib.URIRef(self.name + variable_name), rdflib.URIRef(self.name + variable_name + '_' + variable_next), blank))
                                 self.g.add((blank, rdflib.URIRef(self.skos.definition), rdflib.Literal(variable_value)))
                                 self.navigator = blank
+                                if (self._pending_column
+                                        and self._pending_column.isdigit()):
+                                    self.column_nodes[
+                                        int(self._pending_column)] = blank
                         else:
                             variable_name = compound_variable_name.strip('#  ').replace(" ", "_")
                             try:
@@ -337,6 +371,7 @@ class CDI_DDI:
                 # rows leave it untouched.
                 if self.array_labels_line is None and pending_last_comment:
                     self.array_labels_line = pending_last_comment
+                self._measure_fields(line.rstrip("\n"))
                 if not include_data:
                     continue
                 if self.navigator:
@@ -349,6 +384,20 @@ class CDI_DDI:
                         for row in line.strip().split(' '):
                             self.g.add((self.navigator, rdflib.URIRef(self.rdf.List), rdflib.Literal(row)))
 
+        # Field widths, measured rather than assumed. cdi:minimumLength
+        # and cdi:maximumLength were rr:constant 15 in the mapping, which
+        # is right for 3 of the 55 reference files and wrong for the rest:
+        # observed widths run from 5 to 15, and 34 of the files are not
+        # fixed-width at all. A reader that trusts a wrong constant slices
+        # a variable-width file at fixed offsets and gets garbage.
+        for number, node in self.column_nodes.items():
+            width = self.column_widths.get(number)
+            if not width:
+                continue
+            self.g.add((node, rdflib.URIRef(self.name + "minimumLength"),
+                        rdflib.Literal(width[0])))
+            self.g.add((node, rdflib.URIRef(self.name + "maximumLength"),
+                        rdflib.Literal(width[1])))
         return self.g
 
 def _synthesize_columns_from_array_labels(g: "rdflib.Graph",

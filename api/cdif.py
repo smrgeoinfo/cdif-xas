@@ -224,6 +224,22 @@ def generate_cdif(cdi_jsonld) -> dict[str, any]:
                 _, unit = split_column_label(v.get("skos:definition", ""))
                 if unit:
                     entry["unitText"] = unit
+                # Measured in api/cdi.py while reading the data rows. The
+                # mapping asserted rr:constant 15, which is right for 3
+                # of the 55 reference files: observed widths run 5 to 15
+                # and 34 of the files are not fixed-width at all. A
+                # reader that trusts a wrong constant slices a
+                # variable-width file at fixed offsets.
+                for src, dest in (("cdi:minimumLength", "minLength"),
+                                  ("cdi:maximumLength", "maxLength")):
+                    width = v.get(src)
+                    # rdflib's typed literal survives into the JSON-LD as
+                    # {"@type": ...integer, "@value": 10}; the mapping
+                    # wants the number.
+                    if isinstance(width, dict):
+                        width = width.get("@value")
+                    if width is not None:
+                        entry[dest] = int(width)
                 if concept:
                     entry["conceptLocalName"] = concept
                 if dataset_id:

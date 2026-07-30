@@ -1831,14 +1831,16 @@
   ] ;
   rr:predicateObjectMap [
     rr:predicate cdi:minimumLength;
+    # Measured per column in api/cdi.py, not assumed. This was
+    # rr:constant 15 -- correct for 3 of the 55 reference files.
     rr:objectMap [
-      rr:constant 15
+      rml:reference "$['minLength']"
     ]
   ] ;
   rr:predicateObjectMap [
     rr:predicate cdi:maximumLength;
     rr:objectMap [
-      rr:constant 15
+      rml:reference "$['maxLength']"
     ]
   ] ;
   rr:predicateObjectMap [
