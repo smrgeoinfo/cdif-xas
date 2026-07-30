@@ -7,6 +7,54 @@
 
 ---
 
+## Already applied in this repository (2026-07-28)
+
+> Read this before starting. Several tasks below are **done in
+> `smrgeoinfo/cdif-xas`**, the fork this checkout points at, and the
+> instructions still describe the pre-uplift state. Re-applying them
+> would be work at best and a regression at worst.
+
+Applied here and not yet submitted upstream to `UKDSResearch/cdif-xas`:
+
+- **Tasks 1-9** — the prefix rebinding, concept renames, conformance
+  URIs, `@id`-form policy, `xas:analysisevent`, the peer instrument
+  model, the source-instrument wrapper, `schema:object` MaterialSample,
+  and `measurementTechnique`/`keywords`.
+- **Three `rr:constant` corrections** that were producing wrong values
+  rather than missing ones: the reflection plane (wrong for 13 of 55
+  files), the monochromator crystal (right by luck), and the detection
+  mode (wrong for the one fluorescence-only file). See "Derive in
+  Python, assign in RML" in `AGENTS.md` — the hazard is the general
+  lesson, not the three instances.
+- **Header normalisations** in `api/cdi.py`: ISO datetimes, qualitative
+  temperatures (`room temperature` to `295.0 K`, with a note recording
+  the original), unit-less energies, and `Sample.preparation` aliased to
+  the dictionary's `Sample.prep`.
+- **`schema:propertyID` on every variable.** The mapping had a rule that
+  read `$['meaning']` -- a definition sentence -- and only fired when a
+  `xas:Column.N.*` node was in the graph, which it never is. So no
+  propertyID was emitted for any column in any file. `api/cdif.py` now
+  builds the whole IRI as `$['propertyIRI']`: the glossary base plus the
+  concept's local name from the crosswalk, or the OGC nil URI where no
+  crosswalk row names one. The mapping assigns it with
+  `rr:termType rr:IRI` and no GREL.
+
+The nil URI is a convention worth keeping: a column that was measured is
+recorded whether or not anyone has named its concept, and saying nothing
+at all would be indistinguishable from a column nobody looked at.
+
+**Where this leaves the two implementations.** Over the same 55 XDI
+files, this pipeline and `usgin/hdf5metadata` now agree on the top-level
+property set, the variable count per file, the document shape, and --
+since the propertyID work -- on all 55 files the exact set of concepts
+carried by the variables. What remains is one structural difference
+that is not expressible as a mapping rule: where `cdi:isStructuredBy`
+goes, and whether parts are typed as datasets, depends on how many
+datasets the input holds. Every XDI file holds one spectrum, so this
+pipeline never meets the case. See `CONVERGENCE-PROPOSAL.md`.
+
+---
+
 ## Why this exists
 
 `cdif-xas-UKDS` currently produces `resources/cdif_dds_framed.jsonld`

@@ -14,6 +14,14 @@ from pyld import jsonld as jsonldlib
 #:
 #: Held as a table rather than read from the TSV so the service stays
 #: self-contained. If it drifts, the crosswalk is the authority.
+#: What a column's propertyID says when no crosswalk row names its
+#: concept. The column was measured and is recorded; nothing is claimed
+#: about what it means. Saying nothing at all would be indistinguishable
+#: from a column nobody looked at.
+NIL_MISSING = "http://www.opengis.net/def/nil/OGC/0/missing"
+
+XAS_BASE = "https://w3id.org/cdif/xas/"
+
 COLUMN_CONCEPTS = {
     "energy": "monochromatorenergy",
     "i0": "incidentintensity",
@@ -177,6 +185,12 @@ def generate_cdif(cdi_jsonld) -> dict[str, any]:
                 # happens to be in the graph, which it never is, so no
                 # propertyID was emitted at all.
                 concept = COLUMN_CONCEPTS.get(col_name.lower())
+                # The full IRI, built here rather than assembled in the
+                # mapping: an unmapped column's propertyID is the OGC nil
+                # URI, which is not under the glossary base, so no amount
+                # of prefixing gets there from a local name.
+                entry["propertyIRI"] = (
+                    XAS_BASE + concept if concept else NIL_MISSING)
                 if concept:
                     entry["conceptLocalName"] = concept
                 if dataset_id:

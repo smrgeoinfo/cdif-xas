@@ -56,6 +56,16 @@ _QUALITATIVE_TEMPERATURES = {
 # XDI header keys carrying a temperature, normalised as above.
 _TEMPERATURE_KEYS = {"Sample.temperature"}
 
+# Header keys files write that the XDI dictionary does not define, mapped
+# to the defined key they mean. The dictionary defines Sample.prep;
+# xdl_CeO2.xdi writes Sample.preparation, and the value is the same free
+# text. Normalising here rather than in the mapping is the usual
+# division: the mapping references one canonical key and cannot branch,
+# so a second spelling has to become the first before rmlmapper sees it.
+_HEADER_ALIASES = {
+    "Sample.preparation": "Sample.prep",
+}
+
 # XDI header keys carrying an energy that should name its unit.
 # Scan.edge_energy is a defined field; ScanParameters.e0 is an extension
 # field that beamline software writes for the same quantity. Both arrive
@@ -280,6 +290,8 @@ class CDI_DDI:
                         if '.' in compound_variable_name:
                             head, rest = compound_variable_name.split('.', 1)
                             compound_variable_name = head + '.' + rest.lower()
+                        compound_variable_name = _HEADER_ALIASES.get(
+                            compound_variable_name, compound_variable_name)
                         if compound_variable_name in _DATETIME_KEYS:
                             iso = _normalize_datetime(variable_value)
                             if iso is not None:

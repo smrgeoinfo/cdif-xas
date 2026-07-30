@@ -237,37 +237,15 @@
   #   ] ;
   rr:predicateObjectMap [
     rr:predicate schema:propertyID;
+    # api/cdif.py builds the whole IRI: the glossary base plus the
+    # concept's local name where the crosswalk names one, and the OGC
+    # nil URI where it does not. Assembling it here with GREL could not
+    # produce the nil case, which is not under the glossary base -- and
+    # the version that tried read a definition sentence and fired for no
+    # column in any file.
     rr:objectMap [
-      a fnml:FunctionTermMap;
-      # Prepends the full XAS glossary base and marks the result as an
-      # IRI reference so it serializes as JSON-LD {"@id": "..."} instead
-      # of a bare string literal.
-      #
-      # Reads $['conceptLocalName'], which api/cdif.py sets from the
-      # Column.* rows of the XAS crosswalk -- a v2-conformant local name,
-      # lowercase and without underscores. It used to read $['meaning'],
-      # which is a definition sentence and would have produced an IRI
-      # that could not resolve; in practice $['meaning'] was never set,
-      # so no propertyID was emitted at all.
-      rr:termType rr:IRI ;
-      fnml:functionValue [
-        rr:predicateObjectMap [
-          rr:predicate fno:executes;
-          rr:objectMap [ rr:constant grel:string_replace ]
-        ];
-        rr:predicateObjectMap [
-          rr:predicate grel:valueParameter;
-          rr:objectMap [ rml:reference "$['conceptLocalName']" ]
-        ];
-        rr:predicateObjectMap [
-          rr:predicate grel:p_string_find;
-          rr:objectMap [ rr:constant "/^/" ]
-        ];
-        rr:predicateObjectMap [
-          rr:predicate grel:p_string_replace;
-          rr:objectMap [ rr:constant "https://w3id.org/cdif/xas/" ]
-        ]
-      ]
+      rml:reference "$['propertyIRI']" ;
+      rr:termType rr:IRI
     ]
   ] ;
   rr:predicateObjectMap [
