@@ -29,7 +29,7 @@ validate 55/55 against the `xasDocument` composite.
 | Runtime | FastAPI + Java rmlmapper + pyld | Python only |
 | Dataverse | yes | **no** |
 | Reviewed / in production | **yes** | no |
-| Tests | — | 189 |
+| Tests | — | 190 |
 
 Neither is strictly better. The columns that matter for this proposal
 are the second and the last two.
@@ -352,38 +352,55 @@ built from by reading your records.
 - Depending on a codebase that is currently one person's and not yet
   reviewed by you. **This is the real risk and I am not minimising it.**
 
-## Divergence added since this was written (2026-07-28)
+## Where the two implementations actually stand (2026-07-28)
 
-The gap is no longer only about `rr:constant`. Four changes have gone
-into the Python implementation that the RML pipeline does not have, and
-they are listed here because a proposal that understates the distance
-between two implementations is not useful.
+This section was first written to record divergence. By the end of the
+day the movement had gone the other way, in both directions, so it
+records the measured position instead. Everything below is from running
+both pipelines over the same 55 XDI files and comparing the output.
 
-| change | Python | RML |
+### Two gaps closed, one each way
+
+**RML emitted no `schema:propertyID` on any variable in any file.** Its
+columns were identified positionally -- `iv/Column_1`, `schema:name`
+`energy` -- with nothing saying which quantity a column held. The
+mapping did have a rule, but it read `$['meaning']`, which is a
+definition sentence rather than a concept name, and `$['meaning']` is
+only set when a `xas:Column.N.*` node happens to be in the graph, which
+it never is. The rule therefore fired for no column, ever, and the IRI it
+would have produced could not have resolved.
+
+Fixed by deriving `$['conceptLocalName']` in `api/cdif.py` from the
+`Column.*` rows of the crosswalk and pointing the rule at that. **206
+propertyIDs across the corpus, where there were none.**
+
+**The Python pipeline discarded units the file recorded.** XDI writes a
+column label as a name optionally followed by a unit -- `Column.1: energy
+eV` -- and the parser kept the first token. RML was extracting `eV` and
+we were not. Fixed by splitting the label; we now extract more than RML
+does, including two files where the unit is followed by a beamline
+provenance suffix after `||`.
+
+### What the outputs now agree on
+
+Over the 55 files, both implementations produce the same top-level
+property set, the same number of variables per file, the same document
+shape -- neither emits `schema:hasPart` for a single-spectrum file -- and
+on **30 of the 55 the same set of concepts on the variables**. No
+concept that RML emits is missing from the Python output.
+
+### What still differs, and why
+
+| difference | which way | reason |
 |---|---|---|
-| `Sample.preparation` read as well as `Sample.prep` | yes | no |
-| parts typed `schema:MediaObject` + `schema:Dataset`, with their own identifier, dates, licence, description and keywords | yes | n/a — no parts |
-| `cdi:isStructuredBy` on the part rather than the distribution | yes | n/a |
-| `schema:unitCode` from the vocabulary where the file records no unit | yes | no |
+| unmapped columns carry the OGC nil URI as `propertyID` | Python only, 25 files | A deliberate convention: the column was measured and is recorded, and nothing is claimed about its meaning. RML omits the property instead. |
+| `Sample.preparation` read as well as `Sample.prep` | Python only, 1 file | One crosswalk row here, validated against the glossary by the build. In RML it means editing `api/cdi.py` to derive the key and `mapping_dds.ttl` to reference it, with nothing checking the two agree. |
+| `schema:unitCode` from the vocabulary where the file is silent | Python only, 2 files | Needs a units table keyed on concept. The corpus barely exercises it -- only `mufluor` and `murefer` are marked dimensionless, and `absorptioncoefficient` deliberately is not while its definition and the data disagree. |
+| `cdi:isStructuredBy` on the part; parts typed `schema:Dataset` | not reachable in RML | Depends on how many datasets the input holds, which is a decision rather than a correspondence. Every XDI file holds one spectrum, so RML never meets the case; a NeXus file with 26 entries does. |
 
-Two of the four are not reachable by the RML pipeline as it stands, and
-that is the substantive point rather than a complaint. `xdl_CeO2.xdi`
-writes `Sample.preparation` instead of the dictionary's `Sample.prep`;
-adding that to the Python binding was one crosswalk row, validated
-against the glossary by the build. Doing the same in RML means editing
-`api/cdi.py` to derive the key and `mapping_dds.ttl` to reference it,
-with nothing checking that the two agree.
-
-The other two are structural. Neither `isStructuredBy` placement nor
-per-part typing is expressible as a mapping rule, because both depend on
-how many datasets the input holds -- a decision, not a correspondence.
-The RML pipeline reads one spectrum per file and so never meets the
-case; a NeXus file with 26 entries in it does, and RML has no way to
-describe it.
-
-None of this makes the RML pipeline wrong. It makes the two
-implementations answer different questions, which is what the proposal
-below is about.
+The first three are each a small piece of work in the RML pipeline. The
+fourth is not expressible as a mapping rule at all, which is the one
+structural difference rather than a difference of effort.
 
 ## Open issues, stated rather than hidden
 
