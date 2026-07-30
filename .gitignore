@@ -12,3 +12,12 @@ lib/
 
 # Environment variables
 .env
+
+# Pipeline scratch. api.py writes cdif_skos.json and Mapper.py writes the
+# two dds files, once per input file -- which is why batch processing is
+# serial. Whatever they hold after a run is just the last file processed,
+# so tracking them produced a diff on every run that meant nothing.
+resources/cdif_skos.json
+resources/cdif_dds.jsonld
+resources/cdif_dds_framed.jsonld
+

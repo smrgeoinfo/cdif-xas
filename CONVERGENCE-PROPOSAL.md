@@ -352,6 +352,39 @@ built from by reading your records.
 - Depending on a codebase that is currently one person's and not yet
   reviewed by you. **This is the real risk and I am not minimising it.**
 
+## Divergence added since this was written (2026-07-28)
+
+The gap is no longer only about `rr:constant`. Four changes have gone
+into the Python implementation that the RML pipeline does not have, and
+they are listed here because a proposal that understates the distance
+between two implementations is not useful.
+
+| change | Python | RML |
+|---|---|---|
+| `Sample.preparation` read as well as `Sample.prep` | yes | no |
+| parts typed `schema:MediaObject` + `schema:Dataset`, with their own identifier, dates, licence, description and keywords | yes | n/a — no parts |
+| `cdi:isStructuredBy` on the part rather than the distribution | yes | n/a |
+| `schema:unitCode` from the vocabulary where the file records no unit | yes | no |
+
+Two of the four are not reachable by the RML pipeline as it stands, and
+that is the substantive point rather than a complaint. `xdl_CeO2.xdi`
+writes `Sample.preparation` instead of the dictionary's `Sample.prep`;
+adding that to the Python binding was one crosswalk row, validated
+against the glossary by the build. Doing the same in RML means editing
+`api/cdi.py` to derive the key and `mapping_dds.ttl` to reference it,
+with nothing checking that the two agree.
+
+The other two are structural. Neither `isStructuredBy` placement nor
+per-part typing is expressible as a mapping rule, because both depend on
+how many datasets the input holds -- a decision, not a correspondence.
+The RML pipeline reads one spectrum per file and so never meets the
+case; a NeXus file with 26 entries in it does, and RML has no way to
+describe it.
+
+None of this makes the RML pipeline wrong. It makes the two
+implementations answer different questions, which is what the proposal
+below is about.
+
 ## Open issues, stated rather than hidden
 
 - **`hdf5metadata` has no Dataverse integration at all.** It emits
