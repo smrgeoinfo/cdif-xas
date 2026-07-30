@@ -354,53 +354,80 @@ built from by reading your records.
 
 ## Where the two implementations actually stand (2026-07-28)
 
-This section was first written to record divergence. By the end of the
-day the movement had gone the other way, in both directions, so it
-records the measured position instead. Everything below is from running
-both pipelines over the same 55 XDI files and comparing the output.
+**The output difference is gone.** Run both pipelines over the same 55
+XDI files and compare:
 
-### Two gaps closed, one each way
-
-**RML emitted no `schema:propertyID` on any variable in any file.** Its
-columns were identified positionally -- `iv/Column_1`, `schema:name`
-`energy` -- with nothing saying which quantity a column held. The
-mapping did have a rule, but it read `$['meaning']`, which is a
-definition sentence rather than a concept name, and `$['meaning']` is
-only set when a `xas:Column.N.*` node happens to be in the graph, which
-it never is. The rule therefore fired for no column, ever, and the IRI it
-would have produced could not have resolved.
-
-Fixed by deriving `$['conceptLocalName']` in `api/cdif.py` from the
-`Column.*` rows of the crosswalk and pointing the rule at that. **206
-propertyIDs across the corpus, where there were none.**
-
-**The Python pipeline discarded units the file recorded.** XDI writes a
-column label as a name optionally followed by a unit -- `Column.1: energy
-eV` -- and the parser kept the first token. RML was extracting `eV` and
-we were not. Fixed by splitting the label; we now extract more than RML
-does, including two files where the unit is followed by a beamline
-provenance suffix after `||`.
-
-### What the outputs now agree on
-
-Over the 55 files, both implementations produce the same top-level
-property set, the same number of variables per file, the same document
-shape -- neither emits `schema:hasPart` for a single-spectrum file -- and
-on **30 of the 55 the same set of concepts on the variables**. No
-concept that RML emits is missing from the Python output.
-
-### What still differs, and why
-
-| difference | which way | reason |
+| | start of day | now |
 |---|---|---|
-| unmapped columns carry the OGC nil URI as `propertyID` | Python only, 25 files | A deliberate convention: the column was measured and is recorded, and nothing is claimed about its meaning. RML omits the property instead. |
-| `Sample.preparation` read as well as `Sample.prep` | Python only, 1 file | One crosswalk row here, validated against the glossary by the build. In RML it means editing `api/cdi.py` to derive the key and `mapping_dds.ttl` to reference it, with nothing checking the two agree. |
-| `schema:unitCode` from the vocabulary where the file is silent | Python only, 2 files | Needs a units table keyed on concept. The corpus barely exercises it -- only `mufluor` and `murefer` are marked dimensionless, and `absorptioncoefficient` deliberately is not while its definition and the data disagree. |
-| `cdi:isStructuredBy` on the part; parts typed `schema:Dataset` | not reachable in RML | Depends on how many datasets the input holds, which is a decision rather than a correspondence. Every XDI file holds one spectrum, so RML never meets the case; a NeXus file with 26 entries does. |
+| top-level property set | 55/55 agree | 55/55 |
+| variable count per file | 55/55 | 55/55 |
+| concepts carried by variables | **0/55** | **55/55** |
+| units on variables | **0/55** | **55/55** |
 
-The first three are each a small piece of work in the RML pipeline. The
-fourth is not expressible as a mapping rule at all, which is the one
-structural difference rather than a difference of effort.
+That is worth stating plainly because it costs this proposal an
+argument. The case can no longer be "the RML output is missing things".
+It is not.
+
+### What changed, and what it took
+
+Four fixes, two in each pipeline:
+
+- **RML emitted no `schema:propertyID` on any variable in any file.** A
+  rule existed; it read `$['meaning']`, which is a definition sentence,
+  and only fired when a `xas:Column.N.*` node was in the graph, which it
+  never is. Fixed by deriving the IRI in `api/cdif.py` and assigning it
+  in one line of RML. 206 propertyIDs where there were none.
+- **RML wrote `""` for units it did not know**, 165 times, asserting
+  that the unit is the empty string. Fixed the same way: derive in
+  Python, emit nothing when there is nothing.
+- **RML dropped `Sample.preparation`**, which one file writes instead of
+  the dictionary's `Sample.prep`. Fixed with a header alias.
+- **The Python pipeline discarded units the column label carried**,
+  which RML was reading. Fixed by splitting the label.
+
+Note what each fix looked like. The three on the RML side were all
+*derive in Python, assign in RML* -- because a mapping rule cannot
+branch, cannot fall back, and cannot build a value that is not a
+substring of the input. Two of them replaced GREL constructs that had
+been silently producing nothing or producing a wrong value for every
+file in the corpus, undetected. The one on the Python side was a change
+to a parser and a test.
+
+### What this leaves
+
+**Complementary content, not disagreement.** Each pipeline emits
+predicates the other does not, and both are useful: RML describes the
+serialization -- delimiter, header rows, column index, field lengths --
+while the Python side describes provenance and identity, `cdif:locator`
+per component and an SPDX checksum. A consumer wanting to parse the file
+wants the first; a consumer wanting to know which bytes these are wants
+the second.
+
+**One structural difference that is not expressible as a mapping rule.**
+Where `cdi:isStructuredBy` goes, and whether a part is typed as a
+dataset, depends on how many datasets the input holds. That is a
+decision about the input, not a correspondence between vocabularies.
+Every XDI file holds one spectrum, so this pipeline never meets the
+case; a NeXus file with 26 entries does, and RML has no way to describe
+it.
+
+### So what the proposal now rests on
+
+Not output quality. Two things:
+
+1. **A second input format.** The RML pipeline reads XDI. Adding NeXus
+   means a second mapping file, a second intermediate shape, and no
+   shared place to record that `cdifxas:facility` arrived from
+   `Facility.name` in one and `NXsource/name` in the other.
+2. **What each fix costs.** Every RML fix above was two coordinated
+   edits -- a key derived in `api/cdi.py` or `api/cdif.py`, a reference
+   in `mapping_dds.ttl` -- with nothing checking that the two agree. The
+   crosswalk equivalent is one row, and `build_crosswalk.py` fails the
+   build if the concept is not in the glossary or the key is not one the
+   converter reads.
+
+Both were true this morning. They are just no longer obscured by an
+output gap that has since closed.
 
 ## Open issues, stated rather than hidden
 
