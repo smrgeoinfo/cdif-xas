@@ -89,17 +89,17 @@ So the choice is not *declarative versus imperative*. It is
 **Python + RML + Java + FastAPI** versus **Python**. The declarative
 layer is handling the easy parts and adding a runtime to do it.
 
-### Three bugs of one shape
+### Four bugs of one shape
 
-Scanning all 40 TriplesMaps for `rr:constant` on a value-bearing
-predicate turned up three defects, all found in a single afternoon and
-all now fixed:
+Scanning the TriplesMaps for `rr:constant` on a value-bearing predicate
+turned up four defects, all now fixed:
 
 | TriplesMap | asserted | correct for | wrong for |
 |---|---|---|---|
 | `mono_reflection` | `"1,1,1"` | 42 of 55 | **13** — every `Si(220)` and `Si(311)` |
 | `mono_type` | `"Si"` | 55 of 55 | the first `Ge(220)` that arrives |
 | `nexus` | `"Transmission"` | 54 of 55 | **1** — `xdl_pyrite2_rt_01`, an `ifluor` file |
+| `physicalMapping` | `15` for both `cdi:minimumLength` and `cdi:maximumLength` | **3 of 55** | **52** — observed field widths run 5 to 15 |
 
 The pattern matters more than any one of them.
 
@@ -120,9 +120,25 @@ vocabulary defines the field."*
 
 **Each was fixed the same way** — derive the value in `api/cdi.py`,
 expose a key, point the mapping at it. That is now the pattern for
-datetimes, temperatures, energy units, reflection planes, crystal types
-and detection modes. Six transformations, all in Python, with RML
-carrying the assignment.
+datetimes, temperatures, energy units, reflection planes, crystal types,
+detection modes, concept IRIs, units, sample-preparation spellings and
+field widths. Ten transformations, all in Python, with RML carrying the
+assignment.
+
+**The fourth is the one that would have done real damage.** The first
+three write a wrong label — a reflection plane, a crystal, a detection
+mode — which a reader may notice is implausible for their sample. The
+field widths are not a label but a parsing instruction: a consumer that
+trusts `cdi:minimumLength == cdi:maximumLength == 15` will slice a
+file whose fields are 9 or 10 characters at fixed offsets and read
+numbers that are wrong without being obviously wrong. It was correct for
+3 of the 55 files, and 34 of the 55 are not fixed-width at all.
+
+It also shows how weak agreement is as evidence when one side is a
+constant. The two implementations agreed on `se_na2so4_rt`, whose fields
+really are 15 characters, and that agreement was briefly taken as
+confirmation that both were measuring correctly. Only one was. Checking
+whether the value varied across the corpus is what exposed it.
 
 **One hid because of where it sat.** The detection mode is on
 `schema:name`, where 15 of the mapping's 16 constants are property
@@ -380,12 +396,16 @@ Four fixes, two in each pipeline:
 - **RML wrote `""` for units it did not know**, 165 times, asserting
   that the unit is the empty string. Fixed the same way: derive in
   Python, emit nothing when there is nothing.
+- **RML asserted a 15-character field width** for every column of every
+  file, `rr:constant` on both `cdi:minimumLength` and
+  `cdi:maximumLength`. Correct for 3 of the 55. Now measured while the
+  data rows are read.
 - **RML dropped `Sample.preparation`**, which one file writes instead of
   the dictionary's `Sample.prep`. Fixed with a header alias.
 - **The Python pipeline discarded units the column label carried**,
   which RML was reading. Fixed by splitting the label.
 
-Note what each fix looked like. The three on the RML side were all
+Note what each fix looked like. The ones on the RML side were all
 *derive in Python, assign in RML* -- because a mapping rule cannot
 branch, cannot fall back, and cannot build a value that is not a
 substring of the input. Two of them replaced GREL constructs that had
