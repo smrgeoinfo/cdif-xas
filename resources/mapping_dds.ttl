@@ -250,63 +250,12 @@
   ] ;
   rr:predicateObjectMap [
     rr:predicate schema:unitText ;
-    rr:objectMap [
-      a fnml:FunctionTermMap;
-      fnml:functionValue [
-        rr:predicateObjectMap [
-          rr:predicate fno:executes;
-          rr:objectMap [ rr:constant grel:controls_if ]
-        ];
-        rr:predicateObjectMap [
-          rr:predicate grel:bool_b;
-          rr:objectMap [
-            a fnml:FunctionTermMap;
-            fnml:functionValue [
-              rr:predicateObjectMap [
-                rr:predicate fno:executes;
-                rr:objectMap [ rr:constant grel:string_contains ]
-              ];
-              rr:predicateObjectMap [
-                rr:predicate grel:valueParameter;
-                rr:objectMap [ rml:reference "$['definition']" ]
-              ];
-              rr:predicateObjectMap [
-                rr:predicate grel:string_sub;
-                rr:objectMap [ rr:constant " " ]
-              ]
-            ]
-          ]
-        ];
-        rr:predicateObjectMap [
-          rr:predicate grel:any_true;
-          rr:objectMap [
-            a fnml:FunctionTermMap;
-            fnml:functionValue [
-              rr:predicateObjectMap [
-                rr:predicate fno:executes;
-                rr:objectMap [ rr:constant grel:string_replace ]
-              ];
-              rr:predicateObjectMap [
-                rr:predicate grel:valueParameter;
-                rr:objectMap [ rml:reference "$['definition']" ]
-              ];
-              rr:predicateObjectMap [
-                rr:predicate grel:p_string_find;
-                rr:objectMap [ rr:constant "/^.* /" ]
-              ];
-              rr:predicateObjectMap [
-                rr:predicate grel:p_string_replace;
-                rr:objectMap [ rr:constant "" ]
-              ]
-            ]
-          ]
-        ];
-        rr:predicateObjectMap [
-          rr:predicate grel:any_false;
-          rr:objectMap [ rr:constant "" ]
-        ]
-      ]
-    ]
+    # api/cdif.py sets $['unitText'] only where the column label states a
+    # unit, and rmlmapper emits no triple for a reference that is not
+    # there. The GREL this replaces tested the label for a space and
+    # produced "" when there was none -- asserting that the unit is the
+    # empty string, which is not the same as not knowing it.
+    rr:objectMap [ rml:reference "$['unitText']" ]
   ] .
 
   

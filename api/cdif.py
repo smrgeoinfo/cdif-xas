@@ -14,6 +14,31 @@ from pyld import jsonld as jsonldlib
 #:
 #: Held as a table rather than read from the TSV so the service stays
 #: self-contained. If it drifts, the crosswalk is the authority.
+
+def split_column_label(value):
+    """`Column.N` value -> (name, unit or None).
+
+    XDI writes a column label as a name optionally followed by a unit:
+    `energy eV`. Beamline software sometimes appends its own provenance
+    after `||` -- `itrans counts || 13BMD:scaler1_calc3.VAL` -- which is
+    neither, so anything from the separator on is dropped first.
+
+    Only a second token is a unit. Three tokens means the label is prose,
+    and guessing which word is the unit would be worse than recording
+    none. Matches inspect/xdi.py in usgin/hdf5metadata, deliberately:
+    the two implementations should read the same label the same way.
+    """
+    if not value:
+        return "", None
+    head = value.split("||", 1)[0].strip()
+    parts = head.split()
+    if not parts:
+        return "", None
+    if len(parts) == 2:
+        return parts[0], parts[1]
+    return parts[0], None
+
+
 #: What a column's propertyID says when no crosswalk row names its
 #: concept. The column was measured and is recorded; nothing is claimed
 #: about what it means. Saying nothing at all would be indistinguishable
@@ -191,6 +216,14 @@ def generate_cdif(cdi_jsonld) -> dict[str, any]:
                 # of prefixing gets there from a local name.
                 entry["propertyIRI"] = (
                     XAS_BASE + concept if concept else NIL_MISSING)
+                # Only when the label states one. Emitting "" asserts
+                # that the unit IS the empty string, which a consumer
+                # cannot tell from a column whose unit was never
+                # recorded -- and 19 of the 55 reference files write a
+                # bare `energy` with no unit at all.
+                _, unit = split_column_label(v.get("skos:definition", ""))
+                if unit:
+                    entry["unitText"] = unit
                 if concept:
                     entry["conceptLocalName"] = concept
                 if dataset_id:
