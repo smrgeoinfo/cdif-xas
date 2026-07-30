@@ -2,7 +2,7 @@
 
 **To:** Deirdre, Slava
 **From:** Stephen Richard (smrgeoinfo)
-**About:** `cdif-xas-UKDS` and `usgin/hdf5metadata`
+**About:** `cdif-xas-UKDS` and `usgin/cdifnexmetadata`
 
 ## What this is not
 
@@ -21,7 +21,7 @@ without touching either.
 Two pipelines now produce CDIF-XAS from the same 55 XDI files. Both
 validate 55/55 against the `xasDocument` composite.
 
-| | `cdif-xas-UKDS` | `usgin/hdf5metadata` |
+| | `cdif-xas-UKDS` | `usgin/cdifnexmetadata` |
 |---|---|---|
 | Input formats | XDI | XDI **and** NeXus/HDF5 |
 | Intermediate keys | `cdi:Facility_name` | `cdifxas:facility` |
@@ -42,7 +42,7 @@ calls it*. That works for one input format and has nowhere to put a
 second: there is no place to record that the same concept arrived from
 `NXsource/name` in an HDF5 file.
 
-`hdf5metadata` keys on the concept — `cdifxas:facility` — and records
+`cdifnexmetadata` keys on the concept — `cdifxas:facility` — and records
 *where it came from* as an attribute of the value, alongside the SSSOM
 predicate that licensed the mapping and a confidence. A second input
 format is then a second parser, not a second pipeline.
@@ -59,7 +59,7 @@ Three things were measured rather than argued.
 the reader, the mapper or the emitter changed. Real SAS files produce 22
 concepts, 4 variables, and the data-structure profile.
 
-**Adding a format cost one parser.** XDI support in `hdf5metadata` is
+**Adding a format cost one parser.** XDI support in `cdifnexmetadata` is
 `inspect/xdi.py` plus `map/xdi.py`. The emitter, profile detection,
 validation and CLI are the same code the NeXus path uses. All 55 corpus
 files are recognised and mapped.
@@ -207,7 +207,7 @@ monochromator crystal is. In full, 29 lines:
     rr:objectMap [ rr:constant "Si" ] ] .
 ```
 
-The equivalent in `hdf5metadata` is one crosswalk row:
+The equivalent in `cdifnexmetadata` is one crosswalk row:
 
 ```
 xdi:Mono.name   skos:closeMatch   cdifxas:monochromatortype
@@ -266,7 +266,7 @@ lives.
 }
 ```
 
-`hdf5metadata` produces, from the same header:
+`cdifnexmetadata` produces, from the same header:
 
 ```json
 {
@@ -451,7 +451,7 @@ output gap that has since closed.
 
 ## Open issues, stated rather than hidden
 
-- **`hdf5metadata` has no Dataverse integration at all.** It emits
+- **`cdifnexmetadata` has no Dataverse integration at all.** It emits
   placeholder `schema:creator`, `schema:license` and identifiers under
   `w3id.org/cdif/testing/`. Your pipeline fetches real values. Any merge
   must keep that, and it is the strongest argument for building *onto*
@@ -482,8 +482,8 @@ I am happy to write that spike.
 
 ## References
 
-- `usgin/hdf5metadata` — `DESIGN.md`, `STATUS.md`
-- `XAS-CDIF/exampleMetadata-hdf5metadata/README.md` — both pipelines'
+- `usgin/cdifnexmetadata` — `DESIGN.md`, `STATUS.md`
+- `XAS-CDIF/exampleMetadata-cdifnexmetadata/README.md` — both pipelines'
   output over the same 55 files, with the differences characterised
 - `cdif-xas-UKDS/UPLIFT-INSTRUCTIONS.md` — the CDIF 1.1 uplift already
   applied here
