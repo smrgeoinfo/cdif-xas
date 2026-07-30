@@ -25,7 +25,7 @@ def split_column_label(value):
 
     Only a second token is a unit. Three tokens means the label is prose,
     and guessing which word is the unit would be worse than recording
-    none. Matches inspect/xdi.py in usgin/hdf5metadata, deliberately:
+    none. Matches inspect/xdi.py in usgin/cdifnexmetadata, deliberately:
     the two implementations should read the same label the same way.
     """
     if not value:
