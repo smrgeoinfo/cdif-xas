@@ -7,7 +7,7 @@
 
 ---
 
-## Already applied in this repository (2026-07-28)
+## Already applied in this repository (2026-08-03)
 
 > Read this before starting. Several tasks below are **done in
 > `smrgeoinfo/cdif-xas`**, the fork this checkout points at, and the
@@ -20,16 +20,42 @@ Applied here and not yet submitted upstream to `UKDSResearch/cdif-xas`:
   URIs, `@id`-form policy, `xas:analysisevent`, the peer instrument
   model, the source-instrument wrapper, `schema:object` MaterialSample,
   and `measurementTechnique`/`keywords`.
-- **Three `rr:constant` corrections** that were producing wrong values
+- **Four `rr:constant` corrections** that were producing wrong values
   rather than missing ones: the reflection plane (wrong for 13 of 55
-  files), the monochromator crystal (right by luck), and the detection
-  mode (wrong for the one fluorescence-only file). See "Derive in
-  Python, assign in RML" in `AGENTS.md` — the hazard is the general
-  lesson, not the three instances.
+  files), the monochromator crystal (right by luck), the detection mode
+  (wrong for the one fluorescence-only file), and the field width, which
+  asserted 15 characters and was right for **3 of 55**. The last is the
+  one to notice: a width is a parsing instruction, not a label, so a
+  consumer trusting it slices a variable-width file at fixed offsets and
+  reads numbers that are wrong without looking wrong. Widths are now
+  measured per column from the data rows. See "Derive in Python, assign
+  in RML" in `AGENTS.md` — the hazard is the general lesson, not the
+  four instances.
+- **Two positional-reference corrections**, the same hazard in its other
+  form. `schema:startDate` read `$['skos:prefLabel'][2]` — position 2 in
+  the list of every `Scan.*` value the file happens to carry. That was
+  the start time in 21 of 55 files, the **end** time in 4 (a scan that
+  ran 18:29–18:36 was published as starting at 18:36), and out of range
+  in 12 more, which lost their acquisition date entirely. It now reads
+  `$['cdi:Scan_start_time']['skos:definition']`, by name. **If you are
+  writing a rule and reaching for a list index, the named predicate is
+  already in the intermediate — use it.**
+- **`schema:unitText` only where the column label states a unit.** It
+  had been emitting an empty string for the rest, which asserts that a
+  variable is dimensionless rather than that nobody said.
 - **Header normalisations** in `api/cdi.py`: ISO datetimes, qualitative
   temperatures (`room temperature` to `295.0 K`, with a note recording
   the original), unit-less energies, and `Sample.preparation` aliased to
   the dictionary's `Sample.prep`.
+- **The normalised temperature now reaches the output.** It did not
+  before: `api/cdi.py` converted the value and appended its conversion
+  note to `schema:description`, but `mapping_dds.ttl` had no temperature
+  rule at all — so 15 documents announced a conversion of a number that
+  appeared nowhere in them, and all 21 files recording a temperature
+  published none. `TriplesMap_sample_temperature` now carries it as a
+  `schema:additionalProperty` on the sample, keyed on `xas:temperature`.
+  A note without its value is worse than neither: it tells a reader to
+  distrust a number they cannot find.
 - **`schema:propertyID` on every variable.** The mapping had a rule that
   read `$['meaning']` -- a definition sentence -- and only fired when a
   `xas:Column.N.*` node was in the graph, which it never is. So no
@@ -44,14 +70,24 @@ recorded whether or not anyone has named its concept, and saying nothing
 at all would be indistinguishable from a column nobody looked at.
 
 **Where this leaves the two implementations.** Over the same 55 XDI
-files, this pipeline and `usgin/cdifnexmetadata` now agree on the top-level
-property set, the variable count per file, the document shape, and --
-since the propertyID work -- on all 55 files the exact set of concepts
-carried by the variables. What remains is one structural difference
-that is not expressible as a mapping rule: where `cdi:isStructuredBy`
-goes, and whether parts are typed as datasets, depends on how many
-datasets the input holds. Every XDI file holds one spectrum, so this
-pipeline never meets the case. See `CONVERGENCE-PROPOSAL.md`.
+files, this pipeline and `usgin/cdifnexmetadata` agree on the top-level
+property set, the variable count per file, the document shape, the set
+of concepts carried by the variables, the units, the physical-mapping
+subclass, the measured field widths, the sample temperature and the
+acquisition date. What remains is one structural difference that is not
+expressible as a mapping rule: where `cdi:isStructuredBy` goes, and
+whether parts are typed as datasets, depends on how many datasets the
+input holds. Every XDI file holds one spectrum, so this pipeline never
+meets the case. See `CONVERGENCE-PROPOSAL.md`.
+
+**Running the two against each other is what found all of this.** Every
+defect listed above produced metadata that validated cleanly, before and
+after, so none was reachable by either implementation alone. The last
+three went unnoticed for weeks because the earlier comparison rounds
+checked properties, variables, concepts, units and widths — and neither
+temperature nor acquisition date was in that set. Both were wrong on
+both sides. Whatever gets decided about maintaining two pipelines, the
+comparison is the part worth keeping.
 
 ---
 

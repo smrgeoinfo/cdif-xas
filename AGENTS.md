@@ -185,7 +185,7 @@ the derived key. This is the established pattern, not an exception:
 | crystal material | `cdi:Mono_crystal` | splitting `Si(311)` |
 | detection mode | `cdi:Scan_mode` | branching on which columns exist |
 
-**Before adding `rr:constant` to a value-bearing predicate, stop.** Three
+**Before adding `rr:constant` to a value-bearing predicate, stop.** Four
 constants in `mapping_dds.ttl` were latent data bugs, found by comparing
 against a second implementation:
 
@@ -195,9 +195,13 @@ against a second implementation:
   wrong for the first `Ge(220)`.
 - `rr:constant "Transmission"` for the detection mode — wrong for
   `xdl_pyrite2_rt_01`, which has `ifluor` and no `itrans`.
+- `rr:constant 15` for the field width — right for **3 of 55**, and the
+  worst of the four. A width is a parsing instruction, not a label: a
+  consumer trusting it slices a variable-width file at fixed offsets and
+  reads numbers that are wrong without looking wrong.
 
-All three produced plausible metadata and validated cleanly before and
-after. None could have been caught by the pipeline itself. The last hid
+All four produced plausible metadata and validated cleanly before and
+after. None could have been caught by the pipeline itself. The third hid
 longest because it sits on `schema:name`, where 15 of 16 constants are
 correct property labels — only its `inDefinedTermSet` reveals it carries
 data.
@@ -206,6 +210,28 @@ A constant is right for a **property label** (`"d-spacing"`, `"Probe"`)
 and for a value the **format itself** determines (`"x-ray"` as the probe,
 since XDI is the X-ray Absorption Data Interchange format). It is wrong
 anywhere the answer varies with the file.
+
+**A list index is a constant wearing a disguise.** `schema:startDate`
+read `rml:reference "$['skos:prefLabel'][2]"` — position 2 in the list of
+every `Scan.*` value the file happens to carry. The list is built in
+header order with no fixed length, so position 2 held the start time in
+21 of 55 files, the **end** time in 4, and nothing at all in 12 more,
+which published no acquisition date. Both wrong answers validate.
+
+The intermediate exposes every header under a named predicate
+(`$['cdi:Scan_start_time']['skos:definition']`,
+`$['cdi:Sample_temperature']['skos:definition']`); dump `cdif_skos.json`
+for any file and read the shape. If you find yourself indexing a
+`skos:prefLabel` array, the value you want has a name.
+
+**A normalisation is not done until a rule emits it.** `api/cdi.py`
+converted `room temperature` to `295.0 K` and appended a conversion note
+to `schema:description` — while `mapping_dds.ttl` had no temperature rule
+at all. So 15 documents announced the conversion of a number that
+appeared nowhere in them, and all 21 files recording a temperature
+published none. The derivation and the rule that carries it live in
+different files and neither fails without the other. After adding a
+derived key, grep the generated output for its value.
 
 ## Key files
 

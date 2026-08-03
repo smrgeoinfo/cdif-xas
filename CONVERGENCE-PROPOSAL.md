@@ -368,21 +368,33 @@ built from by reading your records.
 - Depending on a codebase that is currently one person's and not yet
   reviewed by you. **This is the real risk and I am not minimising it.**
 
-## Where the two implementations actually stand (2026-07-28)
+## Where the two implementations actually stand (2026-08-03)
 
 **The output difference is gone.** Run both pipelines over the same 55
 XDI files and compare:
 
-| | start of day | now |
+| | before | now |
 |---|---|---|
 | top-level property set | 55/55 agree | 55/55 |
 | variable count per file | 55/55 | 55/55 |
 | concepts carried by variables | **0/55** | **55/55** |
 | units on variables | **0/55** | **55/55** |
+| measured field widths | **3/55** | 55/55 |
+| sample temperature | **0/21 either side** | 21/21 |
+| acquisition date | **21/37 RML, 0/37 Python** | 37/37 |
 
 That is worth stating plainly because it costs this proposal an
 argument. The case can no longer be "the RML output is missing things".
 It is not.
+
+The last two rows are new, and they are the ones to look at hardest. The
+comparison had been run four times before either appeared, because each
+round checked the columns it had checked before -- properties, variables,
+concepts, units, widths -- and neither temperature nor acquisition date
+was in that set. **Both pipelines were wrong about both, in different
+ways, the whole time.** A comparison harness only tests what it
+compares; the honest reading is not that the two now agree, but that
+agreement is only evidence over the fields you thought to check.
 
 ### What changed, and what it took
 
@@ -404,6 +416,25 @@ Four fixes, two in each pipeline:
   the dictionary's `Sample.prep`. Fixed with a header alias.
 - **The Python pipeline discarded units the column label carried**,
   which RML was reading. Fixed by splitting the label.
+- **RML normalised the sample temperature and never emitted it.**
+  `api/cdi.py` turned `room temperature` into `295.0 K` and appended a
+  note saying so to `schema:description`; `mapping_dds.ttl` had no
+  temperature rule at all. So 15 documents announced the conversion of a
+  number that appeared nowhere in them, and all 21 files recording a
+  temperature published none. Fixed with a `TriplesMap` on the sample.
+- **RML read the acquisition date by list position.**
+  `rml:reference "$['skos:prefLabel'][2]"` -- position 2 in the list of
+  every `Scan.*` value the file happens to carry. That was the start
+  time in 21 of 55 files, the **end** time in 4, and out of range in 12
+  more, which published no date. Fixed by reading
+  `$['cdi:Scan_start_time']['skos:definition']`, by name.
+- **The Python pipeline published no acquisition date at all.** It read
+  its times off the emitted parts, and after a change that stopped
+  emitting parts for single-entry files, that list was empty for 37 of
+  the 55. Fixed by reading the entries instead.
+- **The Python pipeline wrote a NeXus timestamp as `['2016-06-23T...']`.**
+  h5py returns a one-element array for a scalar string field. Only
+  visible once the line above stopped discarding the value.
 
 Note what each fix looked like. The ones on the RML side were all
 *derive in Python, assign in RML* -- because a mapping rule cannot
@@ -446,8 +477,17 @@ Not output quality. Two things:
    build if the concept is not in the glossary or the key is not one the
    converter reads.
 
-Both were true this morning. They are just no longer obscured by an
-output gap that has since closed.
+   The temperature is that argument as a worked example rather than a
+   prediction. Half the work was done and committed: the value was
+   normalised, the note was written, the note shipped in 15 documents.
+   The other half -- the rule that carries the value out -- was never
+   written, and nothing anywhere failed. Not the converter, not
+   rmlmapper, not the JSON Schema, not the SHACL. The output validated
+   55/55 while asserting a conversion of a number it did not contain.
+   Two files that must agree, with no mechanism that makes them.
+
+Both were true before any of this. They are just no longer obscured by
+an output gap that has since closed.
 
 ## Open issues, stated rather than hidden
 

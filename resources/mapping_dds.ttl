@@ -655,6 +655,19 @@
     ]
   ] .
 
+# When the scan started. Reads cdi:Scan_start_time by name.
+#
+# This used to read "$['skos:prefLabel'][2]" -- position 2 in the list
+# of every Scan.* value the file happens to carry. The list is built in
+# header order and has no fixed length, so position 2 was the start time
+# in 21 of the 55 corpus files, the END time in 4 (a scan that ran from
+# 18:29 to 18:36 was published as having started at 18:36), and absent
+# in 12 more, which lost their acquisition date entirely.
+#
+# Same failure as the rr:constant values fixed earlier: RML cannot
+# select by name inside a list, so a mapping reaches for an index, and
+# an index is only right for the files that happen to match it. The
+# named predicate exists in the intermediate -- use it.
 <#TriplesMap_scan_startdate> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
       rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Scan')]";
@@ -668,10 +681,10 @@
       rml:class prov:Activity, schema:Action;
       rml:template "https://w3id.org/cdif/xas/provevent"
     ] ;
-  rr:predicateObjectMap [ 
+  rr:predicateObjectMap [
     rr:predicate schema:startDate;
     rr:objectMap [
-      rml:reference "$['skos:prefLabel'][2]"
+      rml:reference "$['cdi:Scan_start_time']['skos:definition']"
     ]
   ] .
 
@@ -750,6 +763,55 @@
     rr:predicate schema:additionalProperty;
     rr:objectMap [
       rr:parentTriplesMap <#TriplesMap_sample_preparation>
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalProperty;
+    rr:objectMap [
+      rr:parentTriplesMap <#TriplesMap_sample_temperature>
+    ]
+  ] .
+
+# Optional sample-temperature additionalProperty. Reads the XDI
+# Sample.temperature header (cdi:Sample_temperature) when present.
+#
+# api/cdi.py has normalised this value since the qualitative-temperature
+# work went in -- "room temperature" becomes 295.0 K, and a note saying
+# so is appended to schema:description. But no rule ever carried the
+# value into the output, so 15 documents announced a conversion of a
+# temperature that appeared nowhere in them, and all 21 files that
+# record a temperature published none. The note without the value is
+# worse than neither: it tells a reader to distrust a number they
+# cannot find.
+<#TriplesMap_sample_temperature> a rml:TriplesMap;
+  rml:logicalSource [ a rml:LogicalSource;
+      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Sample')]";
+      rml:referenceFormulation rml:JSONPath;
+      rml:source [ a rml:RelativePathSource;
+          rml:root rml:MappingDirectory;
+          rml:path "cdif_skos.json"
+        ]
+    ];
+  rml:subjectMap [
+      rr:termType rr:BlankNode;
+      rr:class schema:PropertyValue;
+      rr:template "_:sample_temperature"
+    ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:propertyID;
+    rr:objectMap [
+      rr:constant xas:temperature ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:name;
+    rr:objectMap [ rr:constant "Sample temperature" ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:value;
+    rr:objectMap [
+      rml:reference "$['cdi:Sample_temperature']['skos:definition']"
     ]
   ] .
 
