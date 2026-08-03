@@ -655,7 +655,8 @@
     ]
   ] .
 
-# When the scan started. Reads cdi:Scan_start_time by name.
+# When the scan ran. Reads cdi:Scan_start_time and cdi:Scan_end_time by
+# name.
 #
 # This used to read "$['skos:prefLabel'][2]" -- position 2 in the list
 # of every Scan.* value the file happens to carry. The list is built in
@@ -668,6 +669,11 @@
 # select by name inside a list, so a mapping reaches for an index, and
 # an index is only right for the files that happen to match it. The
 # named predicate exists in the intermediate -- use it.
+#
+# schema:startTime/endTime, not startDate: schema.org gives startDate to
+# Event and CreativeWork, and this subject is a schema:Action. The
+# profile's cdifProvActivity shape asks for startTime and endTime by
+# name, and had been reporting both as missing on every file.
 <#TriplesMap_scan_startdate> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
       rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Scan')]";
@@ -682,9 +688,15 @@
       rml:template "https://w3id.org/cdif/xas/provevent"
     ] ;
   rr:predicateObjectMap [
-    rr:predicate schema:startDate;
+    rr:predicate schema:startTime;
     rr:objectMap [
       rml:reference "$['cdi:Scan_start_time']['skos:definition']"
+    ]
+  ] ;
+  rr:predicateObjectMap [
+    rr:predicate schema:endTime;
+    rr:objectMap [
+      rml:reference "$['cdi:Scan_end_time']['skos:definition']"
     ]
   ] .
 
