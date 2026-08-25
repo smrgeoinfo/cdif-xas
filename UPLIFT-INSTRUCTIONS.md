@@ -7,6 +7,62 @@
 
 ---
 
+## Summary — what these tasks change
+
+Sixteen tasks. Together they take the pipeline's output from *a CDIF
+document that mentions XAS* to *a document that validates as
+`cdif/xasDocument/1.0`*. Four groups, and they do different kinds of work:
+
+**Naming and identity — Tasks 1, 2, 4** *(mechanical)*
+The `xas:` prefix moves from the Astromat namespace to
+`https://w3id.org/cdif/xas/`, concept local names take their v2 spellings,
+and every URI-valued `schema:additionalType` / `schema:propertyID` becomes a
+JSON-LD `{"@id": ...}` reference instead of a string that merely looks like
+one. Nothing new is described; what was already described becomes
+dereferenceable and machine-comparable. Task 4 also audits subject maps for
+a missing `rml:class`, without which RML emits untyped subjects and framing
+has nothing to project into `@type`.
+
+**Conformance declaration — Tasks 3, 5** *(additive, one line each)*
+The two XAS conformance URIs join `subjectOf.dcterms:conformsTo`, and the
+activity is typed `xas:analysisevent`. These are what let a consumer
+*recognise* the document as an XAS document rather than infer it.
+
+**Structure — Tasks 6, 7, 8, 9, 16** *(editorial; the real work)*
+`prov:used` is restructured to the peer instrument model — each instrument
+its own entry rather than nested under one — a source-instrument wrapper and
+a `schema:object` MaterialSample are added, `measurementTechnique` and
+`keywords` are wired up, and creator/contributor is aligned with CDIF Core.
+This is where the document gains content it did not previously carry, and
+where most of the SHACL conformance is won.
+
+**Robustness — Tasks 11, 12, 13, 14, 15** *(pipeline, not output shape)*
+Parser resilience (case folding, ISO datetimes, sentinel fallbacks), XDI
+pre-validation that surfaces spec problems before the mapping runs, an RML
+iterator marker, defensive name-or-identifier shapes, and blank-node
+materialization. These change how reliably the pipeline produces the above,
+not what conforming output looks like. Tasks 11-12 come first in the
+suggested order precisely so everything after runs against normalized input.
+
+**Task 10 sits apart**: it points the validator at the right target. Doing
+it early (step 7 of the suggested order) means Tasks 4, 6-9 are validated
+against the profile they are aiming at, instead of against a schema that
+predates them.
+
+### What "done" looks like
+
+A document that passes both gates against the `xasDocument/1.0` release
+bundle: **0 JSON Schema errors and 0 SHACL violations**. The seven examples
+in `XAS-CDIF/release/examples/` are the worked reference — as of 2026-08-25
+all seven pass both, including the five UKDS-derived ones, which needed
+exactly the instrument-shape changes Tasks 6-7 describe.
+
+Not everything here is required for that. Tasks 11-15 are about the pipeline
+surviving real-world input; a hand-corrected document can conform without
+them, but the pipeline will not do it repeatably.
+
+---
+
 ## Already applied in this repository (2026-07-28)
 
 > Read this before starting. Several tasks below are **done in
