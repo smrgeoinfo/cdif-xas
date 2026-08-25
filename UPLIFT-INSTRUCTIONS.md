@@ -7,6 +7,62 @@
 
 ---
 
+## Summary — what these tasks change
+
+Sixteen tasks. Together they take the pipeline's output from *a CDIF
+document that mentions XAS* to *a document that validates as
+`cdif/xasDocument/1.0`*. Four groups, and they do different kinds of work:
+
+**Naming and identity — Tasks 1, 2, 4** *(mechanical)*
+The `xas:` prefix moves from the Astromat namespace to
+`https://w3id.org/cdif/xas/`, concept local names take their v2 spellings,
+and every URI-valued `schema:additionalType` / `schema:propertyID` becomes a
+JSON-LD `{"@id": ...}` reference instead of a string that merely looks like
+one. Nothing new is described; what was already described becomes
+dereferenceable and machine-comparable. Task 4 also audits subject maps for
+a missing `rml:class`, without which RML emits untyped subjects and framing
+has nothing to project into `@type`.
+
+**Conformance declaration — Tasks 3, 5** *(additive, one line each)*
+The two XAS conformance URIs join `subjectOf.dcterms:conformsTo`, and the
+activity is typed `xas:analysisevent`. These are what let a consumer
+*recognise* the document as an XAS document rather than infer it.
+
+**Structure — Tasks 6, 7, 8, 9, 16** *(editorial; the real work)*
+`prov:used` is restructured to the peer instrument model — each instrument
+its own entry rather than nested under one — a source-instrument wrapper and
+a `schema:object` MaterialSample are added, `measurementTechnique` and
+`keywords` are wired up, and creator/contributor is aligned with CDIF Core.
+This is where the document gains content it did not previously carry, and
+where most of the SHACL conformance is won.
+
+**Robustness — Tasks 11, 12, 13, 14, 15** *(pipeline, not output shape)*
+Parser resilience (case folding, ISO datetimes, sentinel fallbacks), XDI
+pre-validation that surfaces spec problems before the mapping runs, an RML
+iterator marker, defensive name-or-identifier shapes, and blank-node
+materialization. These change how reliably the pipeline produces the above,
+not what conforming output looks like. Tasks 11-12 come first in the
+suggested order precisely so everything after runs against normalized input.
+
+**Task 10 sits apart**: it points the validator at the right target. Doing
+it early (step 7 of the suggested order) means Tasks 4, 6-9 are validated
+against the profile they are aiming at, instead of against a schema that
+predates them.
+
+### What "done" looks like
+
+A document that passes both gates against the `xasDocument/1.0` release
+bundle: **0 JSON Schema errors and 0 SHACL violations**. The seven examples
+in `XAS-CDIF/release/examples/` are the worked reference — as of 2026-08-25
+all seven pass both, including the five UKDS-derived ones, which needed
+exactly the instrument-shape changes Tasks 6-7 describe.
+
+Not everything here is required for that. Tasks 11-15 are about the pipeline
+surviving real-world input; a hand-corrected document can conform without
+them, but the pipeline will not do it repeatably.
+
+---
+
 ## Already applied in this repository (2026-08-03)
 
 > Read this before starting. Several tasks below are **done in
@@ -282,6 +338,25 @@ need this treatment:
    - `TriplesMap_representedVariable` — needs `rml:class cdi:InstanceVariable`
      (a subclass of RepresentedVariable) so `cdif:isDefinedBy_RepresentedVariable`
      objects carry `@type`.
+
+     **Which `cdif:isDefinedBy_RepresentedVariable` this is matters** (mBB
+     as of 2026-08-25 defines two, with different rules):
+
+     - on `cdifDataStructureComponent`: an inline RepresentedVariable
+       **or** an `{"@id"}` reference
+     - on `cdifInstanceVariable`: an `{"@id"}` reference **only** —
+       sealed, no other keys permitted
+
+     This task concerns the first. XAS documents attach the property to
+     DataStructureComponent nodes inside the `cdi:WideDataStructure`, where
+     an inline typed node is valid, and that is what the reference example
+     emits (`{"@id": ..., "cdif:name": ...}`).
+
+     On an InstanceVariable the slot is a bare reference by design: the
+     represented-variable-level properties are defined once on the
+     RepresentedVariable and deliberately not duplicated there. Emitting a
+     typed inline node in *that* position will fail validation.
+
    - `TriplesMap_physicalMapping` — needs `rml:class cdif:TextMapping`
      (or `cdif:PhysicalMapping` / `cdif:LocatorMapping` per your
      dataset shape).
@@ -511,6 +586,23 @@ Then update `api/Mapper.py` line 26:
 **Option B is what makes the output actually validate against the XAS
 document profile**. Option A leaves the profile as DDS and the XAS
 extensions are informally present but not enforced.
+
+Both bundles were regenerated from mBB on 2026-08-25 and are current as of
+that date. Option B's had been stale -- generated before mBB `a98330da3`
+("prov:used wrappers: schema:instrument is always an array") and still
+typing `schema:instrument` as an object, so it rejected the very structure
+Tasks 6 and 7 tell you to build. If you are working from a checkout older
+than that, refresh it before trusting a validation failure: mBB's reference
+examples (`exampleCDIFxas.json`, `example_dds_framed.json`) must validate
+**0 errors** against whichever bundle you use. If they do not, the bundle is
+behind mBB, not your mapping.
+
+Note that five release-only examples in `XAS-CDIF/release/examples/`
+(`262875_PtSn_OCO_Abu_1`, `Se_Na2SeO4_rt_01`, `cdif_dds_framed`, `valid`,
+`valid_angle_dspacing`) do **not** yet conform to the refreshed schema --
+they are pre-uplift pipeline output, and are the thing this document exists
+to fix. Their bundled `batch_validation_report.*` predates the refresh and
+still claims all six are valid.
 
 Frame update (Option B only): download the XAS document frame if you
 want the output structure to include the XAS-specific slots:
