@@ -490,37 +490,26 @@ Then update `api/Mapper.py` line 26:
 + DDS_SCHEMA_PATH = RESOURCES_DIR + "/cdifXASDocumentResolvedSchema.json"
 ```
 
-**Check which of these is current before choosing** (verified 2026-08-25):
+**Option B is what makes the output actually validate against the XAS
+document profile**. Option A leaves the profile as DDS and the XAS
+extensions are informally present but not enforced.
 
-Option B's bundle is **stale**. It was generated before mBB commit
-`a98330da3` ("prov:used wrappers: schema:instrument is always an array"),
-so it still types `schema:instrument` as an object. mBB's own XAS examples
-(`exampleCDIFxas.json`, `example_dds_framed.json`) each produce **4
-validation errors** against it, all at `/prov:wasGeneratedBy/0/prov:used`
--- meaning it rejects the peer-instrument structure Tasks 6 and 7 tell you
-to build. Against Option A's schema, and against mBB's current
-`xasDocument/resolvedSchema.json`, the same two examples produce **0**.
+Both bundles were regenerated from mBB on 2026-08-25 and are current as of
+that date. Option B's had been stale -- generated before mBB `a98330da3`
+("prov:used wrappers: schema:instrument is always an array") and still
+typing `schema:instrument` as an object, so it rejected the very structure
+Tasks 6 and 7 tell you to build. If you are working from a checkout older
+than that, refresh it before trusting a validation failure: mBB's reference
+examples (`exampleCDIFxas.json`, `example_dds_framed.json`) must validate
+**0 errors** against whichever bundle you use. If they do not, the bundle is
+behind mBB, not your mapping.
 
-Option A's URL is currently byte-identical to mBB's DDS resolved schema
-under `_sources/profiles/cdifCompositeProfile/`, because the release repos
-were resynced from mBB on 2026-08-25.
-
-So, in order of preference:
-
-1. **Regenerate the XAS-CDIF release bundle from current mBB**, then take
-   Option B. This is the only route that both validates and enforces the
-   XAS extensions, and it restores the original recommendation.
-2. If that has not happened yet, take **Option A**. The caveat below still
-   applies -- the profile stays DDS and the XAS extensions are present but
-   unenforced -- but the schema at least matches the documents the mapping
-   now produces.
-
-Do not take Option B against the bundle as it stands: it will fail the
-output of Tasks 6 and 7, and the failure looks like a mapping bug rather
-than a stale schema.
-
-Option A leaves the profile as DDS and the XAS extensions are informally
-present but not enforced.
+Note that five release-only examples in `XAS-CDIF/release/examples/`
+(`262875_PtSn_OCO_Abu_1`, `Se_Na2SeO4_rt_01`, `cdif_dds_framed`, `valid`,
+`valid_angle_dspacing`) do **not** yet conform to the refreshed schema --
+they are pre-uplift pipeline output, and are the thing this document exists
+to fix. Their bundled `batch_validation_report.*` predates the refresh and
+still claims all six are valid.
 
 Frame update (Option B only): download the XAS document frame if you
 want the output structure to include the XAS-specific slots:
