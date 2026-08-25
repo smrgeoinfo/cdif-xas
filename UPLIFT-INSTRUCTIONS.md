@@ -246,6 +246,24 @@ need this treatment:
    - `TriplesMap_representedVariable` — needs `rml:class cdi:InstanceVariable`
      (a subclass of RepresentedVariable) so `cdif:isDefinedBy_RepresentedVariable`
      objects carry `@type`.
+
+     **Which `cdif:isDefinedBy_RepresentedVariable` this is matters** (mBB
+     as of 2026-08-25 defines two, with different rules):
+
+     - on `cdifDataStructureComponent`: an inline RepresentedVariable
+       **or** an `{"@id"}` reference
+     - on `cdifInstanceVariable`: an `{"@id"}` reference **only** —
+       sealed, no other keys permitted
+
+     This task concerns the first. XAS documents attach the property to
+     DataStructureComponent nodes inside the `cdi:WideDataStructure`, where
+     an inline typed node is valid, and that is what the reference example
+     emits (`{"@id": ..., "cdif:name": ...}`).
+
+     On an InstanceVariable the slot is a bare reference by design: the
+     represented-variable-level properties are defined once on the
+     RepresentedVariable and deliberately not duplicated there. Emitting a
+     typed inline node in *that* position will fail validation.
    - `TriplesMap_physicalMapping` — needs `rml:class cdif:TextMapping`
      (or `cdif:PhysicalMapping` / `cdif:LocatorMapping` per your
      dataset shape).
@@ -472,9 +490,37 @@ Then update `api/Mapper.py` line 26:
 + DDS_SCHEMA_PATH = RESOURCES_DIR + "/cdifXASDocumentResolvedSchema.json"
 ```
 
-**Option B is what makes the output actually validate against the XAS
-document profile**. Option A leaves the profile as DDS and the XAS
-extensions are informally present but not enforced.
+**Check which of these is current before choosing** (verified 2026-08-25):
+
+Option B's bundle is **stale**. It was generated before mBB commit
+`a98330da3` ("prov:used wrappers: schema:instrument is always an array"),
+so it still types `schema:instrument` as an object. mBB's own XAS examples
+(`exampleCDIFxas.json`, `example_dds_framed.json`) each produce **4
+validation errors** against it, all at `/prov:wasGeneratedBy/0/prov:used`
+-- meaning it rejects the peer-instrument structure Tasks 6 and 7 tell you
+to build. Against Option A's schema, and against mBB's current
+`xasDocument/resolvedSchema.json`, the same two examples produce **0**.
+
+Option A's URL is currently byte-identical to mBB's DDS resolved schema
+under `_sources/profiles/cdifCompositeProfile/`, because the release repos
+were resynced from mBB on 2026-08-25.
+
+So, in order of preference:
+
+1. **Regenerate the XAS-CDIF release bundle from current mBB**, then take
+   Option B. This is the only route that both validates and enforces the
+   XAS extensions, and it restores the original recommendation.
+2. If that has not happened yet, take **Option A**. The caveat below still
+   applies -- the profile stays DDS and the XAS extensions are present but
+   unenforced -- but the schema at least matches the documents the mapping
+   now produces.
+
+Do not take Option B against the bundle as it stands: it will fail the
+output of Tasks 6 and 7, and the failure looks like a mapping bug rather
+than a stale schema.
+
+Option A leaves the profile as DDS and the XAS extensions are informally
+present but not enforced.
 
 Frame update (Option B only): download the XAS document frame if you
 want the output structure to include the XAS-specific slots:
