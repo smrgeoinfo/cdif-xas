@@ -62,19 +62,19 @@ cdifd:CDIFActionShape a sh:NodeShape ;
                     sh:message "valueRequired is specified by a boolean (not a string) value, either 'true' or 'false'" ;
                     sh:path schema:valueRequired ] ] ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-            PREFIX schema: <http://schema.org/>\r
-            PREFIX prov: <http://www.w3.org/ns/prov#>\r
-            SELECT ?this WHERE {\r
-                ?this a ?type .\r
-                FILTER (?type IN (\r
-                    schema:Action, schema:AssessAction, schema:ConsumeAction,\r
-                    schema:ControlAction, schema:CreateAction, schema:FindAction,\r
-                    schema:InteractAction, schema:MoveAction, schema:PlayAction, schema:SearchAction,\r
-                    schema:DeleteAction, schema:TransferAction, schema:UpdateAction\r
-                ))\r
-                FILTER NOT EXISTS { ?this a prov:Activity }\r
-            }\r
+            sh:select """
+            PREFIX schema: <http://schema.org/>
+            PREFIX prov: <http://www.w3.org/ns/prov#>
+            SELECT ?this WHERE {
+                ?this a ?type .
+                FILTER (?type IN (
+                    schema:Action, schema:AssessAction, schema:ConsumeAction,
+                    schema:ControlAction, schema:CreateAction, schema:FindAction,
+                    schema:InteractAction, schema:MoveAction, schema:PlayAction, schema:SearchAction,
+                    schema:DeleteAction, schema:TransferAction, schema:UpdateAction
+                ))
+                FILTER NOT EXISTS { ?this a prov:Activity }
+            }
         """ ] .
 
 cdifd:CDIFAddPropertyTermShape a sh:NodeShape ;
@@ -91,14 +91,14 @@ cdifd:CDIFAddPropertyTermShape a sh:NodeShape ;
                                                         sh:pattern "^https?:\\/\\/[^\\s]+$" ] ] ) ] ) ] ) ;
             sh:path schema:identifier ] ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-      PREFIX schema: <http://schema.org/>\r
-      SELECT DISTINCT ?this\r
-        WHERE {\r
-          ?this a schema:DefinedTerm .\r
-          FILTER (\r
-            EXISTS {  ?s schema:propertyID ?this . }\r
-          )\r
+            sh:select """
+      PREFIX schema: <http://schema.org/>
+      SELECT DISTINCT ?this
+        WHERE {
+          ?this a schema:DefinedTerm .
+          FILTER (
+            EXISTS {  ?s schema:propertyID ?this . }
+          )
         }""" ] .
 
 cdifd:CDIFCatalogRecordShape a sh:NodeShape ;
@@ -274,19 +274,19 @@ cdifd:CDIFIdentifierShape a sh:NodeShape ;
             sh:path schema:propertyID ;
             sh:severity sh:Warning ] ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-      PREFIX schema: <http://schema.org/>\r
-      SELECT DISTINCT ?this\r
-        WHERE {\r
-        ?this a schema:PropertyValue .\r
-        {\r
-          ?this schema:propertyID "example identifier" .\r
-          FILTER NOT EXISTS { ?s ?p ?this . }\r
-        }\r
-        Union\r
-        {\r
-          ?s schema:identifier ?this .\r
-        }\r
+            sh:select """
+      PREFIX schema: <http://schema.org/>
+      SELECT DISTINCT ?this
+        WHERE {
+        ?this a schema:PropertyValue .
+        {
+          ?this schema:propertyID "example identifier" .
+          FILTER NOT EXISTS { ?s ?p ?this . }
+        }
+        Union
+        {
+          ?s schema:identifier ?this .
+        }
       }""" ] .
 
 cdifd:CDIFIdentifierTypeTermShape a sh:NodeShape ;
@@ -305,14 +305,14 @@ cdifd:CDIFIdentifierTypeTermShape a sh:NodeShape ;
     sh:target [ a sh:SPARQLTarget ;
             sh:prefixes ( [ sh:namespace "http://schema.org/" ;
                         sh:prefix "schema" ] ) ;
-            sh:select """\r
-      PREFIX schema: <http://schema.org/>\r
-      SELECT DISTINCT ?this\r
-        WHERE {\r
-          ?this a schema:DefinedTerm .\r
-          FILTER (\r
-            EXISTS { ?s schema:propertyID ?this . }\r
-          )\r
+            sh:select """
+      PREFIX schema: <http://schema.org/>
+      SELECT DISTINCT ?this
+        WHERE {
+          ?this a schema:DefinedTerm .
+          FILTER (
+            EXISTS { ?s schema:propertyID ?this . }
+          )
         }""" ] .
 
 cdifd:CDIFInstanceVariableShape a sh:NodeShape ;
@@ -489,19 +489,19 @@ cdifd:CDIFVariableMeasuredShape a sh:NodeShape ;
         cdifd:name3Property,
         cdifd:nameRequiredProperty ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-      PREFIX schema: <http://schema.org/>\r
-      SELECT DISTINCT ?this\r
-        WHERE {\r
-        ?this a schema:PropertyValue .\r
-        {\r
-          ?this schema:name "example variable measured" .\r
-          FILTER NOT EXISTS { ?s ?p ?this . }\r
-        }\r
-        Union\r
-        {\r
-          ?s schema:variableMeasured ?this .\r
-        }\r
+            sh:select """
+      PREFIX schema: <http://schema.org/>
+      SELECT DISTINCT ?this
+        WHERE {
+        ?this a schema:PropertyValue .
+        {
+          ?this schema:name "example variable measured" .
+          FILTER NOT EXISTS { ?s ?p ?this . }
+        }
+        Union
+        {
+          ?s schema:variableMeasured ?this .
+        }
       }""" ] .
 
 cdifd:CDIFadditionalPropertyShape a sh:NodeShape ;
@@ -523,19 +523,19 @@ cdifd:CDIFadditionalPropertyShape a sh:NodeShape ;
             sh:severity sh:Warning ],
         cdifd:additionalPropertyNameProperty ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-      PREFIX schema: <http://schema.org/>\r
-      SELECT DISTINCT ?this\r
-        WHERE {\r
-        ?this a schema:PropertyValue .\r
-        {\r
-          ?this schema:name "example additional property" .\r
-          FILTER NOT EXISTS { ?s ?p ?this . }\r
-        }\r
-        Union\r
-        {\r
-          ?s schema:additionalProperty ?this .\r
-        }\r
+            sh:select """
+      PREFIX schema: <http://schema.org/>
+      SELECT DISTINCT ?this
+        WHERE {
+        ?this a schema:PropertyValue .
+        {
+          ?this schema:name "example additional property" .
+          FILTER NOT EXISTS { ?s ?p ?this . }
+        }
+        Union
+        {
+          ?s schema:additionalProperty ?this .
+        }
       }""" ] .
 
 cdifd:CDIFxasInstanceVariableShape a sh:NodeShape ;
@@ -655,15 +655,15 @@ cdifd:XasCoreConformsToShape a sh:NodeShape ;
             sh:message "Metadata record must declare conformance to the CDIF XAS core profile (https://w3id.org/cdif/xasCore/1.0)" ;
             sh:path dcterms:conformsTo ] ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-            PREFIX schema: <http://schema.org/>\r
-            PREFIX dcat: <http://www.w3.org/ns/dcat#>\r
-            SELECT ?this\r
-            WHERE {\r
-            ?this a schema:Dataset ;\r
-             schema:about ?parent ;\r
-             schema:additionalType dcat:CatalogRecord .\r
-            }\r
+            sh:select """
+            PREFIX schema: <http://schema.org/>
+            PREFIX dcat: <http://www.w3.org/ns/dcat#>
+            SELECT ?this
+            WHERE {
+            ?this a schema:Dataset ;
+             schema:about ?parent ;
+             schema:additionalType dcat:CatalogRecord .
+            }
         """ ] .
 
 cdifd:XasOptionalConformsToShape a sh:NodeShape ;
@@ -730,7 +730,7 @@ cdifd:cdifDataStructure_WideDataStructureShape a sh:NodeShape ;
     sh:targetClass cdi:WideDataStructure .
 
 cdifd:cdifDataStructure_inlineStructureShape a sh:NodeShape ;
-    sh:sparql [ sh:message "A self-contained data-structure description must define the structure inline: a distribution's cdi:isStructuredBy must carry cdi:has_DataStructureComponent, not be a bare @id reference." ;
+    sh:sparql [ sh:message "A distribution's cdi:isStructuredBy must resolve to a structure that carries cdi:has_DataStructureComponent. The components may be written inline or on a node identified by @id elsewhere in the same document -- in RDF both denote the same node, and this rule is satisfied either way. What it rejects is a reference to a structure that is never defined." ;
             sh:select """
 			SELECT $this WHERE {
 				$this <http://schema.org/distribution> ?dist .
@@ -1032,20 +1032,20 @@ cdifd:generatedByNode a sh:NodeShape ;
             sh:path prov:used ;
             sh:severity sh:Warning ] ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-      PREFIX schema: <http://schema.org/>\r
-      PREFIX prov: <http://www.w3.org/ns/prov#>\r
-      SELECT DISTINCT ?this\r
-        WHERE {\r
-        ?this a prov:Activity .\r
-        {\r
-          ?this schema:name "example generated by" .\r
-          FILTER NOT EXISTS { ?s ?p ?this . }\r
-        }\r
-        Union\r
-        {\r
-          ?s prov:wasGeneratedBy ?this .\r
-        }\r
+            sh:select """
+      PREFIX schema: <http://schema.org/>
+      PREFIX prov: <http://www.w3.org/ns/prov#>
+      SELECT DISTINCT ?this
+        WHERE {
+        ?this a prov:Activity .
+        {
+          ?this schema:name "example generated by" .
+          FILTER NOT EXISTS { ?s ?p ?this . }
+        }
+        Union
+        {
+          ?s prov:wasGeneratedBy ?this .
+        }
       }""" ] .
 
 cdifd:instrumentNode a sh:NodeShape ;
@@ -1088,12 +1088,12 @@ cdifd:instrumentNode a sh:NodeShape ;
             sh:path schema:contributor ;
             sh:severity sh:Info ] ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-      PREFIX schema: <http://schema.org/>\r
-      SELECT DISTINCT ?this\r
-        WHERE {\r
-          ?s schema:instrument ?this .\r
-          FILTER (isIRI(?this) || isBlank(?this))\r
+            sh:select """
+      PREFIX schema: <http://schema.org/>
+      SELECT DISTINCT ?this
+        WHERE {
+          ?s schema:instrument ?this .
+          FILTER (isIRI(?this) || isBlank(?this))
           }""" ] .
 
 cdifd:maintainerOrProviderContactPointShape a sh:NodeShape ;
@@ -1103,14 +1103,14 @@ cdifd:maintainerOrProviderContactPointShape a sh:NodeShape ;
             sh:path schema:contactPoint ;
             sh:severity sh:Warning ] ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-            PREFIX schema: <http://schema.org/>\r
-            SELECT ?this WHERE {\r
-                { ?record schema:maintainer ?this . }\r
-                UNION\r
-                { ?record schema:provider ?this . }\r
-                ?this a schema:Person .\r
-            }\r
+            sh:select """
+            PREFIX schema: <http://schema.org/>
+            SELECT ?this WHERE {
+                { ?record schema:maintainer ?this . }
+                UNION
+                { ?record schema:provider ?this . }
+                ?this a schema:Person .
+            }
         """ ] .
 
 cdifd:physicalMappingShape a sh:NodeShape ;
@@ -1140,20 +1140,20 @@ cdifd:qualityMeasurementNode a sh:NodeShape ;
             sh:or ( [ sh:datatype xsd:string ] [ sh:class schema:DefinedTerm ] ) ;
             sh:path dqv:value ] ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-      PREFIX schema: <http://schema.org/>\r
-      PREFIX dqv: <http://www.w3.org/ns/dqv#>\r
-      SELECT DISTINCT ?this\r
-        WHERE {\r
-        ?this a dqv:QualityMeasurement .\r
-        {\r
-          ?this schema:name "example additional property" .\r
-          FILTER NOT EXISTS { ?s ?p ?this . }\r
-        }\r
-        Union\r
-        {\r
-          ?s schema:additionalProperty ?this .\r
-        }\r
+            sh:select """
+      PREFIX schema: <http://schema.org/>
+      PREFIX dqv: <http://www.w3.org/ns/dqv#>
+      SELECT DISTINCT ?this
+        WHERE {
+        ?this a dqv:QualityMeasurement .
+        {
+          ?this schema:name "example additional property" .
+          FILTER NOT EXISTS { ?s ?p ?this . }
+        }
+        Union
+        {
+          ?s schema:additionalProperty ?this .
+        }
       }""" ] ;
     sh:targetClass dqv:QualityMeasurement .
 
@@ -1249,7 +1249,7 @@ cdifd:xasFacilityNode a sh:NodeShape ;
       SELECT DISTINCT ?this
         WHERE {
           ?this a schema:Place .
-          ?this schema:additionalType "xas:facility" .
+          ?this schema:additionalType xas:facility .
           }""" ] .
 
 cdifd:xasGeneratedByNode a sh:NodeShape ;
@@ -1297,11 +1297,11 @@ cdifd:xasSampleNode a sh:NodeShape ;
             sh:minLength 3 ;
             sh:path schema:name ] ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-      PREFIX schema: <http://schema.org/>\r
-      SELECT DISTINCT ?this\r
-        WHERE {\r
-          ?this schema:additionalType "MaterialSample".\r
+            sh:select """
+      PREFIX schema: <http://schema.org/>
+      SELECT DISTINCT ?this
+        WHERE {
+          ?this schema:additionalType <https://w3id.org/isample/vocabulary/materialsampleobjecttype/materialsample> .
           }""" ] .
 
 <https://cdif.org/validation/0.1/skos#ConceptShape> a sh:NodeShape ;
@@ -1312,12 +1312,12 @@ cdifd:xasSampleNode a sh:NodeShape ;
 
 <https://cdif.org/validation/0.1/skos#conceptBroaderNotSelfShape> a sh:NodeShape ;
     sh:sparql [ sh:message "A Concept must not declare itself as skos:broader (reflexive hierarchy)." ;
-            sh:select """\r
-            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\r
-            SELECT $this\r
-            WHERE {\r
-                $this skos:broader $this .\r
-            }\r
+            sh:select """
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT $this
+            WHERE {
+                $this skos:broader $this .
+            }
         """ ] ;
     sh:targetClass skos:Concept .
 
@@ -1361,25 +1361,25 @@ cdifd:CDIFDefinedTermShape a sh:NodeShape ;
             sh:path schema:termCode ;
             sh:severity sh:Info ] ;
     sh:target [ a sh:SPARQLTarget ;
-            sh:select """\r
-      PREFIX schema: <http://schema.org/>\r
-      SELECT DISTINCT ?this\r
-        WHERE {\r
-        ?this a schema:DefinedTerm .\r
-        {\r
-          ?this schema:name "example defined term" .\r
-          FILTER NOT EXISTS { ?s ?p ?this . }\r
-        }\r
-        Union\r
-        {\r
-         VALUES ?p {\r
-            schema:linkRelationship\r
-            schema:measurementTechnique\r
-            schema:keywords\r
-            schema:name\r
-          }\r
-         ?s ?p ?this .\r
-        }\r
+            sh:select """
+      PREFIX schema: <http://schema.org/>
+      SELECT DISTINCT ?this
+        WHERE {
+        ?this a schema:DefinedTerm .
+        {
+          ?this schema:name "example defined term" .
+          FILTER NOT EXISTS { ?s ?p ?this . }
+        }
+        Union
+        {
+         VALUES ?p {
+            schema:linkRelationship
+            schema:measurementTechnique
+            schema:keywords
+            schema:name
+          }
+         ?s ?p ?this .
+        }
       }""" ] .
 
 cdifd:accessProperty a sh:PropertyShape ;
