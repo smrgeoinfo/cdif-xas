@@ -2,7 +2,7 @@
 
 **To:** Deirdre, Slava
 **From:** Stephen Richard (smrgeoinfo)
-**About:** `cdif-xas-UKDS` and `usgin/cdifnexmetadata`
+**About:** `cdif-xas-UKDS` and `CDIF-4-XAS/cdifnexmetadata`
 
 ## What this is not
 
@@ -21,7 +21,7 @@ without touching either.
 Two pipelines now produce CDIF-XAS from the same 55 XDI files. Both
 validate 55/55 against the `xasDocument` composite.
 
-| | `cdif-xas-UKDS` | `usgin/cdifnexmetadata` |
+| | `cdif-xas-UKDS` | `CDIF-4-XAS/cdifnexmetadata` |
 |---|---|---|
 | Input formats | XDI | XDI **and** NeXus/HDF5 |
 | Intermediate keys | `cdi:Facility_name` | `cdifxas:facility` |
@@ -522,7 +522,7 @@ I am happy to write that spike.
 
 ## References
 
-- `usgin/cdifnexmetadata` — `DESIGN.md`, `STATUS.md`
+- `CDIF-4-XAS/cdifnexmetadata` — `DESIGN.md`, `STATUS.md`
 - `XAS-CDIF/exampleMetadata-cdifnexmetadata/README.md` — both pipelines'
   output over the same 55 files, with the differences characterised
 - `cdif-xas-UKDS/UPLIFT-INSTRUCTIONS.md` — the CDIF 1.1 uplift already

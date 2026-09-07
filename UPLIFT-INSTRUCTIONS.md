@@ -126,7 +126,7 @@ recorded whether or not anyone has named its concept, and saying nothing
 at all would be indistinguishable from a column nobody looked at.
 
 **Where this leaves the two implementations.** Over the same 55 XDI
-files, this pipeline and `usgin/cdifnexmetadata` agree on the top-level
+files, this pipeline and `CDIF-4-XAS/cdifnexmetadata` agree on the top-level
 property set, the variable count per file, the document shape, the set
 of concepts carried by the variables, the units, the physical-mapping
 subclass, the measured field widths, the sample temperature and the
