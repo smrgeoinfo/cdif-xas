@@ -331,7 +331,7 @@ Refresh from the current mBB build. Either:
 - **Or swap to the XAS document profile schema** by replacing the
   bundled file with
   `C:\GithubC\CDIF\XAS-CDIF\release\cdifXASDocumentStructuredSchema.json`
-  (from the `cdifxasRelease` branch of XAS-CDIF). This is what a
+  (from the `cdifxasRelease1.1` branch of XAS-CDIF). This is what a
   conformant XAS document actually validates against.
 
 If you swap: `Mapper.py:validate` also needs to point at the new schema
@@ -432,7 +432,7 @@ pyshacl -s xasDocumentRules.shacl -f table \
     -df json-ld resources/cdif_dds_framed.jsonld
 ```
 
-(SHACL rules file lives in the `cdifxasRelease` branch of XAS-CDIF at
+(SHACL rules file lives in the `cdifxasRelease1.1` branch of XAS-CDIF at
 `release/xasDocumentRules.shacl`, or in mBB at
 `_sources/profiles/cdifCompositeProfile/xasDocument/rules.shacl`.)
 

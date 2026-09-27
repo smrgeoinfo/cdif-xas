@@ -47,7 +47,7 @@ SHACL are bundled at
 The pipeline never hard-fails on missing metadata. Seven coordinated
 strategies keep validation green when the source is thin. Verified
 37/37 fully valid on the XAS-CDIF/exampleData corpus (JSON Schema +
-SHACL against the smrgeoinfo/XAS-CDIF@cdifxasRelease release/
+SHACL against the smrgeoinfo/XAS-CDIF@cdifxasRelease1.1 release/
 artifacts).
 
 **Sentinel-value conventions used throughout:**
