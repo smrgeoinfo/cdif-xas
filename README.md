@@ -217,9 +217,9 @@ xasCore + xasOptional). Regenerate them from the release:
 
 ```bash
 curl -sL -o resources/cdifXASDocumentResolvedSchema.json \
-    https://raw.githubusercontent.com/smrgeoinfo/XAS-CDIF/cdifxasRelease1.1/release/cdifXASDocumentResolvedSchema.json
+    https://raw.githubusercontent.com/CDIF-4-XAS/XAS-CDIF/cdifxasRelease1.1/release/cdifXASDocumentResolvedSchema.json
 curl -sL -o resources/xasDocumentRules.shacl \
-    https://raw.githubusercontent.com/smrgeoinfo/XAS-CDIF/cdifxasRelease1.1/release/xasDocumentRules.shacl
+    https://raw.githubusercontent.com/CDIF-4-XAS/XAS-CDIF/cdifxasRelease1.1/release/xasDocumentRules.shacl
 ```
 
 Validate a framed output:

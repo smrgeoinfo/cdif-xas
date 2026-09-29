@@ -172,11 +172,11 @@ document-level composite of six profiles:
 
 - **Implementation Guide** (single source of truth for what the profile
   requires):
-  <https://github.com/smrgeoinfo/XAS-CDIF/blob/cdifxasRelease1.1/release/CDIFXASDocumentImplementationGuide.md>
+  <https://github.com/CDIF-4-XAS/XAS-CDIF/blob/cdifxasRelease1.1/release/CDIFXASDocumentImplementationGuide.md>
 - **Resolved JSON Schema** (Draft 2020-12, fully inlined):
-  <https://github.com/smrgeoinfo/XAS-CDIF/raw/cdifxasRelease1.1/release/cdifXASDocumentResolvedSchema.json>
+  <https://github.com/CDIF-4-XAS/XAS-CDIF/raw/cdifxasRelease1.1/release/cdifXASDocumentResolvedSchema.json>
 - **Aggregated SHACL rules** (all six components):
-  <https://github.com/smrgeoinfo/XAS-CDIF/raw/cdifxasRelease1.1/release/xasDocumentRules.shacl>
+  <https://github.com/CDIF-4-XAS/XAS-CDIF/raw/cdifxasRelease1.1/release/xasDocumentRules.shacl>
 - **Reference example** — this repository's own `cdif_dds_framed.jsonld`
   after uplift and adaptation:
   <https://github.com/Cross-Domain-Interoperability-Framework/metadataBuildingBlocks/raw/main/_sources/profiles/cdifCompositeProfile/xasDocument/example_dds_framed.json>
@@ -575,7 +575,7 @@ picks up the SHACL rule fix and URI-serialization policy changes.
 **Option B** — swap for the xasDocument profile schema:
 ```
 curl -o resources/cdifXASDocumentResolvedSchema.json \
-    https://github.com/smrgeoinfo/XAS-CDIF/raw/cdifxasRelease1.1/release/cdifXASDocumentResolvedSchema.json
+    https://github.com/CDIF-4-XAS/XAS-CDIF/raw/cdifxasRelease1.1/release/cdifXASDocumentResolvedSchema.json
 ```
 Then update `api/Mapper.py` line 26:
 ```
@@ -608,7 +608,7 @@ Frame update (Option B only): download the XAS document frame if you
 want the output structure to include the XAS-specific slots:
 ```
 curl -o resources/cdifXASDocument-frame.jsonld \
-    https://github.com/smrgeoinfo/XAS-CDIF/raw/cdifxasRelease1.1/release/cdifXASDocument-frame.jsonld
+    https://github.com/CDIF-4-XAS/XAS-CDIF/raw/cdifxasRelease1.1/release/cdifXASDocument-frame.jsonld
 ```
 And update `DDS_FRAME_PATH` in `api/Mapper.py`.
 
@@ -1058,7 +1058,7 @@ for e in errs[:10]:
 ```bash
 pip install pyshacl
 curl -o /tmp/xasDocumentRules.shacl \
-    https://github.com/smrgeoinfo/XAS-CDIF/raw/cdifxasRelease1.1/release/xasDocumentRules.shacl
+    https://github.com/CDIF-4-XAS/XAS-CDIF/raw/cdifxasRelease1.1/release/xasDocumentRules.shacl
 pyshacl -s /tmp/xasDocumentRules.shacl -f table \
     -df json-ld resources/cdif_dds_framed.jsonld
 ```
