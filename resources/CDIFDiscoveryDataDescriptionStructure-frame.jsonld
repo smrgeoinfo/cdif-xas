@@ -480,7 +480,7 @@
       "cdi:statistic": {
         "@embed": "@always"
       },
-      "cdi:typeOfStatistic": {
+      "cdif:typeOfStatistic": {
         "@embed": "@always"
       },
       "cdi:hasWeight": {
@@ -497,7 +497,7 @@
         "cdi:statistic": {
           "@embed": "@always"
         },
-        "cdi:typeOfStatistic": {
+        "cdif:typeOfStatistic": {
           "@embed": "@always"
         },
         "cdi:hasWeight": {
@@ -508,7 +508,7 @@
     "cdi:statistic": {
       "@embed": "@always"
     },
-    "cdi:typeOfStatistic": {
+    "cdif:typeOfStatistic": {
       "@embed": "@always"
     },
     "cdi:hasWeight": {
@@ -555,19 +555,19 @@
     "cdif:isDescribedBy_StatisticsCollection": {
       "@embed": "@always"
     },
-    "cdi:function": {
+    "cdif:function": {
       "@embed": "@always"
     },
-    "cdi:platformType": {
+    "cdif:platformType": {
       "@embed": "@always"
     },
     "cdi:source": {
       "@embed": "@always"
     },
-    "cdi:hasIntendedDataType": {
+    "cdif:hasIntendedDataType": {
       "@embed": "@always"
     },
-    "cdi:describedUnitOfMeasure": {
+    "cdif:describedUnitOfMeasure": {
       "@embed": "@always"
     }
   },
