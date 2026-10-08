@@ -13,6 +13,7 @@
 @prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
 @prefix doi: <https://doi.org/> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix wd: <https://www.wikidata.org/entity/> .
 @base <https://example.org/> .
 
 <#TriplesMap_root> a rml:TriplesMap;
@@ -349,13 +350,6 @@
         rr:predicate dcterms:conformsTo ;
         rr:objectMap [
             rr:constant <https://w3id.org/cdif/xasCore/1.0> ;
-            rr:termType rr:IRI
-        ]
-    ] ;
-  rr:predicateObjectMap [
-        rr:predicate dcterms:conformsTo ;
-        rr:objectMap [
-            rr:constant <https://w3id.org/cdif/xasOptional/1.0> ;
             rr:termType rr:IRI
         ]
     ] ;
@@ -1034,13 +1028,22 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
-      rr:class schema:Thing, schema:Product;
+      rr:class schema:Thing, schema:Product, prov:Entity;
       rr:template "_:source_instrument"
     ] ;
   rr:predicateObjectMap [
     rr:predicate schema:additionalType;
     rr:objectMap [
       rr:constant xas:source ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  # Scientific instrument: xasInstrument requires wd:Q3099911 alongside the
+  # domain type on every peer instrument.
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant wd:Q3099911 ;
       rr:termType rr:IRI
     ]
   ] ;
@@ -1128,13 +1131,22 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
-      rr:class schema:Thing, schema:Product;
+      rr:class schema:Thing, schema:Product, prov:Entity;
       rr:template "_:beamline"
     ] ;
   rr:predicateObjectMap [
     rr:predicate schema:additionalType;
     rr:objectMap [
       rr:constant xas:beamline ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  # Scientific instrument: xasInstrument requires wd:Q3099911 alongside the
+  # domain type on every peer instrument.
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant wd:Q3099911 ;
       rr:termType rr:IRI
     ]
   ] ;
@@ -1319,13 +1331,22 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
-      rr:class schema:Thing, schema:Product;
+      rr:class schema:Thing, schema:Product, prov:Entity;
       rr:template "_:mono"
     ] ;
   rr:predicateObjectMap [
     rr:predicate schema:additionalType;
     rr:objectMap [
       rr:constant xas:xraymonochromator ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  # Scientific instrument: xasInstrument requires wd:Q3099911 alongside the
+  # domain type on every peer instrument.
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant wd:Q3099911 ;
       rr:termType rr:IRI
     ]
   ] ;
@@ -1529,13 +1550,22 @@
     ];
   rml:subjectMap [
       rr:termType rr:BlankNode;
-      rr:class schema:Thing, schema:Product;
+      rr:class schema:Thing, schema:Product, prov:Entity;
       rr:template "_:detector"
     ] ;
   rr:predicateObjectMap [
     rr:predicate schema:additionalType;
     rr:objectMap [
       rr:constant xas:xraymonitor ;
+      rr:termType rr:IRI
+    ]
+  ] ;
+  # Scientific instrument: xasInstrument requires wd:Q3099911 alongside the
+  # domain type on every peer instrument.
+  rr:predicateObjectMap [
+    rr:predicate schema:additionalType;
+    rr:objectMap [
+      rr:constant wd:Q3099911 ;
       rr:termType rr:IRI
     ]
   ] ;

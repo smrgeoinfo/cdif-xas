@@ -45,6 +45,8 @@ ARRAY_PROPERTIES = [
     'schema:query-input',
     'schema:participant',
     'schema:additionalProperty',
+    # The XAS profile pins prov:used's schema:instrument wrapper to an array.
+    'schema:instrument',
     # PROV properties
     'prov:wasGeneratedBy',
     'prov:wasDerivedFrom',
@@ -265,6 +267,15 @@ def remove_nulls_and_normalize(obj, parent_key=None):
         if alt is not None:
             if is_var_or_place and not isinstance(alt, list):
                 result['schema:alternateName'] = [alt]
+
+        # schema:identifier is an array on an instrument, where the schema pins
+        # schema:instrument/items/properties/schema:identifier to type: array.
+        # Keyed off the parent property, not ARRAY_PROPERTIES, because on a
+        # Person/Organization the same property is a single value.
+        if parent_key == 'schema:instrument':
+            ident = result.get('schema:identifier')
+            if ident is not None and not isinstance(ident, list):
+                result['schema:identifier'] = [ident]
 
         return result
 
