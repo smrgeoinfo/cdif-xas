@@ -117,13 +117,13 @@ def build_placeholder_dataset(url: str,
     # TriplesMap_dv_creator_contributor) creates schema:Person blank nodes
     # keyed to the DV @id pattern and reads $['schema:author']['schema:name']
     # for the name. Without an author here the Person is emitted with no
-    # schema:name and fails the base SHACL Person shape. Emit a sentinel
-    # 'unknown' so validation stays green and downstream consumers can
-    # tell the field is a placeholder.
+    # schema:name and fails the base SHACL Person shape. Emit the
+    # DataCite ":unav" sentinel so validation stays green and downstream
+    # consumers can tell the field is a placeholder.
     author = rdflib.BNode()
     g.add((ds, SCHEMA_NS.author, author))
     g.add((author, rdflib.RDF.type, SCHEMA_NS.Person))
-    g.add((author, SCHEMA_NS.name, rdflib.Literal("Missing")))
+    g.add((author, SCHEMA_NS.name, rdflib.Literal(":unav")))
 
     # Dates from file mtime, ISO 8601 date-only. Typed as schema:Date so
     # the JSON-LD serialization carries a {"@type": "schema:Date",

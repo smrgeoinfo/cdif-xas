@@ -145,6 +145,25 @@ def _normalize_temperature(value: str) -> tuple[str, Optional[str]]:
     return raw, None
 
 
+# The xasSample SHACL shape requires a sample name of at least 3
+# characters, and XDI files often name a foil by its element alone
+# ("Cu", "Au", "Pb" -- 9 of the 55 reference files).
+_MIN_SAMPLE_NAME = 3
+
+
+def _normalize_sample_name(value: str) -> tuple[str, Optional[str]]:
+    """Return (value, note).
+
+    A name shorter than the profile allows gets " sample" appended, with
+    a note recording what the file said, so the padding is never taken
+    for the file's own wording. Anything else is returned unchanged.
+    """
+    raw = (value or "").strip()
+    if raw and len(raw) < _MIN_SAMPLE_NAME:
+        return f"{raw} sample", f'sample name reported as "{raw}"'
+    return raw, None
+
+
 def _normalize_datetime(value: str) -> Optional[str]:
     """Try to parse a raw XDI datetime string and return ISO 8601.
 
@@ -333,6 +352,11 @@ class CDI_DDI:
                                 variable_value)
                             if note and note not in self.conversion_notes:
                                 self.conversion_notes.append(note)
+                        if compound_variable_name == "Sample.name":
+                            variable_value, note = _normalize_sample_name(
+                                variable_value)
+                            if note and note not in self.conversion_notes:
+                                self.conversion_notes.append(note)
                         if '.' in compound_variable_name:
                             compound_variable_name_uri = compound_variable_name.replace(" ", "_").replace(":", "_")
                             variables = compound_variable_name_uri.split('.')
@@ -504,6 +528,13 @@ def _from_mono_name(g, name_ns, skos_ns, part: str) -> Optional[str]:
     return None
 
 
+# The text placeholder for a value the file does not record: DataCite's
+# "value unavailable", the same token cdifnexmetadata writes, so both
+# converters state a gap the same way. URI-valued gaps use the OGC nil
+# IRI instead (NIL_MISSING in api/cdif.py).
+UNAV = ":unav"
+
+
 def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
                               skos_ns: "rdflib.Namespace") -> None:
     """Inject placeholder triples so the RML mapping can populate
@@ -512,7 +543,7 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
     real key is absent — real data from the XDI is never overwritten.
 
     Fallbacks currently emitted:
-      cdi:Mono has no cdi:Mono_d_spacing -> synthesize with value 'unknown'
+      cdi:Mono has no cdi:Mono_d_spacing -> synthesize with value UNAV
         (correct value depends on the crystal cut; the fallback keeps
         the schema:value predicate present so xasCore validates)
 
@@ -533,7 +564,7 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
     mono = URIRef(str(name_ns) + "Mono")
     if (mono, None, None) in g:
         if not _has_child(mono, "Mono_d_spacing"):
-            _synthesize_child(mono, "Mono_d_spacing", "unknown")
+            _synthesize_child(mono, "Mono_d_spacing", UNAV)
         # The reflection plane is inside Mono.name -- XDI writes "Si(311)"
         # for what CDIF keeps as crystal type and reflection separately.
         # The RML mapping used to emit a constant "1,1,1" for every file,
@@ -545,7 +576,7 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
             _synthesize_child(
                 mono, "Mono_reflection",
                 _from_mono_name(g, name_ns, skos_ns, "reflection")
-                or "unknown")
+                or UNAV)
         # The crystal material is the other half of Mono.name. The
         # mapping used to emit a constant "Si", which is right for every
         # file in this corpus and wrong for the first Ge(220) that shows
@@ -555,7 +586,7 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
             _synthesize_child(
                 mono, "Mono_crystal",
                 _from_mono_name(g, name_ns, skos_ns, "material")
-                or "unknown")
+                or UNAV)
 
     # Detection mode. TriplesMap_nexus emitted a constant "Transmission"
     # for every file, which is wrong for any fluorescence measurement --
@@ -568,7 +599,7 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
     if not _has_child(scan, "Scan_mode"):
         _synthesize_child(
             scan, "Scan_mode",
-            _detection_mode(g, name_ns, skos_ns) or "unknown")
+            _detection_mode(g, name_ns, skos_ns) or UNAV)
 
     # Beamline / Facility schema:name are required by the xasDocument
     # profile (JSON Schema for the beamline peer instrument, SHACL
@@ -576,7 +607,7 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
     # cdi:*_name key is absent from the SKOS graph — either because the
     # XDI header is missing OR because it was written in a non-canonical
     # case (e.g. `Facility.Name` with capital N never populates
-    # `cdi:Facility_name`) — synthesize a "missing" sentinel so the RML
+    # `cdi:Facility_name`) — synthesize the UNAV sentinel so the RML
     # mapping's schema:name lookup finds a value.
     for parent_local, child_local in (
         ("Beamline", "Beamline_name"),
@@ -584,7 +615,7 @@ def _add_xas_fallback_triples(g: "rdflib.Graph", name_ns: "rdflib.Namespace",
     ):
         parent = URIRef(str(name_ns) + parent_local)
         if (parent, None, None) in g and not _has_child(parent, child_local):
-            _synthesize_child(parent, child_local, "missing")
+            _synthesize_child(parent, child_local, UNAV)
 
 
 def _append_conversion_notes(graph, notes) -> None:
@@ -678,7 +709,17 @@ def generate_cdi(source_url: str, resources_dir: Optional[str], dataset_type: Op
     # citation-URL @id shape.
     _SCHEMA = rdflib.Namespace("http://schema.org/")
     _CDIF = rdflib.Namespace("https://w3id.org/cdif/")
+    # Fixed-width or not, from the widths measured while reading the data
+    # rows: fixed only when every column's minimum and maximum agree. Read
+    # by the mapping for cdi:isFixedWidth and cdi:isDelimited, which were
+    # constants (true, false) and wrong for 35 of the 55 reference files.
+    widths = generator.column_widths.values()
+    fixed = bool(widths) and all(low == high for low, high in widths)
     for ds_subj in set(cdi_graph.subjects(rdflib.RDF.type, _SCHEMA.Dataset)):
         cdi_graph.add((ds_subj, _CDIF.isDatasetRecord, rdflib.Literal("yes")))
+        cdi_graph.add((ds_subj, _CDIF.measuredIsFixedWidth,
+                       rdflib.Literal("true" if fixed else "false")))
+        cdi_graph.add((ds_subj, _CDIF.measuredIsDelimited,
+                       rdflib.Literal("false" if fixed else "true")))
 
     return cdi_graph

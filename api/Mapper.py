@@ -103,7 +103,7 @@ def _drop_incomplete_additional_properties(node):
     Real cases where the sub-TriplesMap should keep firing but the
     source value is legitimately absent (Mono.d_spacing on B18) are
     handled by placeholder injection in api/cdi.py, so those items
-    have a real (if 'unknown') value and pass this filter.
+    have a real (if ":unav") value and pass this filter.
     """
     if isinstance(node, dict):
         aps = node.get("schema:additionalProperty")
@@ -148,19 +148,19 @@ def _ensure_person_has_name_or_identifier(node):
     Where our current mapping falls short: TriplesMap_dv_creator reads
     the Person's schema:name from $['schema:author']['schema:name'] on
     the Dataset. In local mode api/local_input.py always emits that
-    value (as "unknown" placeholder). In Dataverse mode it depends on
+    value (as the ":unav" placeholder). In Dataverse mode it depends on
     the exported schema:author carrying schema:name — if it doesn't,
     the framed Person has neither name nor identifier and fails SHACL.
 
     General safety net rather than a fix for one known site. Any
     @type-includes-schema:Person node without schema:name AND without
-    schema:identifier gets schema:name = "unknown" injected. Real data
+    schema:identifier gets schema:name = ":unav" injected. Real data
     is never overwritten.
     """
     if isinstance(node, dict):
         if _has_type(node.get("@type"), "schema:Person"):
             if not node.get("schema:name") and not node.get("schema:identifier"):
-                node["schema:name"] = "Missing"
+                node["schema:name"] = ":unav"
         for v in node.values():
             _ensure_person_has_name_or_identifier(v)
     elif isinstance(node, list):
@@ -174,14 +174,13 @@ def _ensure_organization_has_name_or_identifier(node):
     in _sources/schemaorgProperties/organization/rules.shacl) — an
     sh:or of (schema:identifier) or (schema:name).
 
-    Sentinel: schema:name = "Missing" (per user directive; distinct
-    from Person's "unknown" to signal the two came from different
-    source paths).
+    Sentinel: schema:name = ":unav", DataCite's "value unavailable",
+    the same placeholder cdifnexmetadata writes.
     """
     if isinstance(node, dict):
         if _has_type(node.get("@type"), "schema:Organization"):
             if not node.get("schema:name") and not node.get("schema:identifier"):
-                node["schema:name"] = "Missing"
+                node["schema:name"] = ":unav"
         for v in node.values():
             _ensure_organization_has_name_or_identifier(v)
     elif isinstance(node, list):
