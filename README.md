@@ -211,7 +211,7 @@ with the file. See `AGENTS.md` for the full account, and
 
 Bundled artifacts (`resources/cdifXASDocumentResolvedSchema.json` and
 `resources/xasDocumentRules.shacl`) target the CDIF XAS document
-profile at `https://w3id.org/cdif/xasDocument/1.0` — the six-profile
+profile at `https://w3id.org/cdif/xasDocument/1.1` — the six-profile
 composite (core + discovery + data_description + data_structure +
 xasCore + xasOptional). Regenerate them from the release:
 

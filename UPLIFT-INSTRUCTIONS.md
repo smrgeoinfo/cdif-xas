@@ -1,4 +1,4 @@
-# Uplift `cdif-xas-UKDS` output to CDIF `xasDocument/1.0`
+# Uplift `cdif-xas-UKDS` output to CDIF `xasDocument/1.1`
 
 > **For Deirdre.** Drop this file into your Claude Code session in the
 > `cdif-xas-UKDS` repository root and ask Claude to work through the
@@ -11,7 +11,7 @@
 
 Sixteen tasks. Together they take the pipeline's output from *a CDIF
 document that mentions XAS* to *a document that validates as
-`cdif/xasDocument/1.0`*. Four groups, and they do different kinds of work:
+`cdif/xasDocument/1.1`*. Four groups, and they do different kinds of work:
 
 **Naming and identity — Tasks 1, 2, 4** *(mechanical)*
 The `xas:` prefix moves from the Astromat namespace to
@@ -51,7 +51,7 @@ predates them.
 
 ### What "done" looks like
 
-A document that passes both gates against the `xasDocument/1.0` release
+A document that passes both gates against the `xasDocument/1.1` release
 bundle: **0 JSON Schema errors and 0 SHACL violations**. The seven examples
 in `XAS-CDIF/release/examples/` are the worked reference — as of 2026-08-25
 all seven pass both, including the five UKDS-derived ones, which needed
@@ -156,7 +156,7 @@ output does **not** satisfy the current CDIF XAS document profile,
 which requires two additional XAS-specific conformance tiers plus
 several XAS-mandatory content items.
 
-The target profile is `https://w3id.org/cdif/xasDocument/1.0` — a
+The target profile is `https://w3id.org/cdif/xasDocument/1.1` — a
 document-level composite of six profiles:
 
 | Component | URI | Role |
@@ -165,8 +165,8 @@ document-level composite of six profiles:
 | CDIF Discovery | `https://w3id.org/cdif/discovery/1.1` | optional discovery |
 | CDIF Data Description | `https://w3id.org/cdif/data_description/1.1` | measured variables |
 | CDIF Data Structure | `https://w3id.org/cdif/data_structure/1.1` | physical/tabular structure |
-| XAS Core | `https://w3id.org/cdif/xasCore/1.0` | XAS-mandatory instrument + sample + technique |
-| XAS Optional | `https://w3id.org/cdif/xasOptional/1.0` | XAS-recommended vocabularies |
+| XAS Core | `https://w3id.org/cdif/xasCore/1.1` | XAS-mandatory instrument + sample + technique |
+| XAS Optional | `https://w3id.org/cdif/xasOptional/1.1` | XAS-recommended vocabularies |
 
 ## Reference files (all URLs live)
 
@@ -275,8 +275,8 @@ of the four CDIF URIs, change the `rr:constant`, and duplicate.
 
 Values to add:
 ```
-https://w3id.org/cdif/xasCore/1.0
-https://w3id.org/cdif/xasOptional/1.0
+https://w3id.org/cdif/xasCore/1.1
+https://w3id.org/cdif/xasOptional/1.1
 ```
 
 Order in the array doesn't matter semantically but the reference
@@ -286,7 +286,7 @@ example uses discovery/1.1 first, xas tiers last.
 
 ## Task 4 — Enforce the JSON-LD `@id`-form policy on `additionalType` and `propertyID` (mechanical)
 
-The current `xasDocument/1.0` SHACL enforces a semantic-clarity rule:
+The current `xasDocument/1.1` SHACL enforces a semantic-clarity rule:
 any URI or CURIE (`scheme:localname`) value on `schema:propertyID` or
 `schema:additionalType` MUST be serialized as a JSON-LD IRI reference
 (`{"@id": "..."}`), not as a bare string literal. String literals that

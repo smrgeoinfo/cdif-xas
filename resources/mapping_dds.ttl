@@ -349,7 +349,7 @@
   rr:predicateObjectMap [
         rr:predicate dcterms:conformsTo ;
         rr:objectMap [
-            rr:constant <https://w3id.org/cdif/xasCore/1.0> ;
+            rr:constant <https://w3id.org/cdif/xasCore/1.1> ;
             rr:termType rr:IRI
         ]
     ] ;

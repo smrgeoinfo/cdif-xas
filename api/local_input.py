@@ -90,7 +90,7 @@ def build_placeholder_dataset(url: str,
     placeholder values.
 
     Merged into cdi_graph in api/cdi.py:generate_cdi when the input is a
-    local path. Fields chosen to satisfy the xasDocument/1.0 profile's
+    local path. Fields chosen to satisfy the xasDocument/1.1 profile's
     Core-tier minimum (identifier, name, dateModified, license, and
     either url or distribution).
     """

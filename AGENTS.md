@@ -21,7 +21,7 @@ into CDIF-XAS JSON-LD metadata. Two pipelines:
 `?write_skos=false`), so the two pipelines chain: `/cdif` prepares
 input for `/map`.
 
-Target profile: **`https://w3id.org/cdif/xasDocument/1.0`** — a
+Target profile: **`https://w3id.org/cdif/xasDocument/1.1`** — a
 six-profile composite (core + discovery + data_description +
 data_structure + xasCore + xasOptional). Resolved schema and aggregated
 SHACL are bundled at
@@ -34,7 +34,7 @@ SHACL are bundled at
   intent.
 - **`local-xdi-input`** — active development branch adding local XDI
   file input (via `file://` or absolute paths), placeholder Dataverse
-  metadata, portable path resolution for `rmlmapper`, xasDocument/1.0
+  metadata, portable path resolution for `rmlmapper`, xasDocument/1.1
   uplift of the RML mapping, and XDI pre-validation. See
   [`UPLIFT-INSTRUCTIONS.md`](./UPLIFT-INSTRUCTIONS.md) on the
   `analysis-uplift-to-xasdocument` branch for the plan.
