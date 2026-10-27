@@ -13,7 +13,7 @@ No Docker and no Dataverse needed. Requires Python 3.13 (pinned in
 git clone https://github.com/smrgeoinfo/cdif-xas
 cd cdif-xas
 uv sync
-git clone https://github.com/CDIF-4-XAS/XAS-CDIF -b cdifxasRelease1.1 ../XAS-CDIF
+git clone https://github.com/CDIF-4-XAS/XAS-CDIF ../XAS-CDIF
 ```
 
 Convert all 55 XDI files, then validate them against the profile:
@@ -217,9 +217,9 @@ xasCore + xasOptional). Regenerate them from the release:
 
 ```bash
 curl -sL -o resources/cdifXASDocumentResolvedSchema.json \
-    https://raw.githubusercontent.com/CDIF-4-XAS/XAS-CDIF/cdifxasRelease1.1/release/cdifXASDocumentResolvedSchema.json
+    https://raw.githubusercontent.com/CDIF-4-XAS/XAS-CDIF/main/release/cdifXASDocumentResolvedSchema.json
 curl -sL -o resources/xasDocumentRules.shacl \
-    https://raw.githubusercontent.com/CDIF-4-XAS/XAS-CDIF/cdifxasRelease1.1/release/xasDocumentRules.shacl
+    https://raw.githubusercontent.com/CDIF-4-XAS/XAS-CDIF/main/release/xasDocumentRules.shacl
 ```
 
 Validate a framed output:
