@@ -211,7 +211,7 @@ with the file. See `AGENTS.md` for the full account, and
 
 Bundled artifacts (`resources/cdifXASDocumentResolvedSchema.json` and
 `resources/xasDocumentRules.shacl`) target the CDIF XAS document
-profile at `https://w3id.org/cdif/xasDocument/1.1` — the six-profile
+profile at `https://w3id.org/cdif/xasDocument/1.2` — the six-profile
 composite (core + discovery + data_description + data_structure +
 xasCore + xasOptional). Regenerate them from the release:
 
@@ -245,8 +245,9 @@ pyshacl -s resources/xasDocumentRules.shacl -f table \
 **Uplift status.** This branch applies UPLIFT-INSTRUCTIONS.md tasks
 1–10 in full (mechanical: namespace rebind, v2 concept renames,
 `conformsTo` additions, `@id`-form policy, `xas:analysisevent` +
-`schema:Action`, bundled-schema refresh; editorial: peer `prov:used`
-instrument model, X-ray source wrapper with static defaults,
+`schema:Action`, bundled-schema refresh; editorial: peer instrument
+model (since 1.2 in `schema:instrument` on the activity, no longer
+`prov:used` wrappers), X-ray source wrapper with static defaults,
 MaterialSample sample block reading XDI `Sample.*` headers, DefinedTerm
 content enrichment for element edge/symbol, and the graceful-degradation
 strategies above). Confirmed end-to-end on both the committed

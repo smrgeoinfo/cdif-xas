@@ -21,7 +21,7 @@ into CDIF-XAS JSON-LD metadata. Two pipelines:
 `?write_skos=false`), so the two pipelines chain: `/cdif` prepares
 input for `/map`.
 
-Target profile: **`https://w3id.org/cdif/xasDocument/1.1`** — a
+Target profile: **`https://w3id.org/cdif/xasDocument/1.2`** — a
 six-profile composite (core + discovery + data_description +
 data_structure + xasCore + xasOptional). Resolved schema and aggregated
 SHACL are bundled at

@@ -1,5 +1,12 @@
 # Uplift `cdif-xas-UKDS` output to CDIF `xasDocument/1.1`
 
+> **Executed, and superseded in one respect.** These tasks were applied
+> for the 1.1 release and the file is kept as that record, so it still
+> says 1.1. Release 1.2 (2026-11) replaced Task 6's instrument model:
+> instruments now hang from the activity in `schema:instrument`, not in
+> one `prov:used` wrapper each. `resources/mapping_dds.ttl` emits the 1.2
+> shape and `xasCore/1.2`.
+
 > **For Deirdre.** Drop this file into your Claude Code session in the
 > `cdif-xas-UKDS` repository root and ask Claude to work through the
 > tasks in order. Every reference URL below dereferences to a live file;
