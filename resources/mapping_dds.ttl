@@ -349,7 +349,7 @@
   rr:predicateObjectMap [
         rr:predicate dcterms:conformsTo ;
         rr:objectMap [
-            rr:constant <https://w3id.org/cdif/xasCore/1.1> ;
+            rr:constant <https://w3id.org/cdif/xasCore/1.2> ;
             rr:termType rr:IRI
         ]
     ] ;
@@ -913,80 +913,20 @@
       rr:termType rr:IRI
     ]
   ] ;
-  # Peer prov:used instrument model per xasCore: one prov:used wrapper
-  # per instrument, each wrapper carrying a single schema:instrument.
+  # Instruments hang from the activity in schema:instrument (xasCore/1.2),
+  # one per instrument TriplesMap; 1.1 put each in a prov:used wrapper.
   rr:predicateObjectMap [
-    rr:predicate prov:used;
-    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_prov_used_source> ]
+    rr:predicate schema:instrument;
+    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_source> ]
   ] ;
-  rr:predicateObjectMap [
-    rr:predicate prov:used;
-    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_prov_used_beamline> ]
-  ] ;
-  rr:predicateObjectMap [
-    rr:predicate prov:used;
-    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_prov_used_mono> ]
-  ] ;
-  rr:predicateObjectMap [
-    rr:predicate prov:used;
-    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_prov_used_detector> ]
-  ] .
-
-# Four prov:used wrappers, one per instrument. Each is a blank-node
-# entity with a single schema:instrument predicate joining to the
-# instrument's TriplesMap.
-<#TriplesMap_prov_used_beamline> a rml:TriplesMap;
-  rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Beamline')]";
-      rml:referenceFormulation rml:JSONPath;
-      rml:source [ a rml:RelativePathSource;
-          rml:root rml:MappingDirectory;
-          rml:path "cdif_skos.json"
-        ]
-    ];
-  rml:subjectMap [
-      rr:termType rr:BlankNode;
-      rr:class prov:Entity, schema:Thing;
-      rr:template "_:prov_used_beamline"
-    ] ;
   rr:predicateObjectMap [
     rr:predicate schema:instrument;
     rr:objectMap [ rr:parentTriplesMap <#TriplesMap_beamline> ]
-  ] .
-
-<#TriplesMap_prov_used_mono> a rml:TriplesMap;
-  rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Mono')]";
-      rml:referenceFormulation rml:JSONPath;
-      rml:source [ a rml:RelativePathSource;
-          rml:root rml:MappingDirectory;
-          rml:path "cdif_skos.json"
-        ]
-    ];
-  rml:subjectMap [
-      rr:termType rr:BlankNode;
-      rr:class prov:Entity, schema:Thing;
-      rr:template "_:prov_used_mono"
-    ] ;
+  ] ;
   rr:predicateObjectMap [
     rr:predicate schema:instrument;
     rr:objectMap [ rr:parentTriplesMap <#TriplesMap_mono> ]
-  ] .
-
-<#TriplesMap_prov_used_detector> a rml:TriplesMap;
-  rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['@id'] == 'cdi:Detector')]";
-      rml:referenceFormulation rml:JSONPath;
-      rml:source [ a rml:RelativePathSource;
-          rml:root rml:MappingDirectory;
-          rml:path "cdif_skos.json"
-        ]
-    ];
-  rml:subjectMap [
-      rr:termType rr:BlankNode;
-      rr:class prov:Entity, schema:Thing;
-      rr:template "_:prov_used_detector"
-    ] ;
+  ] ;
   rr:predicateObjectMap [
     rr:predicate schema:instrument;
     rr:objectMap [ rr:parentTriplesMap <#TriplesMap_detector> ]
@@ -998,25 +938,6 @@
 # XDI carries Source.type or Source.probe fields, add
 # schema:additionalProperty entries that read them, mirroring the
 # beamline/mono/detector pattern.
-<#TriplesMap_prov_used_source> a rml:TriplesMap;
-  rml:logicalSource [ a rml:LogicalSource;
-      rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
-      rml:referenceFormulation rml:JSONPath;
-      rml:source [ a rml:RelativePathSource;
-          rml:root rml:MappingDirectory;
-          rml:path "cdif_skos.json"
-        ]
-    ];
-  rml:subjectMap [
-      rr:termType rr:BlankNode;
-      rr:class prov:Entity, schema:Thing;
-      rr:template "_:prov_used_source"
-    ] ;
-  rr:predicateObjectMap [
-    rr:predicate schema:instrument;
-    rr:objectMap [ rr:parentTriplesMap <#TriplesMap_source> ]
-  ] .
-
 <#TriplesMap_source> a rml:TriplesMap;
   rml:logicalSource [ a rml:LogicalSource;
       rml:iterator "$['@graph'][?(@['cdif:isDatasetRecord'] == 'yes')]";
